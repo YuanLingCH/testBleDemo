@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 手动点击更新后进入更新界面 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/space_30"
+    android:layout_marginRight="@dimen/space_30"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_45"
+        android:background="@drawable/blue_tl10_tr10dp"
+        android:gravity="center"
+        android:text="@string/version_update_new"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_16" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white_bl10_br10dp"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/space_10"
+        android:paddingLeft="@dimen/space_20"
+        android:paddingRight="@dimen/space_20"
+        android:paddingTop="@dimen/space_10" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_35"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/is_download_the_latest_version_please_later"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvDownloadProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/title_blue" />
+
+            <View style="@style/placeholder" />
+
+            <TextView
+                android:id="@+id/tvDownloadSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_gray" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/pbProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_13"
+            android:max="100"
+            android:progressDrawable="@drawable/pb_style"/>
+        
+        <Button 
+            android:id="@+id/btCancelUpdate"
+            android:background="@drawable/blue_5dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16"
+            android:text="@string/cancel_update"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_20"
+            android:layout_width="@dimen/space_143"
+            android:layout_height="@dimen/space_35"
+            />
+    </LinearLayout>
+
+</LinearLayout>

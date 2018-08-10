@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="286dp"
+    android:layout_height="377dp"
+    android:layout_centerInParent="true"
+    android:id="@+id/mmmmm"
+    android:background="#e0000000">
+
+    <LinearLayout
+        android:id="@+id/dialogseven_title"
+        android:layout_width="268dp"
+        android:layout_height="365dp"
+        android:background="@color/white"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+
+            >
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:id="@+id/rl_text"
+                >
+                <TextView
+                    android:id="@+id/dialog_seven_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="近七日价格详情"
+                    android:textSize="15dp"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/white"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(财富币)"
+                    android:textColor="@color/white"
+                    android:textSize="10dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/dialog_seven_tag"/>
+
+
+            </RelativeLayout>
+        </RelativeLayout>
+        <ListView
+            android:id="@+id/dialog_seven_listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_below="@+id/dialogseven_title"
+            android:scrollbars="none">
+        </ListView>
+
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/dialogseven_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@mipmap/icon"
+        android:layout_alignParentRight="true"
+        />
+</RelativeLayout>

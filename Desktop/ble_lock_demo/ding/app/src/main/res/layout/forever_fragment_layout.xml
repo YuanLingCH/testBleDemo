@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/backgroundjiemian"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <View
+        android:layout_marginTop="10dp"
+        android:background="#e8e8e8"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"/>
+    <TextView
+        android:textColor="#000"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:textSize="@dimen/butTextSize"
+        android:text=""
+        android:gravity="center"
+        android:background="#e8e8e8"
+        android:id="@+id/tv_pasw"
+        android:layout_width="120dp"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_marginTop="20dp"
+       android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:textColor="#ffffff"
+        android:background="@mipmap/login"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp"
+        android:text="生成密码"
+        android:id="@+id/but_send_pasw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

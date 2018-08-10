@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="切换账号"
+        android:id="@+id/seting_change_numbler"
+        app:showAsAction="never"
+        />
+
+    <item android:title="添加锁"
+        android:id="@+id/seting_add_admini"
+        app:showAsAction="never"
+        />
+
+
+</menu>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        android:id="@+id/ll"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:background="@color/backgroundjiemian"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:background="@color/backgroundtoolbar"
+            android:layout_width="match_parent"
+
+            android:layout_height="?attr/actionBarSize">
+            <TextView
+                android:id="@+id/tv_toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="房猪猪锁"
+                android:textSize="@dimen/title_bar" />
+        </android.support.v7.widget.Toolbar>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lock_list_rc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/iv"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@mipmap/addble"
+        android:layout_width="130dp"
+        android:layout_height="130dp" />
+    <TextView
+        android:id="@+id/tv_lock_list"
+        android:visibility="gone"
+        android:textSize="12sp"
+        android:textColor="#fff"
+        android:layout_gravity="center_horizontal"
+        android:text="点击添加锁"
+        android:layout_marginTop="120dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_lock_listone"
+      android:layout_gravity="center"
+        android:visibility="gone"
+        android:textSize="16sp"
+        android:text="添加锁时，手机必须在锁旁边"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</FrameLayout>
+
+
+
+    </LinearLayout>

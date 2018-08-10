@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:id="@+id/tv_toolbar"
+            android:layout_gravity="center"
+            android:text="设备"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+<Button
+    android:id="@+id/bleManager"
+    android:text="创建蓝牙管理员"
+    android:onClick="butClick"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/shengfenjiaoyan"
+        android:text="身份校验"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/fasongsuobiaoshi"
+        android:text="发送锁标识"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/xiugaimima"
+        android:text="修改密码"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/submit_mima"
+        android:text="确认修改密码"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/tongbushijian"
+        android:text="APP主动同步时间"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/dongjiekaisuo"
+        android:text="管理员冻结开锁"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/jiechulanyaguanliyuan"
+        android:text="解冻蓝牙管理员"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/jiedonglanya"
+        android:text="解冻用户ID"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/jiechu"
+        android:text="解除蓝牙管理员"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/addyongMeaaage"
+        android:text="添加用户信息有ID"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/setzuqifanwei"
+        android:text="设置租期范围"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/add_customPasswords"
+        android:text="添加自定义密码"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/deletyonghuMessage"
+        android:text="删除用户信息"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/obtain_user_meaaage"
+        android:text="获取所用用户信息"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/obtain_zuqifanwei"
+        android:text="获取租期范围"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/obtain_open_lock_recode"
+        android:text="获取开锁记录"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/obtain_open_lock_recode_userID"
+        android:text="获取ID开锁记录"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/obtain_open_lock_recode_time"
+        android:text="获取开锁时间"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/open_lock"
+        android:text="蓝牙开锁"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/open_lock_user"
+        android:text="用户ID开锁"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/delet_open_recode"
+        android:text="删除开锁记录"
+        android:onClick="butClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+
+</ScrollView>

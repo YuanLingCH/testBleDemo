@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">小叮智能</string>
+
+    <string name="cancle">取消</string>
+    <string name="title">请选择时间</string>
+    <string name="commit">确定</string>
+    <string name="year">年</string>
+    <string name="month">月</string>
+    <string name="day">日</string>
+    <string name="hour">时</string>
+    <string name="minute">分</string>
+
+    <string name="app_name1">日期选择控件</string>
+    <string name="select_date">选择日期</string>
+    <string name="current_date">当前日期</string>
+    <string name="select_time">选择时间</string>
+    <string name="current_time">当前时间</string>
+    <string name="touch_to_focus">触摸屏幕对焦</string>
+    <string name="version_update_check">版本检测中...</string>
+    <string name="software_version">软件版本：</string>
+    <string name="file_size">更新时间：</string>
+    <string name="update_content">更新内容：</string>
+    <string name="later">以后再说</string>
+    <string name="update_now">立即更新</string>
+    <string name="found_the_new_version">发现新版本</string>
+    <string name="cancel_update">取消更新</string>
+    <string name="is_download_the_latest_version_please_later">正在下载最新版本，请稍后&#8230;</string>
+    <string name="version_update_new">版本更新中</string>
+    <string name="please_make_sure_open_the_sd_card_access">请先确定SD卡访问权限已开启</string>
+    <string name="program_to_open_such_files_not_found">没有找到打开此类文件的程序</string>
+
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:id="@+id/tv_toolbar"
+            android:layout_gravity="center"
+            android:text="添加指纹"
+            android:textSize="@dimen/title_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+    <TextView
+        android:layout_marginRight="70dp"
+        android:layout_marginLeft="70dp"
+        android:text="添加过程中，请根据提示，在指纹采集器上进行多次的抬起，按压"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/img_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:repeatMode="restart"
+        android:repeatCount="infinite"
+        android:id="@+id/iv_0"
+        android:layout_marginTop="-40dp"
+        android:layout_marginLeft="60dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/img_0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:textColor="#e0e0e0"
+        android:onClick="butClick"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+       android:gravity="center"
+        android:background="@mipmap/elect_but"
+        android:text="开始添加"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

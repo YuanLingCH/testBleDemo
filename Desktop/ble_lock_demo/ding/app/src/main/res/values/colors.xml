@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="homeLvItem">#000</color>
+
+    <color name="backgroundjiemian">#EFEFEF</color>
+    <color name="backgroundtoolbar">#F4F4F4</color>
+
+
+    <color name="background">#FFFFFF</color>
+    <color name="split_line">#11112233</color>
+    <color name="text1">#59B29C</color>
+    <color name="text2">#333333</color>
+
+    <color name="color1">#F0F0F0</color>
+    <color name="color2">#FFFFFF</color>
+    <color name="color3">#B0B0B0</color>
+    <color name="color4">#666666</color>
+    <color name="color5">#57C5E8</color>
+
+    <color name="preview_mock">#9a000000</color>
+
+    <color name="white">#fff</color>
+    <color name="black">#000</color>
+    <color name="red">#d14000</color>
+    <color name="green">#03fa34</color>
+    <color name="blue">#032cfa</color>
+    <color name="gray">#afafaf</color>
+    <color name="text_gray">#d6d6d6</color>
+    <!-- 标题蓝色背景 -->
+    <color name="title_blue">#14B3F3</color>
+    <color name="yishengxiao">#31A14B  </color>
+    <color name="weishengxiao">#EC8325 </color>
+    <color name="yiguoqi">#d14000 </color>
+</resources>

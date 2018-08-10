@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:id="@+id/tv_toolbar"
+            android:layout_gravity="center"
+            android:textSize="@dimen/title_bar"
+            android:text="房猪猪锁"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_gravity="center"
+        android:background="@mipmap/addble"
+        android:layout_width="200dp"
+        android:layout_height="200dp" />
+    <!--<TextView
+
+        android:textSize="15sp"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:text="添加锁时,手机必须在锁旁边"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />-->
+</LinearLayout>

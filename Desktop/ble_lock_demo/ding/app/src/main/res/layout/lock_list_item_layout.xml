@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:background="#fff"
+    android:id="@+id/re_adapter"
+    android:layout_marginTop="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_gravity="center"
+            android:background="@mipmap/list_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+<LinearLayout
+android:layout_marginLeft="10dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textColor="#000"
+            android:id="@+id/lock_name"
+            android:layout_marginTop="3dp"
+            android:text="名称"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignParentRight="true"
+            android:textColor="#fff"
+            android:id="@+id/lock_state"
+            android:layout_gravity="center"
+            android:text="已生效"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <TextView
+        android:layout_gravity="center"
+        android:textColor="#000"
+        android:id="@+id/lock_elcet"
+        android:layout_marginTop="3dp"
+        android:drawablePadding="5dp"
+        android:drawableLeft="@mipmap/elect"
+        android:text="电量"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+     <ImageView
+         android:visibility="gone"
+         android:id="@+id/iv_admin"
+         android:layout_gravity="center"
+         android:layout_marginLeft="5dp"
+         android:background="@mipmap/admin"
+         android:layout_width="20dp"
+         android:layout_height="20dp" />
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/tv_admin"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="center"
+            android:text="管理员"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginBottom="3dp"
+        android:textColor="#000"
+        android:id="@+id/lock_time"
+        android:layout_marginTop="3dp"
+        android:drawablePadding="5dp"
+        android:drawableLeft="@mipmap/time"
+        android:text="时间"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+
+
+
+</LinearLayout>

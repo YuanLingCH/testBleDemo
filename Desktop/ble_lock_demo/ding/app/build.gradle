@@ -1,0 +1,72 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.jakewharton.butterknife'
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+    defaultConfig {
+        applicationId "fangzuzu.com.ding"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 2
+        versionName "1.1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+        }
+
+}
+    lintOptions{
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    //自动追加版本号和版本名称
+    android.applicationVariants.all {
+        variant->variant.outputs.each {
+            output-> output.outputFile = new File(output.outputFile.parent,"app_ding_v"+defaultConfig.versionName+"_"+new Date().format("yyyy-MM-dd")+"_"+buildType.name+".apk")
+        }
+    }
+
+
+
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:design:25.3.0'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha7'
+    testCompile 'junit:junit:4.12'
+    compile 'com.jakewharton:butterknife:8.8.1'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0'
+    // Retrofit库
+    compile 'com.squareup.okhttp3:okhttp:3.1.2'
+    // Okhttp库
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    compile project(':h_ble')
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'me.drakeet.materialdialog:library:1.3.1'
+    compile files('libs/MobCommons-2018.0523.1925.jar')
+    compile files('libs/MobTools-2018.0523.1923.jar')
+    compile files('libs/ShareSDK-Core-3.2.0.jar')
+    compile files('libs/ShareSDK-QQ-3.2.0.jar')
+    compile files('libs/ShareSDK-ShortMessage-3.2.0.jar')
+    compile files('libs/ShareSDK-Wechat-3.2.0.jar')
+    compile files('libs/ShareSDK-Wechat-Core-3.2.0.jar')
+    compile files('libs/org.eclipse.paho.android.service-1.0.2.jar')
+    compile files('libs/org.eclipse.paho.client.mqttv3-1.0.2.jar')
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+
+
+}

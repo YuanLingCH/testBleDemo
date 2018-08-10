@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="butTextSize">15sp</dimen>
+    <dimen name="title_bar">18sp</dimen>
+    <dimen name="create_pasw">12sp</dimen>
+    <dimen name="top">15dp</dimen>
+    <dimen name="edit">20sp</dimen>
+    <dimen name="edit_box">18sp</dimen>
+    <dimen name="edit_text">14sp</dimen>
+    <dimen name="toolbar">18sp</dimen>
+    <dimen name="but_size">16sp</dimen>
+    <dimen name="space_10">10.0dip</dimen>
+    <dimen name="space_30">30.0dip</dimen>
+    <dimen name="space_45">45.0dip</dimen>
+    <dimen name="space_35">35.0dip</dimen>
+    <dimen name="space_20">20.0dip</dimen>
+    <dimen name="space_5">5.0dip</dimen>
+    <dimen name="space_13">13.0dip</dimen>
+    <dimen name="space_143">143.0dip</dimen>
+    <dimen name="text_size_16">16.0sp</dimen>
+    <dimen name="text_size_14">14.0sp</dimen>
+    <dimen name="text_size_18">18.0sp</dimen>
+    <dimen name="text_size_13">13.0sp</dimen>
+</resources>

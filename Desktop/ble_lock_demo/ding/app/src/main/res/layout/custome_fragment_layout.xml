@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/backgroundjiemian"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <View
+        android:layout_marginTop="10dp"
+        android:background="#e8e8e8"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"/>
+    <LinearLayout
+        android:id="@+id/create_time"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="生效时间"
+            android:textSize="@dimen/butTextSize"
+            android:layout_weight="2.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/electfrg_effect_time"
+            android:background="@mipmap/input_box"
+            android:hint="请输入时间"
+            android:gravity="center"
+            android:layout_weight="7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/lose_time"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="失效时间"
+            android:textSize="@dimen/butTextSize"
+            android:layout_weight="2.5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/electfrg_lose_time"
+            android:background="@mipmap/input_box"
+            android:hint="请输入时间"
+            android:gravity="center"
+            android:layout_weight="7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:layout_marginTop="10dp"
+        android:background="#e8e8e8"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"/>
+    <LinearLayout
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="输入方式"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <CheckBox
+            android:id="@+id/app_input_check"
+            android:textColor="#888"
+            android:checked="true"
+            android:layout_marginLeft="25dp"
+            android:text="叮"
+            style="@style/CustomCheckboxTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <CheckBox
+
+            android:id="@+id/lock_input_check"
+            android:textColor="#888"
+            android:layout_marginLeft="40dp"
+            android:text="锁"
+            style="@style/CustomCheckboxTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <EditText
+        android:inputType="number"
+        android:maxLength="9"
+        android:textColor="#000"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center"
+        android:textSize="@dimen/butTextSize"
+        android:hint="请输入密码"
+        android:gravity="center"
+        android:background="#e8e8e8"
+        android:id="@+id/tv_pasw"
+        android:layout_width="120dp"
+        android:layout_height="40dp" />
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="14sp"
+        android:text="手动输入6-9位数字作为密码,并且在锁的旁边"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+       android:id="@+id/but_set_pasw"
+        android:textColor="#ffffff"
+        android:background="@mipmap/login"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp"
+        android:text="设置密码"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

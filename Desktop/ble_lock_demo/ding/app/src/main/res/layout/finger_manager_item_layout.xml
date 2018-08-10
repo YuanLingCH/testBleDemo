@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<ImageView
+    android:id="@+id/iv"
+    android:src="@mipmap/ic_record_fr"
+    android:layout_width="40dp"
+    android:layout_height="40dp" />
+    <TextView
+        android:id="@+id/name"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/iv"
+        android:text="科技侠"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@+id/name"
+        android:text="128356921"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/time_start"
+        android:layout_alignBottom="@+id/iv"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/iv"
+
+        android:text="2018-08-03-15-30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/time_end"
+        android:layout_alignBottom="@+id/iv"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/time_start"
+
+        android:text="2018-08-05-15-10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_margin="20dp"
+        android:layout_alignParentRight="true"
+        android:text="过期"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

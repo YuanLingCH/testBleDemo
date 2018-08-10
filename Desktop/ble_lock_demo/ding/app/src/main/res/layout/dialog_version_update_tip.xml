@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 本应用的服务器更新后提示用户更新版本的提示界面布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/space_30"
+    android:layout_marginRight="@dimen/space_30"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/space_45"
+        android:background="@drawable/blue_tl10_tr10dp"
+        android:gravity="center"
+        android:text="@string/found_the_new_version"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_13" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white_bl10_br10dp"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/space_20"
+        android:paddingLeft="@dimen/space_20"
+        android:paddingRight="@dimen/space_20"
+        android:paddingTop="@dimen/space_10" >
+
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/software_version"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tvFileSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/file_size"
+            android:textColor="@color/black" />
+
+        <com.txxc.testdemo.widget.DashedLineView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_5"
+            android:layout_marginTop="@dimen/space_10" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_10"
+            android:text="@string/update_content"
+            android:textColor="@color/red"
+            android:textSize="@dimen/text_size_18" />
+
+        <TextView
+            android:id="@+id/tvUpdateContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_5"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_14" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/space_35"
+            android:layout_marginBottom="@dimen/space_10"
+            android:layout_marginLeft="@dimen/space_10"
+            android:layout_marginRight="@dimen/space_10"
+            android:layout_marginTop="@dimen/space_20"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/btLater"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:background="@drawable/gray_5dp"
+                android:textSize="@dimen/text_size_16"
+                android:textColor="@color/black"
+                android:text="@string/later" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+            <Button
+                 android:id="@+id/btUpdateNow"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:background="@drawable/blue_5dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_16"
+                android:text="@string/update_now" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

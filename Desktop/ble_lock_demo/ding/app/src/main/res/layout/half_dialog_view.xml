@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<EditText
+    android:inputType="number"
+    android:background="@drawable/login_shape"
+    android:layout_marginTop="30dp"
+    android:maxLength="9"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:hint=" 手动输入4-9位数字作为密码"
+    android:id="@+id/dialog_edit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+</LinearLayout>

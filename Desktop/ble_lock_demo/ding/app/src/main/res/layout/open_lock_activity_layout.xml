@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/backgroundjiemian"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/backgroundtoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:id="@+id/tv_toolbar"
+            android:layout_gravity="center"
+            android:text="操作记录"
+            android:textSize="@dimen/title_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:orientation="horizontal"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/et_open_lock"
+        android:drawableLeft="@mipmap/ic_search"
+        android:background="@drawable/search_shape"
+        android:layout_weight="7"
+        android:focusable="false"
+        android:layout_width="0dp"
+        android:layout_height="40dp" />
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/tv_open_lock_cannel"
+        android:textSize="16sp"
+        android:layout_marginLeft="10dp"
+        android:text="取消"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+        <FrameLayout
+
+            android:id="@+id/open_lock_frl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/open_molder_ll"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+<LinearLayout
+    android:layout_marginTop="10dp"
+   android:gravity="center"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+       android:gravity="center"
+        android:id="@+id/open_lock_pasw"
+        android:text="密码开锁"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/search_shape"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:gravity="center"
+        android:id="@+id/open_lock_app"
+        android:text="APP开锁"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/search_shape"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:gravity="center"
+        android:id="@+id/open_lock_finger"
+        android:text="指纹开锁"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/search_shape"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+        </LinearLayout>
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/open_lock_ic"
+                    android:text="IC卡开锁"
+                    android:layout_weight="1"
+                    android:background="@drawable/search_shape"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:id="@+id/open_lock_shengfenz"
+                    android:text="身份证开锁"
+                    android:layout_weight="1"
+                    android:background="@drawable/search_shape"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:text=""
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/re_reach"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </FrameLayout>
+    </FrameLayout>
+</LinearLayout>
