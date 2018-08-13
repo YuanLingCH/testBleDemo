@@ -1,6 +1,5 @@
 package fangzuzu.com.ding.ui.activity;
 
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,7 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -172,31 +173,35 @@ public class ElectKeyManagerActivity extends BaseActivity {
                         @Override
                         public void onItemLongClick(View view, final int position, final String id) {
 
-                            Log.d("TAG","点击我了"+position+"id:"+id);
-
-                            AlertDialog.Builder builder=new AlertDialog.Builder(ElectKeyManagerActivity.this);
-                            builder.setMessage("确定删除?");
-                            builder.setTitle("提示");
-                            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                            final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+                            TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+                            EditText et_yanzhenpasw= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+                            et_yanzhenpasw.setVisibility(View.GONE);
+                            // tv.setText("谨慎操作，导致数据丢失...");
+                            //  tv.setTextColor(Color.RED);
+                            //  tv.setGravity(Gravity.CENTER);
+                            TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
+                            final AlertDialog dialog = new AlertDialog.Builder(ElectKeyManagerActivity.this)
+                                    .setView(viewDialog)
+                                    .create();
+                            dialog.show();
+                            tv_cancle.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //提交数据到服务器
-                                    //得到item 的id
+                                public void onClick(View v) {
 
+                                    dialog.dismiss();
+
+                                }
+                            });
+                            tv_submit.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
                                     delectData(id,position);
 
                                 }
                             });
-                            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            });
-
-                            builder.create().show();
-
-
 
                         }
                     });

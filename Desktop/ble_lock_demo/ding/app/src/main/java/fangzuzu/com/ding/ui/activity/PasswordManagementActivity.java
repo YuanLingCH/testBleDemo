@@ -14,12 +14,12 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -475,9 +475,11 @@ public class PasswordManagementActivity extends BaseActivity {
                 View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                 final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
                 TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
-                tv.setText("谨慎操作，导致数据丢失...");
-                tv.setTextColor(Color.RED);
-                tv.setGravity(Gravity.CENTER);
+                EditText et_yanzhenpasw= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+                et_yanzhenpasw.setVisibility(View.GONE);
+               // tv.setText("谨慎操作，导致数据丢失...");
+              //  tv.setTextColor(Color.RED);
+              //  tv.setGravity(Gravity.CENTER);
                 TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
                 final AlertDialog dialog = new AlertDialog.Builder(PasswordManagementActivity.this)
                         .setView(viewDialog)
@@ -592,10 +594,13 @@ public class PasswordManagementActivity extends BaseActivity {
                Log.d("TAG","点击我了"+position+"id:"+id+unlcokflag);
                View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+               // et_yanzhenpasw
+               EditText et_yanzhenpasw= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+               et_yanzhenpasw.setVisibility(View.GONE);
                TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
-               tv.setText("谨慎操作，导致数据丢失...");
-               tv.setTextColor(Color.RED);
-               tv.setGravity(Gravity.CENTER);
+              // tv.setText("谨慎操作，导致数据丢失...");
+              // tv.setTextColor(Color.RED);
+              // tv.setGravity(Gravity.CENTER);
                TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
                final AlertDialog dialog = new AlertDialog.Builder(PasswordManagementActivity.this)
                        .setView(viewDialog)

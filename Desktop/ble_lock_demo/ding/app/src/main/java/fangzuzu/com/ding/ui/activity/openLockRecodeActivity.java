@@ -432,7 +432,11 @@ public class openLockRecodeActivity extends BaseActivity {
         });
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBleController.closeBleConn();
+    }
 
     private void initlize() {
         data3=new ArrayList();

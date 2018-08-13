@@ -1,6 +1,7 @@
 package fangzuzu.com.ding.ui.fragment;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -153,9 +154,16 @@ public class circulationFragment extends BaseFragment {
         ll_circulation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                TextView title = new TextView(MainApplication.getInstence());
+                title.setGravity(Gravity.CENTER);
+                title.setText("选择日期");
+                title.setPadding(0,20,0,0);
+                title.setTextSize(16);
+                title.setTextColor(Color.BLACK);
 
-                        .setTitle("选择日期")//设置对话框的标题
+                AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setCustomTitle(title)
+
                         .setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, final int which) {
@@ -163,7 +171,7 @@ public class circulationFragment extends BaseFragment {
                                 which1[0] =which;
                             }
                         })
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        .setNeutralButton("取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -177,6 +185,9 @@ public class circulationFragment extends BaseFragment {
                         }).create();
 
                 dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#EC8325"));
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.BLACK);
+
                 Window dialogWindow =  dialog.getWindow();
                 WindowManager.LayoutParams lp = dialogWindow.getAttributes();
                 lp.width = (int) (ScreenSizeUtils.getInstance(getActivity()).getScreenWidth() * 0.90f);

@@ -654,6 +654,8 @@ public class sendKeyActivity extends BaseActivity {
                     View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                     final TextView tv = (TextView) view.findViewById(R.id.dialog_editname);
                     TextView tv_cancle= (TextView) view.findViewById(R.id.add_cancle);
+                    EditText et_yanzhenpasw= (EditText) view.findViewById(R.id.et_yanzhenpasw);
+                    et_yanzhenpasw.setVisibility(View.INVISIBLE);
                     TextView tv1= (TextView) view.findViewById(R.id.tv);
                     tv1.setVisibility(View.INVISIBLE);
                     tv.setText("发送钥匙成功");

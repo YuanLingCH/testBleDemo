@@ -36,6 +36,11 @@ import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 import com.hansion.h_ble.callback.ScanCallback;
+import com.hansion.h_ble.event.bleStateMessage;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +78,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
     ProgressDialog progressDialog;
     //搜索结果列表
     private List<BluetoothDevice> bluetoothDevices = new ArrayList<BluetoothDevice>();
-    public  List bledata=new ArrayList();
+    public List bledata=new ArrayList();
     private ListView mDeviceList;
     private BleController mBleController;
     DeviceListAdapter adapter;
@@ -138,6 +143,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
         // 进界面弹出对话框   自定义啊
         dialog();
         scanDevices();
+        EventBus.getDefault().register(this);
     }
 
     private void dialog() {
@@ -303,15 +309,13 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                 Log.d("TAG", "蓝牙设备" + string1);
                 String str = string1.replaceAll(" ", "").trim();
                 if (str.indexOf("5453")!=-1){
-
                         if (!bluetoothDevices.contains(device)) {
                             name = device.getName();
                             int length = str.length();
                             Log.d("TAG", "长度" + length);
-                            String address = device.getAddress();
                             Log.d("TAG", "蓝牙设备" + name);
-                          bluetoothDevices.add(device);
-                            String[] split = str.split("5453");
+                           bluetoothDevices.add(device);
+                           String[] split = str.split("5453");
                             Log.d("TAG","切割后面的"+split[1]);
                          strbiaozhi= split[1].substring(14, 16);
                             Log.d("TAG","要的"+strbiaozhi);
@@ -322,6 +326,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                             bledata.add(bean);
                         }
                     }
+
 
 
             }
@@ -355,7 +360,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
         tv.setText("搜索设备");*/
       //  add_smart_iv= (ImageView) findViewById(R.id.add_smart_iv);
         mDeviceList= (ListView) findViewById(R.id.add_smart_lv);
-        adapter=new DeviceListAdapter(this, bluetoothDevices);
+       adapter=new DeviceListAdapter(this, bluetoothDevices);
         //lv.setAdapter(adapter);
     }
 
@@ -378,6 +383,14 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
     protected void onDestroy() {
         super.onDestroy();
         hideProgressDialog();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void messageEventBus(bleStateMessage event){
+        hideProgressDialog();
+        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
+        Log.d("TAG","状态刷新");
     }
 
     public void showProgressDialog(String title, String message) {
@@ -435,12 +448,14 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                 final AlertDialog dialog = new AlertDialog.Builder(addSmartActivity.this)
                         .setView(view)
                     .create();
+                dialog.setCanceledOnTouchOutside(false);
                 dialog.show();
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         dialog.dismiss();
                         hideProgressDialog();
+                        mBleController.closeBleConn();
                     }
                 });
                 tv_submit.setOnClickListener(new View.OnClickListener() {

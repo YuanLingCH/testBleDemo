@@ -325,15 +325,17 @@ public class lockListActivity extends BaseActivity {
                 View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                 final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
                 TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
-                EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
-                tv.setText("谨慎操作，导致数据丢失...");
-                tv.setTextColor(Color.RED);
+                final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+               // tv.setText("谨慎操作，导致数据丢失...");
+               // tv.setTextColor(Color.RED);
+                tv.setVisibility(View.GONE);
                 tv.setGravity(Gravity.CENTER);
                 TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
                 final AlertDialog dialog = new AlertDialog.Builder(lockListActivity.this)
                         .setView(viewDialog)
                         .create();
                 dialog.show();
+                final String pasw = SharedUtils.getString("pasw");
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -345,6 +347,9 @@ public class lockListActivity extends BaseActivity {
                     @Override
                     public void onClick(View v) {
                         dialog.dismiss();
+                        String pas = et.getText().toString().trim();
+                        if (pas.equals(pasw)){
+
 
                         //1 根据当前uid 来判断  和锁里面的uid 是不是蓝牙管理员和普通用户
                         //连接蓝牙 和删除服务器数据
@@ -356,7 +361,9 @@ public class lockListActivity extends BaseActivity {
                             upDataDelet(keyId,position);
                         }
 
-
+                        }else {
+                            Toast.makeText(lockListActivity.this,"你的密码错误", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
 

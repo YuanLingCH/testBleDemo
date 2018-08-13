@@ -62,7 +62,7 @@
         android:background="#ede8e8"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="6dp"/>
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_marginRight="20dp"
@@ -199,8 +199,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <Button
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="15dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
             android:id="@+id/but_send"
             android:layout_marginTop="20dp"
             android:textColor="#ffffff"

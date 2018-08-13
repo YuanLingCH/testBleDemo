@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <EditText
 
+    <EditText
         android:background="@drawable/login_shape"
         android:layout_marginTop="30dp"
-
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:hint=" 请输入修改的名称"
+        android:textSize="15sp"
         android:id="@+id/dialog_edit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-</LinearLayout>
+    <TextView
+        android:id="@+id/add_cancle"
+        android:textSize="15sp"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/dialog_edit_name"
+        android:text="取消"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/add_submit"
+        android:textColor="#F09C59"
+        android:textSize="15sp"
+        android:layout_margin="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/dialog_edit_name"
+        android:text="确认"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

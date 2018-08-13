@@ -67,6 +67,7 @@ import fangzuzu.com.ding.utils.ScreenSizeUtils;
 import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
+import fangzuzu.com.ding.widget.bleConnectUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -264,7 +265,6 @@ public class HomeFragment extends BaseFragment {
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
-
               /*  mReciveString.append(mBleController.bytesToHexString(value) + "\r\n");
                 Log.d("TAG","接收数据HomeFragment"+mReciveString.toString());*/
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, secretKeyBytes);
@@ -292,7 +292,8 @@ public class HomeFragment extends BaseFragment {
                         for (int i = 0; i < token2.length; i++) {
                             Log.d("TAG","token2Fr"+token2[i]);
                         }
-                        sendFirstCode(); //发送锁标识
+
+                      sendFirstCode(); //发送锁标识
 
                     }if (decrypt[0]==02&&decrypt[1]==02&&decrypt[2]==04&&decrypt[3]==00) {
                         sendSecond();//开锁
@@ -431,7 +432,10 @@ public class HomeFragment extends BaseFragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                if (bledata.size()==0){
+                                    Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }
+
                             }
                         });
                      //
@@ -442,8 +446,11 @@ public class HomeFragment extends BaseFragment {
                     public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
                         String address = device.getAddress();
                         if (address.equals(lockNumber)){
-                            bledata.add(address);
-                            Log.d("TAG","蓝牙"+address);
+                            if (!bledata.contains(lockNumber)){
+                                bledata.add(address);
+                                Log.d("TAG","蓝牙扫描"+address);
+                            }
+
                         }
 
                     }
@@ -492,7 +499,7 @@ public class HomeFragment extends BaseFragment {
         }
 
                 }
-            },1100);
+            },1000);
 
         }
 
@@ -694,7 +701,16 @@ public class HomeFragment extends BaseFragment {
             public void onClick(View v) {
 
                     initReceiveData(); //接收数据
-                    initConnectBle();  //连接蓝牙
+                 //   initConnectBle();  //连接蓝牙
+                showProgressDialog("","正在连接蓝牙...");
+                final bleConnectUtils utils=new bleConnectUtils();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        utils.bleConnect(mBleController,secretKeyBytes,allowbyt,lockNumber);
+                    }
+                });
+
 
 
 

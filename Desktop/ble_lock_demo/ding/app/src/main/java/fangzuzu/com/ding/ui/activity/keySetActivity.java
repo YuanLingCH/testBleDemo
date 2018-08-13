@@ -1,6 +1,5 @@
 package fangzuzu.com.ding.ui.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -124,11 +123,48 @@ public class keySetActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                     if (uid.equals(adminUserId)){
+                        View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                        final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+                        TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+                        final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+                        final TextView tv_tishi = (TextView) viewDialog.findViewById(R.id.tv);
+                        tv_tishi.setText("密码验证");
 
-                        // tv_pasw.setText(content);
-                        //跳到修改管理员密码界面
-                        Intent intent =new Intent(keySetActivity.this,upDataManagerPaswActivity.class);
-                        startActivity(intent);
+                        // tv.setText("谨慎操作，导致数据丢失...");
+                        // tv.setTextColor(Color.RED);
+                        tv.setVisibility(View.GONE);
+                        tv.setGravity(Gravity.CENTER);
+                        TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
+                        final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
+                                .setView(viewDialog)
+                                .create();
+                        dialog.show();
+                        final String pasw = SharedUtils.getString("pasw");
+                        tv_cancle.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+
+                            }
+                        });
+                        tv_submit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                                String pas = et.getText().toString().trim();
+                                if (pas.equals(pasw)){
+
+                                    // tv_pasw.setText(content);
+                                    //跳到修改管理员密码界面
+                                    Intent intent =new Intent(keySetActivity.this,upDataManagerPaswActivity.class);
+                                    startActivity(intent);
+
+                                }else {
+                                    Toast.makeText(keySetActivity.this,"你的密码错误", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
 
                     }else {
 
@@ -170,9 +206,50 @@ public class keySetActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (uid.equals(adminUserId)){
-                    Intent intent =new Intent(keySetActivity.this,factoryResetActivity.class);
-                    intent.putExtra("id",id);
-                    startActivity(intent);
+
+                    View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                    final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+                    TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+                    final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+                    final TextView tv_tishi = (TextView) viewDialog.findViewById(R.id.tv);
+                    tv_tishi.setText("密码验证");
+
+                    // tv.setText("谨慎操作，导致数据丢失...");
+                    // tv.setTextColor(Color.RED);
+                    tv.setVisibility(View.GONE);
+                    tv.setGravity(Gravity.CENTER);
+                    TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
+                    final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
+                            .setView(viewDialog)
+                            .create();
+                    dialog.show();
+                    final String pasw = SharedUtils.getString("pasw");
+                    tv_cancle.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+
+                        }
+                    });
+                    tv_submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            String pas = et.getText().toString().trim();
+                            if (pas.equals(pasw)){
+
+                                Intent intent =new Intent(keySetActivity.this,factoryResetActivity.class);
+                                intent.putExtra("id",id);
+                                startActivity(intent);
+
+                            }else {
+                                Toast.makeText(keySetActivity.this,"你的密码错误", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+
+
                 }else {
                     View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                     final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
@@ -231,16 +308,44 @@ public class keySetActivity extends BaseActivity {
             if (uid.equals(adminUserId)){
                 LayoutInflater inflater = LayoutInflater.from(keySetActivity.this);
                 View view = inflater.inflate(R.layout.updata_lock_name, null);
-                TextView title = new TextView(keySetActivity.this);
-                title.setGravity(Gravity.CENTER);
-                title.setPaddingRelative(0,50,0,0);
-                title.setText("修改锁名称");
+                TextView add_cancle= (TextView) view.findViewById(R.id.add_cancle);
+                // add_submit
+                TextView add_submit= (TextView) view.findViewById(R.id.add_submit);
+
 
                 final EditText editText = (EditText) view.findViewById(R.id.dialog_edit_name);
-                AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
+                final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
+                        .setView(view)
+                        .create();
+                dialog.show();
+                add_cancle.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+
+                    }
+                });
+                add_submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String trim = editText.getText().toString().trim();
+                        if (!StringUtils.isEmpty(trim)){
+                            name_lock.setText(trim);
+                            upDataLockName(trim);
+                        }else {
+
+                            Toast.makeText(keySetActivity.this,"内容不能为空", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+           /*     AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                         .setView(view)
                         .setCustomTitle(title)
-                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        .create()
+                        .show();*/
+
+            /*            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -265,7 +370,7 @@ public class keySetActivity extends BaseActivity {
                                 dialog.dismiss();
                             }
                         }).create();
-                dialog.show();
+                dialog.show();*/
             }else {
                 View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                 final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
@@ -357,4 +462,7 @@ public class keySetActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
 }
