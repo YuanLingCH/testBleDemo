@@ -182,6 +182,20 @@ AppCompatActivity mActivity;
     }
 
 
+public void stopScan(){
+    BleDeviceScanCallback bleDeviceScanCallback = new BleDeviceScanCallback(new ScanCallback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+
+        }
+    });
+    mAdapter.stopLeScan(bleDeviceScanCallback);
+}
 
 
     public void scanBleone(int time, final ScanCallback scanCallback ) {
@@ -203,7 +217,7 @@ AppCompatActivity mActivity;
                 mAdapter.stopLeScan(bleDeviceScanCallback);
                 scanCallback.onSuccess();
             }
-        },3000);
+        },2000);
 
         mAdapter.startLeScan(bleDeviceScanCallback);
     }

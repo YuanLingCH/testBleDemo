@@ -67,7 +67,6 @@ import fangzuzu.com.ding.utils.ScreenSizeUtils;
 import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
-import fangzuzu.com.ding.widget.bleConnectUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -434,6 +433,9 @@ public class HomeFragment extends BaseFragment {
                             public void run() {
                                 if (bledata.size()==0){
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }else{
+
+                                    connect();
                                 }
 
                             }
@@ -455,55 +457,35 @@ public class HomeFragment extends BaseFragment {
 
                     }
                 });
+            }else  {
+                Log.d("TAG","没扫描");
+                connect();
             }
-            showProgressDialog("","正在连接蓝牙...");
-            Timer timer=new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Log.d("TAG","mac地址网络"+lockNumber+"集合大小"+bledata.size());
 
-
-            if (bledata.contains(lockNumber)){
-
-
-        Log.d("TAG","mac地址"+lockNumber);
-        // 7D:8D:22:4A:85:C7
-          getActivity().runOnUiThread(new Runnable() {
-              @Override
-              public void run() {
-
-
-                    mBleController.connect(0, lockNumber, new ConnectCallback() {
-                        @Override
-                        public void onConnSuccess() {
-                            // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
-                            Log.d("TAG","连接成功");
-
-                            jiaoyan();
-
-                        }
-                        @Override
-                        public void onConnFailed() {
-                            hideProgressDialog();
-                            mBleController.closeBleConn();
-                            Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-
-                        }
-
-                    });
-
-              }
-          });
-
-        }
-
-                }
-            },1000);
 
         }
 
     }
+
+
+    public void connect(){
+        mBleController.connect(0, lockNumber, new ConnectCallback() {
+            @Override
+            public void onConnSuccess() {
+                jiaoyan();
+            }
+
+            @Override
+            public void onConnFailed() {
+
+            }
+        });
+    }
+
+
+
+
+
 
     private void jiaoyan(){
         //身份校验
@@ -689,7 +671,6 @@ public class HomeFragment extends BaseFragment {
         });
     }
 
-
     /**
      * 蓝牙开锁
      */
@@ -701,15 +682,15 @@ public class HomeFragment extends BaseFragment {
             public void onClick(View v) {
 
                     initReceiveData(); //接收数据
-                 //   initConnectBle();  //连接蓝牙
+                  initConnectBle();  //连接蓝牙
                 showProgressDialog("","正在连接蓝牙...");
-                final bleConnectUtils utils=new bleConnectUtils();
+           /*     final bleConnectUtils utils=new bleConnectUtils();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         utils.bleConnect(mBleController,secretKeyBytes,allowbyt,lockNumber);
                     }
-                });
+                });*/
 
 
 

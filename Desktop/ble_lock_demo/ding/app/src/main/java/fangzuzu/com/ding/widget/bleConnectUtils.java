@@ -1,10 +1,15 @@
 package fangzuzu.com.ding.widget;
 
+import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
 import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
+import com.hansion.h_ble.callback.ScanCallback;
+import com.hansion.h_ble.event.bleStateMessage;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,16 +39,49 @@ public class bleConnectUtils {
         myBleController=mBleController;
         lockmac=lockNumber;
         secret=secretKeyBytes;
-
         Log.d("TAG","密钥类"+myBleController.bytesToHexString(secret) + "\r\n");
         Log.d("TAG","锁标识类"+myBleController.bytesToHexString(allowbyt) + "\r\n");
+        if (!mBleController.isEnable()){
+            mBleController.openBle();
+        }else {
+            if (!bledata.contains(lockNumber)){
+                mBleController.scanBleone(0, new ScanCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("TAG","蓝牙扫描结束");
+
+                                if (bledata.size()==0){
+                                    bleStateMessage message=new bleStateMessage();
+                                    EventBus.getDefault().post(message);
+                               //   Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }
+
+                            connectble();
 
 
+                    }
+
+                    @Override
+                    public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        String address = device.getAddress();
+                        if (address.equals(lockmac)){
+                            if (!bledata.contains(lockmac)){
+                                bledata.add(address);
+                                myBleController.stopScan();
+                                Log.d("TAG","蓝牙扫描"+address);
+                            }
+
+                        }
+
+                    }
+                });
+            }else {
+                Log.d("TAG","不蓝牙扫描");
+                connectble();
+            }
 
 
-
-
-        connectble();
+        }
 
 
     }
