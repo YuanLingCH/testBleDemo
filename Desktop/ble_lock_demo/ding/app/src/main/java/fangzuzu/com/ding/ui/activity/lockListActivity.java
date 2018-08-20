@@ -44,7 +44,6 @@ import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
@@ -70,6 +69,8 @@ import fangzuzu.com.ding.callback.ConnectCallBackHandler;
 import fangzuzu.com.ding.callback.MqttCallbackHandler;
 import fangzuzu.com.ding.callback.SubcribeCallBackHandler;
 import fangzuzu.com.ding.event.MessageEvent;
+import fangzuzu.com.ding.impl.OnMqttListener;
+import fangzuzu.com.ding.presenter.MqttPresenter;
 import fangzuzu.com.ding.utils.HandleBackUtil;
 import fangzuzu.com.ding.utils.NetWorkTesting;
 import fangzuzu.com.ding.utils.StringUtils;
@@ -84,7 +85,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * Created by lingyuan on 2018/6/27.
  */
 
-public class lockListActivity extends BaseActivity {
+public class lockListActivity extends BaseActivity implements OnMqttListener {
     private static MqttAndroidClient client;
     RecyclerView lock_list_rc;
     String partid;
@@ -152,8 +153,9 @@ public class lockListActivity extends BaseActivity {
         tv_lock_list= (TextView) findViewById(R.id.tv_lock_list);
         tv_lock_listone= (TextView) findViewById(R.id.tv_lock_listone);
         swipe_refresh= (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        initlize();
         getUserLockList();
+        initlize();
+
 
         if(Build.VERSION.SDK_INT>=23){
             //判断是否有权限
@@ -176,8 +178,8 @@ public class lockListActivity extends BaseActivity {
 
         Log.d("TAG","密钥"+mBleController.bytesToHexString(aesks) + "\r\n");
         Log.d("TAG","锁标识"+mBleController.bytesToHexString(allowbyt) + "\r\n");
-        deleteLock();
-        startConnect(clientID,serverIP,port);
+
+  startConnect(clientID,serverIP,port);
     }
 
     protected void setStatusBar() {
@@ -203,8 +205,6 @@ public class lockListActivity extends BaseActivity {
         super.onStart();
 
     }
-
-
 
     private void initReceiveData() {
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
@@ -265,6 +265,9 @@ public class lockListActivity extends BaseActivity {
                     Toast.makeText(lockListActivity.this,"删除数据成功", Toast.LENGTH_SHORT).show();
                     data3.remove(p);
                     adapter.notifyDataSetChanged();
+                    mqPre=new MqttPresenter();
+                    mqPre.sendMqtt("az"+uid,lockListActivity.this);
+                    mqPre.sendMqtt("ios"+uid,lockListActivity.this);
                 }
             }
 
@@ -335,7 +338,7 @@ public class lockListActivity extends BaseActivity {
                         .setView(viewDialog)
                         .create();
                 dialog.show();
-                final String pasw = SharedUtils.getString("pasw");
+
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -346,11 +349,13 @@ public class lockListActivity extends BaseActivity {
                 tv_submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dialog.dismiss();
+                         String pasw = SharedUtils.getString("pasw");
+                        Log.d("TAG","密码"+pasw);
                         String pas = et.getText().toString().trim();
+                        if (!StringUtils.isEmpty(pas)){
                         if (pas.equals(pasw)){
-
-
+                            Log.d("TAG","删除走了"+pasw);
+                            dialog.dismiss();
                         //1 根据当前uid 来判断  和锁里面的uid 是不是蓝牙管理员和普通用户
                         //连接蓝牙 和删除服务器数据
                         if (uid.equals(lockusid)){
@@ -363,6 +368,10 @@ public class lockListActivity extends BaseActivity {
 
                         }else {
                             Toast.makeText(lockListActivity.this,"你的密码错误", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+                        }else {
+                            Toast.makeText(lockListActivity.this,"请输入密码", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -372,7 +381,7 @@ public class lockListActivity extends BaseActivity {
     }
 
 
-
+    MqttPresenter mqPre;
   ;public void   upDataDelet(String id, final int postion){
         Retrofit re=new Retrofit.Builder()
                 .baseUrl(apiManager.baseUrl)
@@ -393,6 +402,9 @@ public class lockListActivity extends BaseActivity {
                     Toast.makeText(lockListActivity.this,"删除数据成功", Toast.LENGTH_SHORT).show();
                     data3.remove(postion);
                     adapter.notifyDataSetChanged();
+                    mqPre=new MqttPresenter();
+                    mqPre.sendMqtt("az"+uid,lockListActivity.this);
+                    mqPre.sendMqtt("ios"+uid,lockListActivity.this);
                 }
             }
 
@@ -419,7 +431,7 @@ public class lockListActivity extends BaseActivity {
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
-            showProgressDialog("","正在连接蓝牙...");
+           // showProgressDialog("","正在连接蓝牙...");
         // 7D:8D:22:4A:85:C7
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override
@@ -664,7 +676,7 @@ public class lockListActivity extends BaseActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                subscibe();
+            subscibe();
             }
         },2000);
     }
@@ -704,12 +716,8 @@ public String topic="fzzchat/PTP";
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         String string = event.getString();
-        Log.d("TAG","收到消息"+topic);
-
+        Log.d("TAG","收到消息mqtt走了"+topic);
             getUserLockList();
-
-
-
 
     }
 
@@ -732,7 +740,7 @@ public String topic="fzzchat/PTP";
         });
         data3=new ArrayList();
 
-        adapter=new lockListAdapter(data3,lockListActivity.this);
+
         lock_list_rc= (RecyclerView) findViewById(R.id.lock_list_rc);
         LinearLayoutManager lin=new LinearLayoutManager(lockListActivity.this);
         lin.setOrientation(OrientationHelper.VERTICAL);
@@ -746,6 +754,15 @@ public String topic="fzzchat/PTP";
     /**
      * 请求网络数据
      */
+    String lockName;
+    String secretKey;
+    String adminPsw;
+    String adminUserId;
+    String electricity;
+    String allow;
+    String id1;
+    String lockNumber;
+
     public void getUserLockList() {
         String partid = SharedUtils.getString("partid");
         Log.d("TAG","partid"+partid);
@@ -758,8 +775,6 @@ public String topic="fzzchat/PTP";
         apiManager manager = retrofit.create(apiManager.class);
         final NetWorkTesting net=new NetWorkTesting(this);
         if (net.isNetWorkAvailable()){
-
-
         Call<String> call = manager.getLockUserList("aa123456", uid);
         call.enqueue(new Callback<String>() {
             @Override
@@ -773,38 +788,71 @@ public String topic="fzzchat/PTP";
                 Gson gson=new Gson();
                 userLockBean bean = gson.fromJson(body, new TypeToken<userLockBean>() {}.getType());
                 int code = bean.getCode();
-
+                  data3.clear();// 防止加载重复数据
                 if (code==1001){
                     userLockBean.DataBean data = bean.getData();
                     List<?> parentLock = data.getParentLock();
                     Iterator<?> iterator = parentLock.iterator();
                     while (iterator.hasNext()){
                         Object next = iterator.next();
-                        dataPart.add(net);
+                        dataPart.add(next);
                     }
-
-                    data3.clear();// 防止加载重复数据
                     List<userLockBean.DataBean.UserLockBean> userLock = data.getUserLock();
                     Iterator<userLockBean.DataBean.UserLockBean> iterator1 = userLock.iterator();
                     while (iterator1.hasNext()){
                         userLockBean.DataBean.UserLockBean next = iterator1.next();
+                        lockName = next.getLockName();
+                        secretKey = next.getSecretKey();
+                        adminPsw = next.getAdminPsw();
+                        adminUserId = next.getAdminUserId();
+                        electricity = next.getElectricity();
+                        allow = next.getAllow();
+                        id1 = next.getId();
+                        lockNumber = next.getLockNumber();
+                        Log.d("TAG","锁命"+lockName);
                         data3.add(next);
                     }
+
                     data3.addAll(dataPart);
-                    lock_list_rc.setAdapter(adapter);
+                    Log.d("TAG","集合大小"+data3.size());
                     swipe_refresh.setRefreshing(false); //刷新结束
-                    adapter.notifyDataSetChanged();
-                    hideProgressDialog();
-                    Log.d("TAG",body);
+
+                        hideProgressDialog();
+                        Log.d("TAG",body);
+
                 }else if(code==1002){
                     Log.d("TAG","网络错误");
                     hideProgressDialog();
                 }
                 if (!data3.isEmpty()){
-                    iv.setVisibility(View.GONE);
-                    lock_list_rc.setVisibility(View.VISIBLE);
-                    tv_lock_list.setVisibility(View.GONE);
-                    tv_lock_listone.setVisibility(View.GONE);
+                        // 解析数据
+                    if (data3.size()==1){
+                        Intent intent=new Intent(MainApplication.getInstence(),MainActviity.class);
+                        intent.putExtra("id",id1);
+                        intent.putExtra("secretKey",secretKey);
+                        intent.putExtra("allow",allow);
+                        intent.putExtra("electricity",electricity);
+                        intent.putExtra("lockNumber",lockNumber);
+                        intent.putExtra("adminPsw",adminPsw);
+                        intent.putExtra("lockName",lockName);
+                        intent.putExtra("jihe","1");
+                        intent.putExtra("adminUserId",adminUserId);
+                        startActivity(intent);
+                        finish();
+
+                    }else {
+                        adapter=new lockListAdapter(data3,lockListActivity.this);
+                        lock_list_rc.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                        deleteLock();
+                        iv.setVisibility(View.GONE);
+                        lock_list_rc.setVisibility(View.VISIBLE);
+                        tv_lock_list.setVisibility(View.GONE);
+                        tv_lock_listone.setVisibility(View.GONE);
+                    }
+
+
+
                 }else {
 
                     iv.setVisibility(View.VISIBLE);
@@ -851,20 +899,23 @@ public String topic="fzzchat/PTP";
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        if(client!=null)
-            try {
-                client.disconnect();
-            } catch (MqttException e) {
-                e.printStackTrace();
+        if(client!=null) {
+
+            if (client.isConnected()){
+              //  client.disconnect();
+                               client.close();
+                client.registerResources(lockListActivity.this);
             }
-        MqttService service=new MqttService();
-            unbindService(service);
+
+
+
+
+        }
+
 
     }
 
-    private void unbindService(MqttService service) {
-            service.onDestroy();
-    }
+
 
     /**
      * 退出程序
@@ -947,4 +998,13 @@ public String topic="fzzchat/PTP";
     }
 
 
+    @Override
+    public void mqttSuccess() {
+
+    }
+
+    @Override
+    public void mqttFaild() {
+
+    }
 }

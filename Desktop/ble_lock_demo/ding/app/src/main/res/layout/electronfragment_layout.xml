@@ -111,7 +111,7 @@
                 <EditText
                     android:id="@+id/electfrg_key_name"
                     android:background="@mipmap/input_box"
-                    android:hint=""
+                    android:hint="请给钥匙命名"
                     android:layout_weight="7"
                     android:singleLine="true"
                     android:textSize="@dimen/butTextSize"

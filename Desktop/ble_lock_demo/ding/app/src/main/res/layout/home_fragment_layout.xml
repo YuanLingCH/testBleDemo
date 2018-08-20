@@ -91,15 +91,13 @@
     android:layout_width="match_parent"
     android:layout_weight="3"
     android:layout_height="0dp">
-<TextView
+<Button
     android:layout_marginTop="20dp"
-    android:textSize="40sp"
-    android:textColor="#fff"
-    android:text="叮"
+
     android:id="@+id/tv_ding"
     android:gravity="center"
     android:layout_gravity="center"
-    android:background="@mipmap/yuan"
+    android:background="@mipmap/ding"
     android:layout_width="130dp"
     android:layout_height="130dp" />
 </LinearLayout>

@@ -13,6 +13,8 @@ public class MessageEvent {
     private String topic;
     private MqttMessage mqttMessage;
     private String string="";
+    public MessageEvent() {
+    }
 
     public MessageEvent(String topic, MqttMessage mqttMessage) {
         this.topic = topic;

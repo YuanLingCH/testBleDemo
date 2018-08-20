@@ -408,8 +408,6 @@ public class openLockRecodeActivity extends BaseActivity {
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
-                byte[] aesks = getbyte("secretKeyBytes");
-
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, aesks);
                 Log.d("TAG","解密addICCardOneStepActivity"+mBleController.bytesToHexString(decrypt) + "\r\n");
              if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){

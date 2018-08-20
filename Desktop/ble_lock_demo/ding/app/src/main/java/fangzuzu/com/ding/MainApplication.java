@@ -25,6 +25,7 @@ public class MainApplication extends Application {
     String elect;
     String mac;
 
+
     public String getMac() {
         return mac;
     }
@@ -108,7 +109,10 @@ public class MainApplication extends Application {
         app = this;
 
         oList = new ArrayList<Activity>();
-        //初始化蓝牙
+
+
+
+
 
     }
 
@@ -177,4 +181,7 @@ public class MainApplication extends Application {
             activity.finish();
         }
     }
+
+
+
 }

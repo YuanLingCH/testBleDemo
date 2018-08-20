@@ -94,6 +94,7 @@ public class lockListAdapter extends RecyclerView.Adapter<lockListAdapter.lockVi
        final String secretKey = userLockBean.getSecretKey()+"";
         final String allow = userLockBean.getAllow();
         final String keyId = userLockBean.getKeyId();
+        SharedUtils.putString("keyId",keyId);
         String Starttime = (String) userLockBean.getStartTime();
         String endtime = (String) userLockBean.getEndTime();
         if (uid.equals(adminUserId)){

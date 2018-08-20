@@ -40,10 +40,12 @@ public class MqttCallbackHandler implements MqttCallback {
      * @throws Exception
      */
     @Override
-    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    public void messageArrived(final String s, final MqttMessage mqttMessage) throws Exception {
         Log.d("MqttCallbackHandler","MqttCallbackHandler/messageArrived="+s);
-        Log.d("MqttCallbackHandler","message="+new String(mqttMessage.getPayload()));
-        EventBus.getDefault().post(new MessageEvent(s,mqttMessage));
+        Log.d("MqttCallbackHandler","message打印="+new String(mqttMessage.getPayload()));
+                EventBus.getDefault().post(new MessageEvent(s,mqttMessage));
+
+
     }
 
     @Override

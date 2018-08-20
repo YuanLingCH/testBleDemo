@@ -227,31 +227,15 @@
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
-    <!--<RelativeLayout
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:textColor="#ffffff"
-            android:background="#ED862A"
-            android:layout_marginLeft="20dp"
-            android:text="保存"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:textColor="#ffffff"
-            android:background="#ED862A"
-            android:layout_marginRight="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginLeft="40dp"
-            android:text="编辑"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
--->
+<Button
+    android:onClick="butClick"
+    android:textSize="16sp"
+    android:textColor="#fff"
+    android:background="#EE882D"
+    android:layout_marginTop="5dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="10dp"
+    android:text="删除"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
 </LinearLayout>

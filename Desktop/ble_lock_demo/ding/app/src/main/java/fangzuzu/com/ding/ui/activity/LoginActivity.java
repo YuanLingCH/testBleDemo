@@ -21,13 +21,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.SharedUtils;
+import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.UserBean;
+import fangzuzu.com.ding.bean.userLockBean;
 import fangzuzu.com.ding.impl.OnLoginListener;
 import fangzuzu.com.ding.md5.MD5Utils;
 import fangzuzu.com.ding.presenter.LoginPresenter;
@@ -37,6 +45,11 @@ import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.phoneCheck;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import fangzuzu.com.ding.view.ILoginView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 
 /**
@@ -57,10 +70,13 @@ ImageView pasw_show;
     private TextView tv_forgetPassWord;
     private TextView tv_immediately_register;
     private Button but_login;
-    String uid;
+
     private View layoutContent;
     boolean isKitKat = false;
     Toolbar toolbar;
+    List data3;
+    String uid;
+    List dataPart=new ArrayList();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,6 +109,32 @@ ImageView pasw_show;
         boardHelper = new KeyBoardHelper(this);
         boardHelper.onCreate();
         boardHelper.setOnKeyBoardStatusChangeListener(onKeyBoardStatusChangeListener);
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
+                    pasw_show.setVisibility(View.VISIBLE);
+                }else {
+                    pasw_show.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        etName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus){
+
+                    String name = etName.getText().toString().trim();
+                    if (phoneCheck.isChinaPhoneLegal(name)){
+
+                    }else {
+                        Toast.makeText(LoginActivity.this, "不是电话号码", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
+
 
     }
 
@@ -169,7 +211,10 @@ ImageView pasw_show;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               Timer timer=new Timer();
+                getUserLockList();
+                hideProgressDialog();
+              /* Timer timer=new Timer();
+
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -181,7 +226,13 @@ ImageView pasw_show;
                 String pasw = etPassword.getText().toString().trim();
                 Log.d("TAG","成功后密码"+pasw);
                 SharedUtils.putString("pasw",pasw);
-                hideProgressDialog();
+
+*/
+
+                //成功界面
+                String pasw = etPassword.getText().toString().trim();
+                Log.d("TAG","成功后密码"+pasw);
+                SharedUtils.putString("pasw",pasw);
             }
         });
 
@@ -189,14 +240,9 @@ ImageView pasw_show;
 
     @Override
     public void loginFaild() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_LONG).show();
-                hideProgressDialog();
-            }
-        });
-       Toast.makeText(this, "登录失败", Toast.LENGTH_LONG).show();
+
+        hideProgressDialog();
+       Toast.makeText(this, "用户名或者密码错误", Toast.LENGTH_LONG).show();
     }
     @Override
     public void setName(String name) {
@@ -236,20 +282,7 @@ ImageView pasw_show;
             public void onClick(View v) {
                 final String name = etName.getText().toString().trim();
                 final String pasw = etPassword.getText().toString().trim();
-                Log.d("TAG","name"+name);
-                etName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        Log.d("TAG","校验name"+name);
-                        if (!hasFocus){
-                            if (phoneCheck.isChinaPhoneLegal(name)){
 
-                            }else {
-                                Toast.makeText(LoginActivity.this, "不是电话号码", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }
-                });
                 NetWorkTesting net=new NetWorkTesting(MainApplication.getInstence());
                 if (net.isNetWorkAvailable()) {
 
@@ -319,4 +352,121 @@ ImageView pasw_show;
                 break;
         }
     }
+
+    /**
+     * 请求网络数据
+     */
+    String lockName;
+    String secretKey;
+    String adminPsw;
+    String adminUserId;
+    String electricity;
+    String allow;
+    String id1;
+    String lockNumber;
+    public void getUserLockList() {
+        data3=new ArrayList();
+        String partid = SharedUtils.getString("partid");
+        uid= SharedUtils.getString("uid");
+        Log.d("TAG","partid"+partid);
+
+        Retrofit retrofit=new Retrofit.Builder()
+                .baseUrl(apiManager.baseUrl)
+                .client(MainApplication.getInstence().getClient())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        apiManager manager = retrofit.create(apiManager.class);
+        final NetWorkTesting net=new NetWorkTesting(this);
+        if (net.isNetWorkAvailable()){
+            Call<String> call = manager.getLockUserList("aa123456", uid);
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    String body = response.body();
+                    if (StringUtils.isEmpty(body)){
+                        Log.d("TAG","网络错误"+body);
+
+                    }else {
+                        Log.d("TAG","测试一把手锁"+body );
+                        Gson gson=new Gson();
+                        userLockBean bean = gson.fromJson(body, new TypeToken<userLockBean>() {}.getType());
+                        int code = bean.getCode();
+                        data3.clear();// 防止加载重复数据
+                        if (code==1001){
+                            userLockBean.DataBean data = bean.getData();
+                            List<?> parentLock = data.getParentLock();
+                            Iterator<?> iterator = parentLock.iterator();
+                            while (iterator.hasNext()){
+                                Object next = iterator.next();
+                                dataPart.add(next);
+                            }
+                            List<userLockBean.DataBean.UserLockBean> userLock = data.getUserLock();
+                            Iterator<userLockBean.DataBean.UserLockBean> iterator1 = userLock.iterator();
+                            while (iterator1.hasNext()){
+                                userLockBean.DataBean.UserLockBean next = iterator1.next();
+                                lockName = next.getLockName();
+                                secretKey = next.getSecretKey();
+                                adminPsw = next.getAdminPsw();
+                                adminUserId = next.getAdminUserId();
+                                electricity = next.getElectricity();
+                                allow = next.getAllow();
+                                id1 = next.getId();
+                                lockNumber = next.getLockNumber();
+                                Log.d("TAG","锁命"+lockName);
+                                data3.add(next);
+                            }
+                            data3.addAll(dataPart);
+                            Log.d("TAG","集合大小"+data3.size());
+                            Log.d("TAG",body);
+
+                            if (data3.size()==1){
+                                Intent intent=new Intent(MainApplication.getInstence(),MainActviity.class);
+                                intent.putExtra("id",id1);
+                                intent.putExtra("secretKey",secretKey);
+                                intent.putExtra("allow",allow);
+                                intent.putExtra("electricity",electricity);
+                                intent.putExtra("lockNumber",lockNumber);
+                                intent.putExtra("adminPsw",adminPsw);
+                                intent.putExtra("lockName",lockName);
+                                intent.putExtra("jihe","1");
+                                intent.putExtra("adminUserId",adminUserId);
+                                startActivity(intent);
+                                finish();
+
+                            }else {
+                                Timer timer=new Timer();
+                                timer.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                },1000);
+                            }
+
+
+                        }else if(code==1002){
+                            Log.d("TAG","网络错误");
+
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+        }else {
+
+            Toast.makeText( LoginActivity.this,"当前网络不可用，请检查您的网络！",Toast.LENGTH_LONG).show();
+
+
+
+        }
+    }
+
+
 }

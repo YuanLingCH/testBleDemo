@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +84,7 @@ public class HomeFragment extends BaseFragment {
     private StringBuffer mReciveString = new StringBuffer();
     ProgressDialog progressDialog;
     Toolbar toolbar;
-   TextView tv_ding;
+   Button tv_ding;
     private byte[] token3=new byte[4];
     byte[]jiesouTock=new byte[16];
     byte[]token2=new byte[4];
@@ -226,12 +227,19 @@ public class HomeFragment extends BaseFragment {
             window.setStatusBarColor(Color.TRANSPARENT);
             isKitKat = true;
         }
+
         toolbar = (Toolbar)root. findViewById(R.id.toolbar);
         toolbar.setTitle("");
-
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()). getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
-        ((AppCompatActivity) getActivity()). getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (!StringUtils.isEmpty(jihe)){
+            ((AppCompatActivity) getActivity()). getSupportActionBar().setHomeButtonEnabled(false); //设置返回键可用
+            ((AppCompatActivity) getActivity()). getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }else {
+            ((AppCompatActivity) getActivity()). getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
+            ((AppCompatActivity) getActivity()). getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+
         re_auth_list= (RecyclerView) root.findViewById(R.id.re_auth_list);
         initgetAuthor();
 
@@ -364,6 +372,7 @@ public class HomeFragment extends BaseFragment {
     String   lockName;
     String uid;
     String  adminPsw1;
+    String jihe;
     private void initgetData() {
         Lockid =getActivity(). getIntent().getStringExtra("id");
         secretKey= getActivity().getIntent().getStringExtra("secretKey");
@@ -374,6 +383,9 @@ public class HomeFragment extends BaseFragment {
         electricity = getActivity().getIntent().getStringExtra("electricity");
         String adminUserId = getActivity().getIntent().getStringExtra("adminUserId");
         SharedUtils.putString("adminUserId",adminUserId);
+        jihe = getActivity().getIntent().getStringExtra("jihe");
+
+
         uid= SharedUtils.getString("uid");
 
         Log.d("TAG","传过来的Id"+Lockid);
@@ -418,6 +430,7 @@ public class HomeFragment extends BaseFragment {
     /**
      * 连接蓝牙
      */
+    String  strbiaozhi;
     List   bledata=new ArrayList();
     private void initConnectBle() {
         if (!mBleController.isEnable()){
@@ -434,8 +447,10 @@ public class HomeFragment extends BaseFragment {
                                 if (bledata.size()==0){
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
+                                    if (strbiaozhi.equals("02")){
+                                        connect();
+                                    }
 
-                                    connect();
                                 }
 
                             }
@@ -451,6 +466,21 @@ public class HomeFragment extends BaseFragment {
                             if (!bledata.contains(lockNumber)){
                                 bledata.add(address);
                                 Log.d("TAG","蓝牙扫描"+address);
+                                String string1 = mBleController.bytesToHexString(scanRecord);
+                                Log.d("TAG", "蓝牙设备" + string1);
+                                String str = string1.replaceAll(" ", "").trim();
+                                if (str.indexOf("5453")!=-1){
+                                    int length = str.length();
+                                    String[] split = str.split("5453");
+                                    Log.d("TAG","切割后面的"+split[1]);
+                                  strbiaozhi= split[1].substring(14, 16);
+                                    if (!strbiaozhi.equals("02")){
+                                        hideProgressDialog();
+                                        Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                }
+
                             }
 
                         }
@@ -459,7 +489,20 @@ public class HomeFragment extends BaseFragment {
                 });
             }else  {
                 Log.d("TAG","没扫描");
-                connect();
+                if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
+                    Log.d("TAG","标准"+strbiaozhi);
+                    Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+
+                            hideProgressDialog();
+
+
+
+                    return;
+                }else {
+                    Log.d("TAG","连接");
+                    connect();
+                }
+
             }
 
 
@@ -469,6 +512,7 @@ public class HomeFragment extends BaseFragment {
 
 
     public void connect(){
+        showProgressDialog("","正在连接蓝牙...");
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
@@ -676,14 +720,14 @@ public class HomeFragment extends BaseFragment {
      */
     @Override
     protected void initEvents() {
-        tv_ding= (TextView) root.findViewById(R.id.tv_ding);
+        tv_ding= (Button) root.findViewById(R.id.tv_ding);
         tv_ding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                     initReceiveData(); //接收数据
                   initConnectBle();  //连接蓝牙
-                showProgressDialog("","正在连接蓝牙...");
+               // showProgressDialog("","正在连接蓝牙...");
            /*     final bleConnectUtils utils=new bleConnectUtils();
                 getActivity().runOnUiThread(new Runnable() {
                     @Override

@@ -220,6 +220,9 @@ public class timeLimitFragment extends BaseFragment {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         String body = response.body();
+                        if (!StringUtils.isEmpty(body)){
+
+
                         Log.d("TAG","上传数据"+body);
                         Gson gson1=new Gson();
                         msg s = gson1.fromJson(body, new TypeToken<msg>() {}.getType());
@@ -238,7 +241,9 @@ public class timeLimitFragment extends BaseFragment {
                         Log.d("TAG", pamsg.getPassWord());
                        EventBus.getDefault().post(pamsg);
                         Log.d("TAG","上传数据2");
-
+                        }else {
+                            Toast.makeText(MainApplication.getInstence(),"服务器开小差了,请重试",Toast.LENGTH_LONG).show();
+                        }
                     }
 
                     @Override

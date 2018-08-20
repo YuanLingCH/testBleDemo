@@ -288,7 +288,7 @@ public class sendKeyActivity extends BaseActivity {
         loseTime = (LinearLayout) findViewById(R.id.lose_time);
         but_send = (Button) findViewById(R.id.but_send);
         electfrg_key_name = (EditText) findViewById(R.id.electfrg_key_name);
-        electfrg_key_name.setText(lockName);
+       // electfrg_key_name.setText(lockName);
         StringUtils.fixInputMethodManagerLeak(sendKeyActivity.this);
         electfrg_inputaccount = (EditTextDrawableClick) findViewById(R.id.electfrg_inputaccount);
         electfrg_inputaccount.setDrawableRightListener(new EditTextDrawableClick.DrawableRightListener() {
@@ -315,11 +315,19 @@ public class sendKeyActivity extends BaseActivity {
 
                     if (!StringUtils.isEmpty(usernumber)){
                         String s = usernumber.replaceAll("-", "");
-                        Log.d("TAG","电话切割"+s);
+                        Log.d("TAG","电话切割"+s.length());
+                        if (s.length()==11){
                             getPermision(s);
                         }
+
+                        }
                   else if (!StringUtils.isEmpty(electfrg_inputaccount.getText().toString().trim())){
-                        getPermision(electfrg_inputaccount.getText().toString().trim());
+                        String phone = electfrg_inputaccount.getText().toString().trim();
+                        Log.d("TAG","电话切割"+phone.length());
+                        if (phone.length()==11){
+                            getPermision(phone);
+                        }
+
                     }
                 }
                 }
@@ -380,11 +388,11 @@ public class sendKeyActivity extends BaseActivity {
 
                 String phone = electfrg_inputaccount.getText().toString().trim();
                 String name = electfrg_key_name.getText().toString().trim();
-                if (StringUtils.isEmpty(phone)){
+                if (StringUtils.isEmpty(phone)||StringUtils.isEmpty(name)){
                     Log.d("TAG","锁命"+name);
                     Toast.makeText(sendKeyActivity.this,"请填写信息",Toast.LENGTH_LONG).show();
                 }else {
-                    if (!StringUtils.isEmpty(name)){
+                    if (!StringUtils.isEmpty(name)&&!StringUtils.isEmpty(phone)){
 
                     Log.d("TAG","锁命"+name);
 
@@ -455,13 +463,15 @@ public class sendKeyActivity extends BaseActivity {
                     if (!StringUtils.isEmpty(userId)){
 
 
-                    Map<String,String> map = new HashMap<>();
+                    Map map = new HashMap<>();
                     map.put("lockId", lockid);
                     map.put("userId", userId);
                     map.put("keyName", electfrg_key_name.getText().toString().trim());
                     map.put("startTime", s2);
                     map.put("endTime", s4);
                     map.put("parentId",  parentid);
+                        map.put("firstPermissionIds",authStr);
+
 
 
                         showProgressDialog("","加载数据...");
@@ -491,17 +501,21 @@ public class sendKeyActivity extends BaseActivity {
                                 Toast.makeText(sendKeyActivity.this,"锁已被删除",Toast.LENGTH_LONG).show();
                                 hideProgressDialog();
                             }else if (code.equals("1001")){
+                                Log.d("TAG", "本地接口调用锁" + authordata.size());
+                                sendMqtt("ios"+userId);
+                                sendMqtt("az"+userId);
+
                                 Log.d("TAG", "授权大小集合" + authordata.size());
-                                if (authordata.size()>0){
+                           /*     if (authordata.size()>0){
                                     Log.d("TAG", "授权大小集合" + authordata.size()+"走了");
                                     authPeople();
                                 }else {
                                     Toast.makeText(sendKeyActivity.this,"请选择授权模块",Toast.LENGTH_LONG).show();
                                     hideProgressDialog();
-                                }
+                                }*/
 
                             }else if (code.equals("1002")){
-                                Toast.makeText(sendKeyActivity.this,"发送失败，钥匙只能发给已注册的账号",Toast.LENGTH_LONG).show();
+                                Toast.makeText(sendKeyActivity.this,"发送失败",Toast.LENGTH_LONG).show();
                                 hideProgressDialog();
                             }
 
@@ -697,6 +711,7 @@ public class sendKeyActivity extends BaseActivity {
     /**
      * 发送mqtt
      */
+
     private void sendMqtt(String to) {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
