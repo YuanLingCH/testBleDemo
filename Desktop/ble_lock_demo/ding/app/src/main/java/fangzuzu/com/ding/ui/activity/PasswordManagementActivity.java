@@ -1,6 +1,7 @@
 package fangzuzu.com.ding.ui.activity;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
+import com.hansion.h_ble.callback.ScanCallback;
 import com.hansion.h_ble.event.bleStateMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -82,9 +85,7 @@ public class PasswordManagementActivity extends BaseActivity {
     byte[] aesks;
     String lockType;
     String lockFlag;
-    int totalPage; //总页数
-    private int lastVisibleItem = 0;
-    private final int PAGE_COUNT = 15;
+    private final int PAGE_COUNT = 100;
     String mac; //蓝牙地址
     byte[]token2=new byte[4];
     ProgressDialog progressDialog;
@@ -92,6 +93,9 @@ public class PasswordManagementActivity extends BaseActivity {
     TextView tv_delet_quanbuPaws;//清空密码
     private Handler mHandler = new Handler(Looper.getMainLooper());
     boolean isKitKat = false;
+ LinearLayout   ll_nodata;
+    ImageView iv_no_data;
+    TextView tv_no_datae;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,13 +187,6 @@ public class PasswordManagementActivity extends BaseActivity {
                     }else  if (StringUtils.isEmpty(lockFlag)){
                         delectAllPasw();//删除蓝牙数据
                     }
-
-
-
-
-
-
-
                 }
 
             }
@@ -362,26 +359,28 @@ public class PasswordManagementActivity extends BaseActivity {
 
             }
         }else { //小于等于16 不用分
+            byte[]header=new byte[4];
+            String length1 = bytes.length+1+"";
+            String pas=new String();
+            pas = length1.replace("", "0");
+            pas =  pas.substring(0,  pas.length() - 1);
+            Log.d("TAG","拼接pas"+ pas);
+            byte[] pasbyteslength = StringUtils.toByteArray(pas);
+            Log.d("TAG","密码长度"+length1);
+            header[0]=0x04;
+            header[1]=0x05;
+            header[2]= pasbyteslength[0];
+            header[3]=0x06;
+            byte[] bytesData = byteCunchu.unitByteArray(header, bytes);
+            byte[] bytesData1 = byteCunchu.unitByteArray(bytesData, token3);
             byte[]data80=new byte[16];
-            data80[0]=0x04;
-            data80[1]=0x05;
-            data80[2]=0x09;
-            data80[3]=0x06;
-            data80[4]=bytes[0];
-            data80[5]=bytes[1];
-            data80[6]=bytes[2];
-            data80[7]=bytes[3];
-            data80[8]=bytes[4];
-            data80[9]=bytes[5];
-            data80[10]=bytes[6];
-            data80[11]=bytes[7];
-            data80[12]=token3[0];
-            data80[13]=token3[1];
-            data80[14]=token3[2];
-            data80[15]=token3[3];
+            for (int i = 0; i < bytesData1.length; i++) {
+                data80[i]= bytesData1[i];
+            }
 
             byte[] encrypt40 = jiamiandjiemi.Encrypt(data80,aesks);
-            Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt40) + "\r\n");
+            byte[] decrypt = jiamiandjiemi.Decrypt(encrypt40, aesks);
+            Log.d("TAG","加密不分包"+mBleController.bytesToHexString(decrypt) + "\r\n");
 
             mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
                 @Override
@@ -401,6 +400,9 @@ public class PasswordManagementActivity extends BaseActivity {
 
     }
     private void initlize() {
+        ll_nodata=(LinearLayout) findViewById(R.id.ll_nodata);
+         iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
+        tv_no_datae=(TextView) findViewById(R.id.tv_no_data);
         tv_delet_quanbuPaws= (TextView) findViewById(R.id.tv_delet_quanbuPaws);
         srf= (SwipeRefreshLayout) findViewById(R.id.srf);
         pasw_rc= ( RecyclerView) findViewById(R.id.pasw_rc);
@@ -415,7 +417,7 @@ public class PasswordManagementActivity extends BaseActivity {
                 getdata(1);
             }
         });
-        //滑动监听
+ /*       //滑动监听
         pasw_rc.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -465,7 +467,7 @@ public class PasswordManagementActivity extends BaseActivity {
                 super.onScrolled(recyclerView, dx, dy);
                 lastVisibleItem = lin.findLastVisibleItemPosition();
             }
-        });
+        });*/
         //清空密码
         tv_delet_quanbuPaws.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -513,26 +515,8 @@ public class PasswordManagementActivity extends BaseActivity {
         });
 
     }
-    private List<String> getDatas(final int firstIndex, final int lastIndex) {
-        List  resList = new ArrayList<>();
-        for (int i = firstIndex; i < lastIndex; i++) {
-            if (i < data3.size()) {
-
-                    resList.add(data3.get(i));
 
 
-            }
-        }
-        return resList;
-    }
-    private void updateRecyclerView(int fromIndex, int toIndex) {
-        List newDatas = getDatas(fromIndex, toIndex);
-        if (newDatas.size() > 0) {
-            adapter.updateList(newDatas, true);
-        } else {
-            adapter.updateList(null, false);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -548,7 +532,7 @@ public class PasswordManagementActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-   int recordsTotal;
+
     public void getdata(final int page) {
         data3=new ArrayList();
         String uid =  SharedUtils.getString("uid");
@@ -573,19 +557,30 @@ public class PasswordManagementActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
+                if (!StringUtils.isEmpty(body)){
                 Log.d("TAG",body);
                 passwordManagerBean bean = gson.fromJson(body, new TypeToken<passwordManagerBean>() {}.getType());
                 DataBeanX data = bean.getData();
-                recordsTotal = data.getRecordsTotal();
-                totalPage = data.getTotalPage();
-                List<passwordManagerBean.DataBeanX.DataBean> data1 = data.getData();
+                    List<passwordManagerBean.DataBeanX.DataBean> data1 = data.getData();
+                    if (data1.size()==0){
+                        ll_nodata.setVisibility(View.VISIBLE);
+                        pasw_rc.setVisibility(View.GONE);
+                        tv_no_datae.setText("暂无密码");
+                        Log.d("TAG","没有数据哦 ");
+                        iv_no_data.setImageResource(R.mipmap.no_miam);
+
+                    }else if (data1.size()>0){
+                        ll_nodata.setVisibility(View.GONE);
+                        pasw_rc.setVisibility(View.VISIBLE);
+
+
                 Iterator<passwordManagerBean.DataBeanX.DataBean> iterator = data1.iterator();
                 while (iterator.hasNext()){
                     DataBeanX.DataBean next = iterator.next();
                     data3.add(next);
                 }
 
-                adapter=new passwordManagerListAdapter(getDatas(0, PAGE_COUNT), PasswordManagementActivity.this, getDatas(0, PAGE_COUNT).size() > 0 ? true : false);
+                adapter=new passwordManagerListAdapter(data3, PasswordManagementActivity.this);
                 adapter.setOnItemLongClickListener(new passwordManagerListAdapter.OnItemLongClickListener() {
            @Override
            public void onItemLongClick(View view, final int position, final String id,String unlcokflag,String unlockType) {
@@ -631,11 +626,11 @@ public class PasswordManagementActivity extends BaseActivity {
            }
        });
                 pasw_rc.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+
                 srf.setRefreshing(false);
-
-               adapter.notifyDataSetChanged();
-
-
             }
 
             @Override
@@ -647,42 +642,122 @@ public class PasswordManagementActivity extends BaseActivity {
 
     /**
      * 连接蓝牙
-     *
      */
-String idlock;
-    int p;
+    String  strbiaozhi;
+    List   bledata=new ArrayList();
+    String idlock;
+    int p;   // item 位置
     private void initConnectBle(int postin,String id) {
         p=postin;
         idlock=id;
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
+            if (!bledata.contains(mac)){
+                mBleController.scanBleone(0, new ScanCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("TAG","蓝牙扫描结束");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (bledata.size()==0){
+
+                                    Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    if (strbiaozhi.equals("02")){
+
+                                        connect();
+                                    }
+
+                                }
+
+                            }
+                        });
+                        //
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        showProgressDialog("","正在连接蓝牙...");
+                        String address = device.getAddress();
+                        if (address.equals(mac)){
+                            if (!bledata.contains(mac)){
+                                bledata.add(address);
+                                Log.d("TAG","蓝牙扫描"+address);
+                                String string1 = mBleController.bytesToHexString(scanRecord);
+                                Log.d("TAG", "蓝牙设备" + string1);
+                                String str = string1.replaceAll(" ", "").trim();
+                                if (str.indexOf("5453")!=-1){
+                                    int length = str.length();
+                                    String[] split = str.split("5453");
+                                    Log.d("TAG","切割后面的"+split[1]);
+                                    strbiaozhi= split[1].substring(14, 16);
+                                    if (!strbiaozhi.equals("02")){
+                                        hideProgressDialog();
+                                        Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+                });
+            }else  {
+                Log.d("TAG","没扫描");
+                if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
+                    Log.d("TAG","标准"+strbiaozhi);
+                    Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+                    return;
+                }else {
+                    Log.d("TAG","连接");
+
+                    connect();
+                }
+
+            }
 
 
+        }
+
+    }
+
+
+    public void connect(){
         showProgressDialog("","正在连接蓝牙...");
-        // 7D:8D:22:4A:85:C7
-        mBleController.connect(0,  mac, new ConnectCallback() {
+        mBleController.connect(0, mac, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
-                // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
-                Log.d("TAG","连接成功");
                 jiaoyan();
-
             }
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                hideProgressDialog();
 
             }
-
         });
-        }
-
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void jiaoyan(){
         //身份校验
@@ -858,6 +933,13 @@ public void  delectAllPasw(){
                     msg s= gson.fromJson(body, new TypeToken<msg>() {}.getType());
                     if (s.getCode()==1001){
                         Toast.makeText(MainApplication.getInstence(), "密码删除成功", Toast.LENGTH_SHORT).show();
+                        if (StringUtils.isEmpty(lockFlag)){
+                            data3.clear();
+                        }else {
+                            data3.remove(p);
+                        }
+
+                        adapter.notifyDataSetChanged();
                     }
                 }
 

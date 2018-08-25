@@ -1,6 +1,7 @@
 package fangzuzu.com.ding.ui.activity;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
+import com.hansion.h_ble.callback.ScanCallback;
 import com.hansion.h_ble.event.bleStateMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,8 +34,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -144,10 +148,12 @@ public class addICCardOneStepActivity extends BaseActivity {
     String addType;
     String toolbarvalue;
     byte[] bytestype;  //身份证  还是ic卡
+    String lockNumber;
     public void getValue() {
          addType = getIntent().getStringExtra("addType");
          toolbarvalue = getIntent().getStringExtra("toolbar");
         String str = getIntent().getStringExtra("byte");
+        lockNumber = MainApplication.getInstence().getMac();
         Log.d("TAG","value"+str);
         String sb=new String();
         for (int i = 0; i <str.length(); i++) {
@@ -273,38 +279,102 @@ public class addICCardOneStepActivity extends BaseActivity {
     /**
      * 连接蓝牙
      */
+    String  strbiaozhi;
+    List bledata=new ArrayList();
     private void initConnectBle() {
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
+            if (!bledata.contains(lockNumber)){
+                mBleController.scanBleone(0, new ScanCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("TAG","蓝牙扫描结束");
+                       runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (bledata.size()==0){
 
+                                    Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    if (strbiaozhi.equals("02")){
+
+                                        connect();
+                                    }
+
+                                }
+
+                            }
+                        });
+                        //
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        showProgressDialog("","正在连接蓝牙...");
+                        String address = device.getAddress();
+                        if (address.equals(lockNumber)){
+                            if (!bledata.contains(lockNumber)){
+                                bledata.add(address);
+                                Log.d("TAG","蓝牙扫描"+address);
+                                String string1 = mBleController.bytesToHexString(scanRecord);
+                                Log.d("TAG", "蓝牙设备" + string1);
+                                String str = string1.replaceAll(" ", "").trim();
+                                if (str.indexOf("5453")!=-1){
+                                    int length = str.length();
+                                    String[] split = str.split("5453");
+                                    Log.d("TAG","切割后面的"+split[1]);
+                                    strbiaozhi= split[1].substring(14, 16);
+                                    if (!strbiaozhi.equals("02")){
+                                        hideProgressDialog();
+                                        Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+                });
+            }else  {
+                Log.d("TAG","没扫描");
+                if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
+                    Log.d("TAG","标准"+strbiaozhi);
+                    Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+                    return;
+                }else {
+                    Log.d("TAG","连接");
+
+                    connect();
+                }
+
+            }
+
+
+        }
+
+    }
+
+
+    public void connect(){
         showProgressDialog("","正在连接蓝牙...");
-
-        String lockNumber = MainApplication.getInstence().getMac();
-        Log.d("TAG","mac地址"+lockNumber);
-        // 7D:8D:22:4A:85:C7
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
-                // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
-                Log.d("TAG","连接成功");
                 jiaoyan();
-
             }
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                hideProgressDialog();
 
             }
-
         });
-
-        }
     }
+
 
     private void jiaoyan(){
         //身份校验

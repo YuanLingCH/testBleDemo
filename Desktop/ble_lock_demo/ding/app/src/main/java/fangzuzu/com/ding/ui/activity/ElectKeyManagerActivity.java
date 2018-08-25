@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,9 @@ import fangzuzu.com.ding.adapter.KeyManageAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.keyManagerBean;
 import fangzuzu.com.ding.bean.msg;
+import fangzuzu.com.ding.impl.OnMqttListener;
+import fangzuzu.com.ding.presenter.MqttPresenter;
+import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,7 +53,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
  * Created by lingyuan on 2018/6/20.
  */
 
-public class ElectKeyManagerActivity extends BaseActivity {
+public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListener {
     Toolbar toolbar;
     KeyManageAdapter adapter;
     RecyclerView key_manage_lv;
@@ -57,6 +61,10 @@ public class ElectKeyManagerActivity extends BaseActivity {
     String lockid;
     SwipeRefreshLayout srf;
     boolean isKitKat = false;
+    LinearLayout ll_nodata;
+    ImageView iv_no_data;
+    TextView tv_no_data;
+    String uid;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +106,10 @@ public class ElectKeyManagerActivity extends BaseActivity {
 
 
     private void initlize() {
+        uid = SharedUtils.getString("uid");
+        iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
+        tv_no_data=(TextView) findViewById(R.id.tv_no_data);
+        ll_nodata=(LinearLayout) findViewById(R.id.ll_nodata);
         srf= (SwipeRefreshLayout) findViewById(R.id.srf_elect);
         key_manage_lv= (RecyclerView) findViewById(R.id.key_manage_lv);
         LinearLayoutManager lin=new LinearLayoutManager(MainApplication.getInstence());
@@ -106,6 +118,7 @@ public class ElectKeyManagerActivity extends BaseActivity {
         srf.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                Log.d("TAG","刷新走了");
                 getData();
             }
         });
@@ -129,6 +142,7 @@ public class ElectKeyManagerActivity extends BaseActivity {
 
     public void getData() {
         data3=new ArrayList();
+        Log.d("TAG","刷新走2");
         String uid = SharedUtils.getString("uid");
         Map<String,String>map=new HashMap<>();
         map.put("pageSize","10");
@@ -144,21 +158,27 @@ public class ElectKeyManagerActivity extends BaseActivity {
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(MainApplication.getInstence().getClient())
                 .build();
+        data3.clear();
         apiManager manager = re.create(apiManager.class);
         Call<String> call = manager.keyManager(s);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
+                if (!StringUtils.isEmpty(body)){
+
+
                 keyManagerBean bean = gson.fromJson(body, new TypeToken<keyManagerBean>() {}.getType());
                 keyManagerBean.DataBeanX data = bean.getData();
                 if (data==null){
                     //加载没有数据界面
-                    Toast.makeText(ElectKeyManagerActivity.this,"没数据",Toast.LENGTH_LONG).show();
-
-
+                    key_manage_lv.setVisibility(View.GONE);
+                    ll_nodata.setVisibility(View.VISIBLE);
+                    iv_no_data.setImageResource(R.mipmap.no_key);
+                    tv_no_data.setText("暂无钥匙");
                 }else if (data!=null){
-
+                    key_manage_lv.setVisibility(View.VISIBLE);
+                    ll_nodata.setVisibility(View.GONE);
                     List<keyManagerBean.DataBeanX.DataBean> data1 = data.getData();
                     Iterator<keyManagerBean.DataBeanX.DataBean> iterator = data1.iterator();
                     while (iterator.hasNext()){
@@ -178,9 +198,7 @@ public class ElectKeyManagerActivity extends BaseActivity {
                             TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
                             EditText et_yanzhenpasw= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
                             et_yanzhenpasw.setVisibility(View.GONE);
-                            // tv.setText("谨慎操作，导致数据丢失...");
-                            //  tv.setTextColor(Color.RED);
-                            //  tv.setGravity(Gravity.CENTER);
+
                             TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
                             final AlertDialog dialog = new AlertDialog.Builder(ElectKeyManagerActivity.this)
                                     .setView(viewDialog)
@@ -206,23 +224,21 @@ public class ElectKeyManagerActivity extends BaseActivity {
                         }
                     });
 
-
-
-
-
                     key_manage_lv.setAdapter(adapter);
-                    srf.setRefreshing(false);
+
                     adapter.notifyDataSetChanged();
 
                 }
-
+                    srf.setRefreshing(false);
             }
-
+            }
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 
             }
+
         });
+
     }
 
     public void delectData(String id, final int postion){
@@ -245,6 +261,9 @@ public class ElectKeyManagerActivity extends BaseActivity {
                     Toast.makeText(ElectKeyManagerActivity.this,"删除成功",Toast.LENGTH_LONG).show();
                     data3.remove(postion);
                     adapter.notifyDataSetChanged();
+                    MqttPresenter presenter=new MqttPresenter();
+                    presenter.sendMqtt("az"+uid,ElectKeyManagerActivity.this);
+                    presenter.sendMqtt("ios"+uid,ElectKeyManagerActivity.this);
                 }
             }
 
@@ -256,4 +275,13 @@ public class ElectKeyManagerActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void mqttSuccess() {
+
+    }
+
+    @Override
+    public void mqttFaild() {
+
+    }
 }

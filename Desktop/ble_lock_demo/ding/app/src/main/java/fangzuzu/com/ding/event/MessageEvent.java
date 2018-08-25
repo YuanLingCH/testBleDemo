@@ -13,12 +13,22 @@ public class MessageEvent {
     private String topic;
     private MqttMessage mqttMessage;
     private String string="";
+    private  String code;
     public MessageEvent() {
     }
 
-    public MessageEvent(String topic, MqttMessage mqttMessage) {
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public MessageEvent(String topic, MqttMessage mqttMessage, String code) {
         this.topic = topic;
         this.mqttMessage = mqttMessage;
+        this.code=code;
     }
 
     public MessageEvent(String str) {

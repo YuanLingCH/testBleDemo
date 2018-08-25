@@ -183,7 +183,7 @@ public class circulationFragment extends BaseFragment {
                                 dialog.dismiss();
                             }
                         }).create();
-
+                dialog.setCanceledOnTouchOutside(false);
                 dialog.show();
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#EC8325"));
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.BLACK);

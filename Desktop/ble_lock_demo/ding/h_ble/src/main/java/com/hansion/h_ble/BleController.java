@@ -217,7 +217,7 @@ public void stopScan(){
                 mAdapter.stopLeScan(bleDeviceScanCallback);
                 scanCallback.onSuccess();
             }
-        },2000);
+        },3000);
 
         mAdapter.startLeScan(bleDeviceScanCallback);
     }

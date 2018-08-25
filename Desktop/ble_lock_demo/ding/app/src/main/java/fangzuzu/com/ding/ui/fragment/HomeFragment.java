@@ -1,13 +1,17 @@
 package fangzuzu.com.ding.ui.fragment;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -85,6 +89,7 @@ public class HomeFragment extends BaseFragment {
     ProgressDialog progressDialog;
     Toolbar toolbar;
    Button tv_ding;
+    public  int REQUEST_ACCESS_COARSE_LOCATION=1;
     private byte[] token3=new byte[4];
     byte[]jiesouTock=new byte[16];
     byte[]token2=new byte[4];
@@ -421,18 +426,55 @@ public class HomeFragment extends BaseFragment {
 
         secretKeyBytes= StringUtils.toByteArray(secretKey);
         adminPswBytes=StringUtils.toByteArray(adminPsw);
+
         byteCunchu.put(adminPswBytes,"adminPswBytes");
         allowbyt= StringUtils.toByteArray(allow);
         byteCunchu.put(secretKeyBytes,"secretKeyBytes");
         byteCunchu.put( allowbyt,"allowbyt");//存锁标识
 
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
+        // TODO Auto-generated method stub
+        if (requestCode == REQUEST_ACCESS_COARSE_LOCATION) {
+            if (permissions[0] .equals(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 用户同意使用该权限
+            } else {
+                // 用户不同意，向用户展示该权限作用
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    //showTipDialog("用来扫描附件蓝牙设备的权限，请手动开启！");
+                    return;
+                }
+            }
+        }
+    }
+
+
     /**
      * 连接蓝牙
      */
     String  strbiaozhi;
     List   bledata=new ArrayList();
     private void initConnectBle() {
+
+        if(Build.VERSION.SDK_INT>=23){
+            //判断是否有权限
+            if (ContextCompat.checkSelfPermission(MainApplication.getInstence(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
+                //请求权限
+                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        REQUEST_ACCESS_COARSE_LOCATION);
+//向用户解释，为什么要申请该权限
+                if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                        Manifest.permission.READ_CONTACTS)) {
+                    Toast.makeText(MainApplication.getInstence(),"打开权限才能用哦", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
@@ -440,14 +482,17 @@ public class HomeFragment extends BaseFragment {
                 mBleController.scanBleone(0, new ScanCallback() {
                     @Override
                     public void onSuccess() {
+                        hideProgressDialog();
                         Log.d("TAG","蓝牙扫描结束");
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
+
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (strbiaozhi.equals("02")){
+                                        hideProgressDialog();
                                         connect();
                                     }
 
@@ -461,6 +506,7 @@ public class HomeFragment extends BaseFragment {
 
                     @Override
                     public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        showProgressDialog("","正在连接蓝牙...");
                         String address = device.getAddress();
                         if (address.equals(lockNumber)){
                             if (!bledata.contains(lockNumber)){
@@ -492,14 +538,11 @@ public class HomeFragment extends BaseFragment {
                 if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
                     Log.d("TAG","标准"+strbiaozhi);
                     Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
-
                             hideProgressDialog();
-
-
-
                     return;
                 }else {
                     Log.d("TAG","连接");
+
                     connect();
                 }
 

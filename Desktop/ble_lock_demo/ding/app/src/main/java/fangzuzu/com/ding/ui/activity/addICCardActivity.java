@@ -15,7 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -32,6 +34,7 @@ import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.adapter.IcListAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.Icbean;
+import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,12 +48,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class addICCardActivity extends BaseActivity{
     Toolbar toolbar;
-
+    ImageView iv_no_data;
+    TextView tv_no_data;
     RecyclerView rc;
     List data3;
     IcListAdapter adapter;
     boolean isKitKat = false;
-
+LinearLayout ll_no_data;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +102,9 @@ setStatusBar();
 
 
     private void initlize() {
-
+        ll_no_data=(LinearLayout) findViewById(R.id.ll_nodata);
+        iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
+        tv_no_data=(TextView) findViewById(R.id.tv_no_data);
         rc= (RecyclerView) findViewById(R.id.lv);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
@@ -170,10 +176,19 @@ setStatusBar();
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
+                if (!StringUtils.isEmpty(body)){
                 Log.d("TAG",body);
                 Icbean bean= gson.fromJson(body, new TypeToken<Icbean>() {}.getType());
                 Icbean.DataBeanX data = bean.getData();
                 List<Icbean.DataBeanX.DataBean> data1 = data.getData();
+                    if (data1.size()==0){
+                        rc.setVisibility(View.GONE);
+                        ll_no_data.setVisibility(View.VISIBLE);
+                        iv_no_data.setImageResource(R.mipmap.no_card);
+                        tv_no_data.setText("暂无卡片");
+                    }else  if (data1.size()>0){
+                        ll_no_data.setVisibility(View.GONE);
+                        rc.setVisibility(View.VISIBLE);
                 Iterator<Icbean.DataBeanX.DataBean> iterator = data1.iterator();
                 while (iterator.hasNext()){
                     Icbean.DataBeanX.DataBean next = iterator.next();
@@ -183,7 +198,8 @@ setStatusBar();
                 rc.setAdapter(adapter);
 
             }
-
+            }
+            }
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 

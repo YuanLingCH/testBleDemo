@@ -37,7 +37,7 @@ public interface apiManager {
     //http://192.168.0.118:7956/subset/insert?userSubsetModel=%7B%7D        https://www.fzzsaas.com/lockingSystem/subset/insert?
     // https://www.fzzsaas.com/lockingSystem/subset/insert?    http://192.168.0.119:7956/subset/insert
     @FormUrlEncoded
-    @POST(" http://192.168.0.119:7956/subset/insert")
+    @POST("https://www.fzzsaas.com/lockingSystem/subset/insert?")
     Call<String>sendkey(@Field("userSubsetModel") String s);
 
     // 发送密码 永久  IC卡

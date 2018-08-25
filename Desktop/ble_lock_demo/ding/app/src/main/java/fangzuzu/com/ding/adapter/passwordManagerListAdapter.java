@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fangzuzu.com.ding.R;
@@ -33,16 +31,12 @@ public class passwordManagerListAdapter extends RecyclerView.Adapter{
     private LayoutInflater inflater;
 
     private OnItemLongClickListener mOnItemLongClickListener;
-    private int normalType = 0;     // 第一种ViewType，正常的item
-    private int footType = 1;       // 第二种ViewType，底部的提示View
 
-    private boolean hasMore = true;   // 变量，是否有更多数据
-    private boolean fadeTips = false; // 变量，是否隐藏了底部的提示
-    public passwordManagerListAdapter(List mDatas, Context mContext, boolean hasMore) {
+    public passwordManagerListAdapter(List mDatas, Context mContext) {
         this.mDatas = mDatas;
         this.mContext=mContext;
         inflater=LayoutInflater.from(mContext);
-        this.hasMore = hasMore;
+
 
     }
 
@@ -59,74 +53,27 @@ public class passwordManagerListAdapter extends RecyclerView.Adapter{
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // 根据返回的ViewType，绑定不同的布局文件，这里只有两种
-        if (viewType == normalType) {
-            return new IcViewHolder(inflater.inflate(R.layout.pasw_manager_layout,parent,false));
-        } else {
-            return new FootHolder(inflater.inflate(R.layout.add_more_layout,parent,false));
-        }
+
+            return new IcViewHolder(inflater.inflate(R.layout.pasw_manager_layout, parent, false));
+
 
     }
 
-    // // 底部footView的ViewHolder，用以缓存findView操作
-    class FootHolder extends RecyclerView.ViewHolder {
-            TextView add_more_tv;
-        public FootHolder(View itemView) {
-            super(itemView);
-            add_more_tv= (TextView) itemView.findViewById(R.id.add_more_tv);
 
-        }
-    }
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
 
         if (holder instanceof IcViewHolder) {
             ((IcViewHolder) holder).bind(mDatas, position);
-        }else {
-            // 之所以要设置可见，是因为我在没有更多数据时会隐藏了这个footView
-            ((FootHolder) holder).add_more_tv.setVisibility(View.VISIBLE);
-            // 只有获取数据为空时，hasMore为false，所以当我们拉到底部时基本都会首先显示“正在加载更多...”
-            if (hasMore == true){
-                // 不隐藏footView提示
-                fadeTips = false;
-                if (mDatas.size()>0){
-                // 如果查询数据发现增加之后，就显示正在加载更多
-                    ((FootHolder) holder).add_more_tv.setText("正在加载更多...");
-                    ((FootHolder) holder).add_more_tv.setGravity(Gravity.CENTER);
-
-                }
-            }else {
-                if (mDatas.size() > 0) {
-                    // 如果查询数据发现并没有增加时，就显示没有更多数据了
-                    ((FootHolder) holder).add_more_tv.setText("没有更多数据了");
-                    ((FootHolder) holder).add_more_tv.setGravity(Gravity.CENTER);
-                    // 隐藏提示条
-                    ((FootHolder) holder).add_more_tv.setVisibility(View.GONE);
-                    // 将fadeTips设置true
-                    fadeTips = true;
-                    // hasMore设为true是为了让再次拉到底时，会先显示正在加载更多
-                    hasMore = true;
-                }
-                }
         }
 
          }
-    // 根据条目位置返回ViewType，以供onCreateViewHolder方法内获取不同的Holder
-    @Override
-    public int getItemViewType(int position) {
-        if (position == getItemCount() - 1) {
-            return footType;
-        } else {
-            return normalType;
-        }
-    }
+
     @Override
     public int getItemCount() {
-        return mDatas.size()+1;//recylerview的item的总数目是所有数据数量加一
+        return mDatas.size();//recylerview的item的总数目是所有数据数量加一
     }
-    // 自定义方法，获取列表中数据源的最后一个位置，比getItemCount少1，因为不计上footView
-    public int getRealLastPosition() {
-        return mDatas.size();
-    }
+
     public class IcViewHolder extends RecyclerView.ViewHolder{
 
         TextView lock_name,lock_time,lock_state;
@@ -253,24 +200,8 @@ public class passwordManagerListAdapter extends RecyclerView.Adapter{
 
         }
     }
-    // 暴露接口，改变fadeTips的方法
-    public boolean isFadeTips() {
-        return fadeTips;
-    }
 
-    // 暴露接口，下拉刷新时，通过暴露方法将数据源置为空
-    public void resetDatas() {
-        mDatas = new ArrayList<>();
-    }
 
-    // 暴露接口，更新数据源，并修改hasMore的值，如果有增加数据，hasMore为true，否则为false
-    public void updateList(List  newDatas, boolean hasMore) {
-        // 在原有的数据之上增加新数据
-        if (newDatas != null) {
-            mDatas.addAll(newDatas);
-        }
-        this.hasMore = hasMore;
-        notifyDataSetChanged();
-    }
+
 
 }

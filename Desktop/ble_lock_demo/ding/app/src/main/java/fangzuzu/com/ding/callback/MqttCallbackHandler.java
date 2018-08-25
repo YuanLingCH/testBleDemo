@@ -3,11 +3,18 @@ package fangzuzu.com.ding.callback;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import fangzuzu.com.ding.bean.mqttBean;
 import fangzuzu.com.ding.event.MessageEvent;
 
 
@@ -43,7 +50,21 @@ public class MqttCallbackHandler implements MqttCallback {
     public void messageArrived(final String s, final MqttMessage mqttMessage) throws Exception {
         Log.d("MqttCallbackHandler","MqttCallbackHandler/messageArrived="+s);
         Log.d("MqttCallbackHandler","message打印="+new String(mqttMessage.getPayload()));
-                EventBus.getDefault().post(new MessageEvent(s,mqttMessage));
+        String s1 = new String(mqttMessage.getPayload());
+        Gson gson=new Gson();
+        mqttBean bean = gson.fromJson(s1, new TypeToken<mqttBean>() {}.getType());
+        final String code = bean.getCode();
+
+        Log.d("TAG","消息"+code);
+        Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                EventBus.getDefault().post(new MessageEvent(s,mqttMessage,code));
+            }
+        },1000);
+
+
 
 
     }

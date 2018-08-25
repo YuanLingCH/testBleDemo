@@ -93,7 +93,16 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".ui.activity.icLockItemMessageActvity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.dfuActivity"
+            android:screenOrientation="portrait"/>
 
+        <!--ota升级-->
+        <service android:name=".dfu.DfuService"
+            android:enabled="true"
+            android:exported="true"
+            />
+
+        <service android:name=".service.mqttService"/>
 
 
         <!-- ShareSDK的activity -->

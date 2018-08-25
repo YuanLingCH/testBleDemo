@@ -1,5 +1,6 @@
 package fangzuzu.com.ding.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTabHost;
@@ -13,31 +14,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.android.service.MqttService;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.ButterKnife;
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.SharedUtils;
-import fangzuzu.com.ding.callback.ConnectCallBackHandler;
-import fangzuzu.com.ding.callback.MqttCallbackHandler;
 import fangzuzu.com.ding.callback.SubcribeCallBackHandler;
-import fangzuzu.com.ding.impl.MainService;
+import fangzuzu.com.ding.event.MessageEvent;
 import fangzuzu.com.ding.ui.fragment.CenterFragment;
 import fangzuzu.com.ding.ui.fragment.HomeFragment;
 import fangzuzu.com.ding.ui.fragment.SmartDevice;
 import fangzuzu.com.ding.utils.NetWorkTesting;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by Administrator on 2016/12/1.
@@ -77,24 +68,14 @@ public class MainActviity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        getData();
+
         initalize();
-      //  EventBus.getDefault().register(this);
+      EventBus.getDefault().register(this);
         uid= SharedUtils.getString("uid");
         clientID="az"+uid;
-    // startConnect(clientID,serverIP,port);
+
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Timer timer=new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-        //   subscibe();
-            }
-        },2000);
-    }
+
 
     public String topic="fzzchat/PTP";
     private void subscibe() {
@@ -123,64 +104,23 @@ public class MainActviity extends BaseActivity {
      * 运行在主线程
      *
      */
-/*    @Subscribe(threadMode = ThreadMode.MAIN)
+   @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
 
 
         Log.d("TAG","收到消息main函数走了。。。。。。。。。。。。。。。。。。。。。。。。。。");
-
-     *//* Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
+       String code = event.getCode();
+       if (code.equals("10086")){
+           Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
         startActivity(intent);
         finish();
-*//*
+       }
 
 
 
-    }*/
-    private void startConnect(String clientID, String serverIP, String port) {
-        //服务器地址   192.168.1.3
-        NetWorkTesting net=new NetWorkTesting(this);
-        if (net.isNetWorkAvailable()){
 
-            String  uri ="tcp://";
-            uri=uri+serverIP+":"+port;
-            Log.d("MainActivity",uri+"  "+clientID+serverIP+port);
-            /**
-             * 连接的选项
-             */
-            MqttConnectOptions conOpt = new MqttConnectOptions();
-            /**设计连接超时时间*/
-            conOpt.setConnectionTimeout(3000);
-            /**设计心跳间隔时间300秒*/
-            conOpt.setKeepAliveInterval(300);
-            /**
-             * 创建连接对象
-             */
-            client = new MqttAndroidClient(this,uri, clientID);
-            /**
-             * 连接后设计一个回调
-             */
-            client.setCallback(new MqttCallbackHandler(this, clientID));
-            /**
-             * 开始连接服务器，参数：ConnectionOptions,  IMqttActionListener
-             */
-            try {
-                client.connect(conOpt, null, new ConnectCallBackHandler(this));
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
-        }else {
-            Toast.makeText(this,"当前网络不可用，请检查您的网络！",Toast.LENGTH_LONG).show();
-        }
+
     }
-
-
-
-
-
-
-
-
 
 
     private void initalize() {
@@ -197,28 +137,6 @@ public class MainActviity extends BaseActivity {
         }
 
 
-    }
-
-    private void getData() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://stu.1000phone.net/")
-                .client(MainApplication.getInstence().getClient())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
-        MainService ms = retrofit.create(MainService.class);
-        Call<String> call = ms.getUserInfo();
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String value = response.body();
-
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });
     }
 
 
@@ -246,12 +164,9 @@ public class MainActviity extends BaseActivity {
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-        MqttService service=new MqttService();
-        unbindService(service);
+
 
     }
 
-    private void unbindService(MqttService service) {
-        service.onDestroy();
-    }
+
 }

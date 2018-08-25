@@ -16,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ import fangzuzu.com.ding.adapter.openLockRecodeAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.openLockRecoderBean;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
+import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,6 +77,10 @@ public class openLockRecodeActivity extends BaseActivity {
     LinearLayout open_molder_ll;
     RecyclerView re_reach;
     boolean isKitKat = false;
+    LinearLayout ll_nodata,ll_no_noe;
+    FrameLayout fr_no_two;
+    ImageView iv_no_data;
+    TextView tv_no_data;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,10 +211,8 @@ public class openLockRecodeActivity extends BaseActivity {
                 //4.发送锁标识
                 //  allowbyt
                 Log.d("TAG","存储数据 Token_fr"+mBleController.bytesToHexString(token3) + "\r\n");
+                if (token3!=null){
                 byte[]data5=new byte[16];
-                for (int i = 0; i < allowbyt.length; i++) {
-                    Log.d("TAG","all"+allowbyt[i]);
-                }
 
                 data5[0]=0x02;
                 data5[1]=0x02;
@@ -238,7 +242,9 @@ public class openLockRecodeActivity extends BaseActivity {
                     public void onFailed(int state) {
 
                     }
+
                 });
+                }
             }
         },500);
 
@@ -409,7 +415,7 @@ public class openLockRecodeActivity extends BaseActivity {
             @Override
             public void onRecive(byte[] value) {
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, aesks);
-                Log.d("TAG","解密addICCardOneStepActivity"+mBleController.bytesToHexString(decrypt) + "\r\n");
+                Log.d("TAG","解密获取开锁记录"+mBleController.bytesToHexString(decrypt) + "\r\n");
              if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
                     System.arraycopy(decrypt,3,token2,0,token2.length);
                     token3=new byte[4];
@@ -438,7 +444,11 @@ public class openLockRecodeActivity extends BaseActivity {
 
     private void initlize() {
         data3=new ArrayList();
-
+        ll_no_noe=(LinearLayout) findViewById(R.id.ll_no_one);
+        fr_no_two=(FrameLayout) findViewById(R.id.fr_on_two);
+        ll_nodata=(LinearLayout) findViewById(R.id.ll_nodata);
+        tv_no_data=(TextView) findViewById(R.id.tv_no_data);
+        iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
         rc= (RecyclerView) findViewById(R.id.rc);
         LinearLayoutManager lin=new LinearLayoutManager(MainApplication.getInstence());
         lin.setOrientation(OrientationHelper.VERTICAL);
@@ -486,14 +496,25 @@ public class openLockRecodeActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
+                if (!StringUtils.isEmpty(body)){
+
+
                 Log.d("TAG",body);
                 openLockRecoderBean bean = gson.fromJson(body, new TypeToken<openLockRecoderBean>() {}.getType());
                 openLockRecoderBean.DataBeanX data = bean.getData();
 
                 List<openLockRecoderBean.DataBeanX.DataBean> data1 = data.getData();
-                if (data1.size()>0){
+                    if (data1.size()==0){
+                        ll_no_noe.setVisibility(View.GONE);
+                        fr_no_two.setVisibility(View.GONE);
+                        ll_nodata.setVisibility(View.VISIBLE);
+                       iv_no_data.setImageResource(R.mipmap.no_open_door);
+                        tv_no_data.setText("暂无开锁记录");
 
-
+                    } else if (data1.size()>0){
+                        ll_nodata.setVisibility(View.GONE);
+                        ll_no_noe.setVisibility(View.VISIBLE);
+                        fr_no_two.setVisibility(View.VISIBLE);
 
                 Iterator<openLockRecoderBean.DataBeanX.DataBean> iterator = data1.iterator();
                 while (iterator.hasNext()){
@@ -508,7 +529,7 @@ public class openLockRecodeActivity extends BaseActivity {
                     Toast.makeText(MainApplication.getInstence(), "没有数据", Toast.LENGTH_SHORT).show();
                 }
             }
-
+            }
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 

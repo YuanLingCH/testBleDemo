@@ -19,6 +19,7 @@
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
+        android:visibility="gone"
         android:background="#fff"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -41,7 +42,7 @@
 
         android:background="#F0F0F0"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="20dp"/>
     <LinearLayout
         android:background="#fff"
         android:orientation="horizontal"
@@ -59,7 +60,7 @@
     <View
         android:background="#F0F0F0"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="20dp"/>
     <RelativeLayout
         android:id="@+id/ll_versions"
         android:background="#fff"

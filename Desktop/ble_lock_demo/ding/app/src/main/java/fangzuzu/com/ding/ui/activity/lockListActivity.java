@@ -2,6 +2,7 @@ package fangzuzu.com.ding.ui.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,9 +43,9 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
+import com.hansion.h_ble.callback.ScanCallback;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -65,12 +66,11 @@ import fangzuzu.com.ding.bean.UserBean;
 import fangzuzu.com.ding.bean.msg;
 import fangzuzu.com.ding.bean.userLockBean;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
-import fangzuzu.com.ding.callback.ConnectCallBackHandler;
-import fangzuzu.com.ding.callback.MqttCallbackHandler;
 import fangzuzu.com.ding.callback.SubcribeCallBackHandler;
 import fangzuzu.com.ding.event.MessageEvent;
 import fangzuzu.com.ding.impl.OnMqttListener;
 import fangzuzu.com.ding.presenter.MqttPresenter;
+import fangzuzu.com.ding.service.mqttService;
 import fangzuzu.com.ding.utils.HandleBackUtil;
 import fangzuzu.com.ding.utils.NetWorkTesting;
 import fangzuzu.com.ding.utils.StringUtils;
@@ -101,9 +101,6 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
     private static final int REQUEST_CODE_LOCATION_SETTINGS = 2;
     TextView tv_lock_list,tv_lock_listone;
     boolean isKitKat = false;
-    public  String clientID;
-    public String serverIP="www.fzhuzhu.cn";
-    public String port="1883";
     public static final String REQUESTKEY_SENDANDRECIVEACTIVITY = "lockListActivity";
     private BleController mBleController;
     private StringBuffer mReciveString = new StringBuffer();
@@ -144,7 +141,8 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
         partid = app.getPartid();
    // uid = app.getUid();
      uid= SharedUtils.getString("uid");
-        clientID="az"+uid;
+        client= mqttService.getMqttAndroidClientInstace();
+
 
       //  Log.d("TAG",partid);
   // Log.d("TAG",""uid);
@@ -172,14 +170,14 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
             }
         }
            // initauthor();
-        Log.d("TAG","  "+clientID);
+
         mBleController = BleController.getInstance().init(lockListActivity.this);
 
 
         Log.d("TAG","密钥"+mBleController.bytesToHexString(aesks) + "\r\n");
         Log.d("TAG","锁标识"+mBleController.bytesToHexString(allowbyt) + "\r\n");
 
-  startConnect(clientID,serverIP,port);
+
     }
 
     protected void setStatusBar() {
@@ -316,7 +314,9 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
                 Log.d("TAG",""+position+"id"+id);//弹出对话框提示傻逼用户
                 Log.d("TAG",""+secretKey);
                 Log.d("TAG",""+allow);
+                Log.d("TAG",""+lockNumber);
                 String sb1=new String();
+
                 for (int i = 0; i < allow.length(); i++) {
                     sb1 = allow.replace("", "0");
                 }
@@ -416,45 +416,133 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
 
     }
 
+
     /**
      * 连接蓝牙
-     *
      */
-        String id;//锁id；
+    String id;//锁id；
     int p; //位置
-    private void initConnectBle(String lockNumber,String idlock,int postion) {
-     id=idlock;
+    String  strbiaozhi;
+    List   bledata=new ArrayList();
+    String mac;
+    private void initConnectBle(final String locknumber, String idlock, int postion) {
+        id=idlock;
         p=postion;
-        Log.d("TAG","idlock"+idlock);
-        Log.d("TAG","postion"+postion);
-
+        mac=locknumber;
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
-           // showProgressDialog("","正在连接蓝牙...");
-        // 7D:8D:22:4A:85:C7
-        mBleController.connect(0, lockNumber, new ConnectCallback() {
+            if (!bledata.contains(mac)){
+                mBleController.scanBleone(0, new ScanCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("TAG","蓝牙扫描结束");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (bledata.size()==0){
+
+                                    Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    if (strbiaozhi.equals("02")){
+
+                                        connect();
+                                    }
+
+                                }
+
+                            }
+                        });
+                        //
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        showProgressDialog("","正在连接蓝牙...");
+                        String address = device.getAddress();
+                        if (address.equals(mac)){
+                            if (!bledata.contains(mac)){
+                                bledata.add(address);
+                                Log.d("TAG","蓝牙扫描"+address);
+                                String string1 = mBleController.bytesToHexString(scanRecord);
+                                Log.d("TAG", "蓝牙设备" + string1);
+                                String str = string1.replaceAll(" ", "").trim();
+                                if (str.indexOf("5453")!=-1){
+                                    int length = str.length();
+                                    String[] split = str.split("5453");
+                                    Log.d("TAG","切割后面的"+split[1]);
+                                    strbiaozhi= split[1].substring(14, 16);
+                                    if (!strbiaozhi.equals("02")){
+                                        hideProgressDialog();
+                                        Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+                });
+            }else  {
+                Log.d("TAG","没扫描");
+                if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
+                    Log.d("TAG","标准"+strbiaozhi);
+                    Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+                    return;
+                }else {
+                    Log.d("TAG","连接");
+
+                    connect();
+                }
+
+            }
+
+
+        }
+
+    }
+
+
+
+
+    public void connect(){
+        showProgressDialog("","正在连接蓝牙...");
+        mBleController.connect(0, mac, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
-                // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
-                Log.d("TAG","连接成功");
                 jiaoyan();
-
             }
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                hideProgressDialog();
 
             }
-
         });
-        }
-
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void jiaoyan(){
         //身份校验
@@ -574,54 +662,11 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
 
     }
 
-    private void startConnect(String clientID, String serverIP, String port) {
-        //服务器地址   192.168.1.3
-        NetWorkTesting net=new NetWorkTesting(this);
-        if (net.isNetWorkAvailable()){
-
-        String  uri ="tcp://";
-        uri=uri+serverIP+":"+port;
-        Log.d("MainActivity",uri+"  "+clientID+serverIP+port);
-        /**
-         * 连接的选项
-         */
-        MqttConnectOptions conOpt = new MqttConnectOptions();
-        /**设计连接超时时间*/
-        conOpt.setConnectionTimeout(3000);
-        /**设计心跳间隔时间300秒*/
-        conOpt.setKeepAliveInterval(300);
-        /**
-         * 创建连接对象
-         */
-        client = new MqttAndroidClient(this,uri, clientID);
-        /**
-         * 连接后设计一个回调
-         */
-        client.setCallback(new MqttCallbackHandler(this, clientID));
-        /**
-         * 开始连接服务器，参数：ConnectionOptions,  IMqttActionListener
-         */
-        try {
-            client.connect(conOpt, null, new ConnectCallBackHandler(this));
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-        }else {
-        Toast.makeText(this,"当前网络不可用，请检查您的网络！",Toast.LENGTH_LONG).show();
-        }
-    }
 
 
 
-    /**
-     * 获取MqttAndroidClient实例
-     * @return
-     */
-    public static MqttAndroidClient getMqttAndroidClientInstace(){
-        if(client!=null)
-            return  client;
-        return null;
-    }
+
+
 
     private void initauthor() {
         setLocationService();
@@ -676,7 +721,7 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-            subscibe();
+       subscibe();
             }
         },2000);
     }
@@ -716,7 +761,7 @@ public String topic="fzzchat/PTP";
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         String string = event.getString();
-        Log.d("TAG","收到消息mqtt走了"+topic);
+        Log.d("TAG","收到消息mqtt走了lockList"+topic);
             getUserLockList();
 
     }

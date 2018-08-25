@@ -81,6 +81,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
     String adminUserId;//锁的
     private StringBuffer mReciveString = new StringBuffer();
     boolean isKitKat = false;
+    LinearLayout  ll_dfu;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -365,38 +366,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                     }
                 });
 
-           /*     AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
-                        .setView(view)
-                        .setCustomTitle(title)
-                        .create()
-                        .show();*/
 
-            /*            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String trim = editText.getText().toString().trim();
-                                if (!StringUtils.isEmpty(trim)){
-                                    name_lock.setText(trim);
-                                    upDataLockName(trim);
-                                }else {
-                                    String content = editText.getText().toString().trim();
-                                    // tv_pasw.setText(content);
-                                    //跳到修改管理员密码界面
-                                    Intent intent =new Intent(keySetActivity.this,upDataManagerPaswActivity.class);
-                                    startActivity(intent);
-
-                                }
-
-                                dialog.dismiss();
-                            }
-                        }).create();
-                dialog.show();*/
             }else {
                 View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                 final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
@@ -430,6 +400,20 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
 
             }
         });
+
+
+
+        //ble dfus升级
+        ll_dfu=(LinearLayout)findViewById(R.id.ll_dfu);
+        ll_dfu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(MainApplication.getInstence(),dfuActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     /**
@@ -509,6 +493,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
         final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                 .setView(viewDialog)
                 .create();
+        dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         final String pasw = SharedUtils.getString("pasw");
         Log.d("TAG","密码"+pasw);
@@ -535,8 +520,8 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                             initConnectBle(mac,lockid);
                         }else {
                             //普通直接删除钥匙
-
                             upDataDelet(keyId);
+                            Log.d("TAG","普通钥匙"+pasw);
                         }
 
                     }else {
@@ -940,7 +925,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                             data3.addAll(dataPart);
                             Log.d("TAG","集合大小"+data3.size());
                             Log.d("TAG",body);
-
+/*
                             if (data3.size()==1){
                                 Timer timer=new Timer();
                                 timer.schedule(new TimerTask() {
@@ -962,7 +947,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                                 },1000);
 
 
-                            }else {
+                            }else {*/
                                 Timer timer=new Timer();
                                 timer.schedule(new TimerTask() {
                                     @Override
@@ -972,7 +957,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                                         finish();
                                     }
                                 },1000);
-                            }
+                           /* }*/
 
 
                         }else if(code==1002){

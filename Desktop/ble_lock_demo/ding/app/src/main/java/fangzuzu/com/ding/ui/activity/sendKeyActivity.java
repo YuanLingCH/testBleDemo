@@ -39,9 +39,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -63,8 +60,6 @@ import fangzuzu.com.ding.adapter.PermissionAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.msg;
 import fangzuzu.com.ding.bean.permisonBean;
-import fangzuzu.com.ding.callback.PublishCallBackHandler;
-import fangzuzu.com.ding.event.MessageEvent;
 import fangzuzu.com.ding.event.createtimeMessage;
 import fangzuzu.com.ding.event.losetimeMessage;
 import fangzuzu.com.ding.unixTime;
@@ -98,7 +93,7 @@ public class sendKeyActivity extends BaseActivity {
     EditTextDrawableClick electfrg_inputaccount;
     RecyclerView rc;
     PermissionAdapter adapter;
-    MqttAndroidClient client;
+
     String  parentid;
     TextView select_author;
     String str=new String();
@@ -129,9 +124,8 @@ public class sendKeyActivity extends BaseActivity {
         DatePicier.initDatePicker(currentDate, currentTime, sendKeyActivity.this);
         EventBus.getDefault().register(this);
         initView();
-        /**获取client对象*/
-        client = lockListActivity.getMqttAndroidClientInstace();
-        publish();
+
+
 
 
     }
@@ -170,38 +164,9 @@ public class sendKeyActivity extends BaseActivity {
 
     }
 
-    private void publish() {
-        String pubMessage = "abczzzzzz";
-        byte[] message = pubMessage.getBytes();
-        if (client != null) {
-            /**发布一个主题:如果主题名一样不会新建一个主题，会复用*/
-            try {
-                client.publish("topicTest", message, 0, false, null, new PublishCallBackHandler(sendKeyActivity.this));
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
-        }
 
-    }
 
-    /**
-     * 运行在主线程
-     *
-     * @param event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        String string = event.getString();
-        /**接收到服务器推送的信息，显示在右边*/
-        if ("".equals(string)) {
-            String topic = event.getTopic();
-            MqttMessage mqttMessage = event.getMqttMessage();
-            String s = new String(mqttMessage.getPayload());
-            topic = topic + " : " + s;
-            Log.d("TAG", topic);
-            /**接收到订阅成功的通知,订阅成功，显示在左边*/
-        }
-    }
+
 
 
     List<permisonBean.DataBean> data3;
@@ -504,15 +469,35 @@ public class sendKeyActivity extends BaseActivity {
                                 Log.d("TAG", "本地接口调用锁" + authordata.size());
                                 sendMqtt("ios"+userId);
                                 sendMqtt("az"+userId);
-
-                                Log.d("TAG", "授权大小集合" + authordata.size());
-                           /*     if (authordata.size()>0){
-                                    Log.d("TAG", "授权大小集合" + authordata.size()+"走了");
-                                    authPeople();
-                                }else {
-                                    Toast.makeText(sendKeyActivity.this,"请选择授权模块",Toast.LENGTH_LONG).show();
-                                    hideProgressDialog();
-                                }*/
+                                View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                                final TextView tv = (TextView) view.findViewById(R.id.dialog_editname);
+                                TextView tv_cancle= (TextView) view.findViewById(R.id.add_cancle);
+                                EditText et_yanzhenpasw= (EditText) view.findViewById(R.id.et_yanzhenpasw);
+                                et_yanzhenpasw.setVisibility(View.INVISIBLE);
+                                TextView tv1= (TextView) view.findViewById(R.id.tv);
+                                tv1.setVisibility(View.INVISIBLE);
+                                tv.setText("发送钥匙成功");
+                                tv.setGravity(Gravity.CENTER);
+                                TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+                                final AlertDialog dialog = new AlertDialog.Builder(sendKeyActivity.this)
+                                        .setView(view)
+                                        .create();
+                                dialog.setCanceledOnTouchOutside(false);
+                                dialog.show();
+                                tv_cancle.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        hideProgressDialog();
+                                    }
+                                });
+                                tv_submit.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                        hideProgressDialog();
+                                    }
+                                });
 
                             }else if (code.equals("1002")){
                                 Toast.makeText(sendKeyActivity.this,"发送失败",Toast.LENGTH_LONG).show();
@@ -566,7 +551,6 @@ public class sendKeyActivity extends BaseActivity {
                   @Override
                   public void onItemClick(String id,  int postion,  List<permisonBean.DataBean> data) {
                       Log.d("TAG", "上传数据" + id);
-
                       if (!authordata.contains(id)){
                                     authordata.add(id);
                                    data.get(postion).setFlag(true);
@@ -587,6 +571,7 @@ public class sendKeyActivity extends BaseActivity {
                 final AlertDialog dialog = new AlertDialog.Builder(sendKeyActivity.this)
                         .setView(view)
                         .create();
+                dialog.setCanceledOnTouchOutside(false);
                 dialog.show();
 
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
@@ -618,13 +603,7 @@ public class sendKeyActivity extends BaseActivity {
 
     }
 
-    /**
-     * 发送电子钥匙第一步
-     */
-    private void updata(String s2,String s4) {
 
-
-    }
 
     String[] authStr;
 
@@ -747,7 +726,8 @@ public class sendKeyActivity extends BaseActivity {
                 msg s = gson.fromJson(body, new TypeToken<msg>() {}.getType());
                 int code = s.getCode();
                 if (code==1001){
-                    Toast.makeText(sendKeyActivity.this,"发送钥匙成功",Toast.LENGTH_LONG).show();
+
+                 //   Toast.makeText(sendKeyActivity.this,"发送钥匙成功",Toast.LENGTH_LONG).show();
                     hideProgressDialog();
 
                 }else if (code==1002){

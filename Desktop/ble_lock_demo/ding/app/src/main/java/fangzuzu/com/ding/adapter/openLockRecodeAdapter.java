@@ -47,6 +47,7 @@ public class openLockRecodeAdapter extends RecyclerView.Adapter<openLockRecodeAd
         holder.lock_open_time.setText(substring1);
         if (unlockType==1){
             holder.open_type.setText("APP开锁");
+            holder.iv_open_lock.setImageResource(R.mipmap.portrait);
         }else if (unlockType==0){
             holder.open_type.setText("密码开锁");
             holder.iv_open_lock.setImageResource(R.mipmap.mima);

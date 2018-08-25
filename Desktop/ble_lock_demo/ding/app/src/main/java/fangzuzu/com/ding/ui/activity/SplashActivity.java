@@ -23,6 +23,7 @@ import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.UserBean;
 import fangzuzu.com.ding.bean.userLockBean;
+import fangzuzu.com.ding.service.mqttService;
 import fangzuzu.com.ding.utils.NetWorkTesting;
 import fangzuzu.com.ding.utils.StringUtils;
 import retrofit2.Call;
@@ -60,8 +61,14 @@ public class SplashActivity extends BaseActivity {
         if (user!=null){
             String name = user.name;
             if (!StringUtils.isEmpty(name)){
+                Log.d("TAG","直接走了啊");
 
-                getUserLockList();
+
+                Intent intent=new Intent(SplashActivity.this, mqttService.class);
+                startService(intent);
+
+              getUserLockList();
+
             }
         }else {
             Timer timer=new Timer();
@@ -202,6 +209,7 @@ public class SplashActivity extends BaseActivity {
 
         }
     }
+
 
 
 }

@@ -17,11 +17,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
+        <include layout="@layout/no_data_layout"/>
     <LinearLayout
+        android:id="@+id/ll_no_one"
         android:layout_marginRight="5dp"
         android:layout_marginLeft="5dp"
         android:orientation="horizontal"
         android:focusable="true"
+        android:visibility="invisible"
         android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -44,6 +47,7 @@
         android:layout_height="wrap_content" />
     </LinearLayout>
     <FrameLayout
+        android:id="@+id/fr_on_two"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     <android.support.v7.widget.RecyclerView
@@ -135,4 +139,5 @@
                 android:layout_height="wrap_content"/>
         </FrameLayout>
     </FrameLayout>
+
 </LinearLayout>

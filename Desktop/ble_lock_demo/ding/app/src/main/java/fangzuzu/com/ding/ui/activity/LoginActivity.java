@@ -39,6 +39,7 @@ import fangzuzu.com.ding.bean.userLockBean;
 import fangzuzu.com.ding.impl.OnLoginListener;
 import fangzuzu.com.ding.md5.MD5Utils;
 import fangzuzu.com.ding.presenter.LoginPresenter;
+import fangzuzu.com.ding.service.mqttService;
 import fangzuzu.com.ding.utils.KeyBoardHelper;
 import fangzuzu.com.ding.utils.NetWorkTesting;
 import fangzuzu.com.ding.utils.StringUtils;
@@ -233,6 +234,10 @@ ImageView pasw_show;
                 String pasw = etPassword.getText().toString().trim();
                 Log.d("TAG","成功后密码"+pasw);
                 SharedUtils.putString("pasw",pasw);
+
+                //启动服务 连接mqtt
+                Intent intent=new Intent(LoginActivity.this, mqttService.class);
+                startService(intent);
             }
         });
 

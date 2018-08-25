@@ -139,3 +139,5 @@
 -dontwarn android.support.**
 
 -keepattributes EnclosingMethod
+#蓝牙升级包
+-keep class no.nordicsemi.android.dfu.** { *; }

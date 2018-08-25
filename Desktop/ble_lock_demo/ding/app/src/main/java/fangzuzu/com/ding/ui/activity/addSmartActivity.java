@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
@@ -201,7 +203,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                 if (value[2]==0x06){
                     System.arraycopy(value,3,lockid,0,lockid.length);
                     byteCunchu.put(lockid,"lockid");
-                    upData();
+                    allowSucess();
                     for (int i = 0; i < lockid.length; i++) {
                         Log.d("TAG","id"+lockid[i]);
 
@@ -211,6 +213,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                 if (value[1]==03){
                     System.arraycopy(value,3,blemanager,0,blemanager.length);
                     byteCunchu.put(blemanager,"blemanager");
+                    adminSucess();
                     for (int i = 0; i < blemanager.length; i++) {
                         Log.d("TAG","idh"+blemanager[i]);
                     }
@@ -219,8 +222,8 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                 if (value[1]==04){
                     System.arraycopy(value,3,aesk,0,aesk.length);
                     byteCunchu.put(aesk,"aesk");
-
-
+                    askSucess();
+                //
                     for (int i = 0; i < aesk.length; i++) {
                         Log.d("TAG","aesk"+aesk[i]);
                     }
@@ -236,6 +239,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
             if (value[0]==01&&value[1]==04&&value[2]==01&&value[3]==0){
             mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
                 mBleController.closeBleConn();
+
 
             }
                 if (value[0]!=01){
@@ -501,6 +505,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
      * 创建蓝牙管理员
      */
     private void createBleManager() {
+
         final byte[]data={0x01,0x01,0x02,0x06,0x08,0x08,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
 
         mBleController.writeBuffer(data, new OnWriteCallback() {
@@ -514,49 +519,65 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
 
             }
         });
-        //锁身份标识成功
-        final byte[]data1={0x01,0x02,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
-        mBleController.writeBuffer(data1, new OnWriteCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d("TAG","发送成功");
-
-            }
-            @Override
-            public void onFailed(int state) {
-
-            }
-        });
-
-
-        //锁身份标识成功
-        final byte[]data2={0x01,0x03,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
-        mBleController.writeBuffer(data2, new OnWriteCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d("TAG","发送成功");
-            }
-            @Override
-            public void onFailed(int state) {
-
-            }
-        });
-
-        //返回密钥成功
-        final byte[]data3={0x01,0x04,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
-        mBleController.writeBuffer(data3, new OnWriteCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d("TAG","发送成功");
-
-
-            }
-            @Override
-            public void onFailed(int state) {
-            }
-        });
 
     }
+
+public  void allowSucess(){
+            //锁身份标识成功
+            final byte[]data1={0x01,0x02,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
+            mBleController.writeBuffer(data1, new OnWriteCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.d("TAG","发送成功");
+
+                }
+                @Override
+                public void onFailed(int state) {
+
+                }
+            });
+
+}
+
+public void adminSucess(){
+    //管理员密码成功
+    final byte[]data2={0x01,0x03,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
+    mBleController.writeBuffer(data2, new OnWriteCallback() {
+        @Override
+        public void onSuccess() {
+            Log.d("TAG","发送成功");
+        }
+        @Override
+        public void onFailed(int state) {
+
+        }
+    });
+}
+
+public void askSucess(){
+    //返回密钥成功
+    final byte[]data3={0x01,0x04,0x01,0x00,0x00,0x00,0x00,0x00,0xc,0xf,0xc,0xf,0xc,0xf,0xc,0xf};
+    mBleController.writeBuffer(data3, new OnWriteCallback() {
+        @Override
+        public void onSuccess() {
+            Log.d("TAG","发送返回密钥成功");
+           upData();
+          //
+            Timer timer =new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    mBleController.closeBleConn();
+                }
+            },1000);
+        }
+        @Override
+        public void onFailed(int state) {
+        }
+    });
+}
+
+
 
     /**
      * 上传蓝牙管理员数据
@@ -571,17 +592,13 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
         StringBuffer bufferlock=new StringBuffer();
         byte[] lockid = byteCunchu.getbyte("lockid");
         for (int i = 0; i < lockid.length; i++) {
-            Log.d("TAG","管理员"+lockid[i]);
-            bufferlock.append((lockid[i]));
+            bufferlock.append(lockid[i]);
         }
 
-        final String ble = mBleController.bytesToHexString(blemanager).toString().trim();
-        String ble1 = ble.replaceAll(" ", "");
 
         final String aesk1 =mBleController.bytesToHexString(aesk).toString().trim();
         String aesk11 = aesk1.replaceAll(" ", "");
-        final String lock = mBleController.bytesToHexString(lockid).toString().trim();
-        String lock1 = lock.replaceAll(" ", "");
+
 
         //上传数据
         Map<String,String> map=new HashMap();

@@ -22,12 +22,17 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/srf_elect"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         >
-
+      <FrameLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/key_manage_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+          <include layout="@layout/no_data_layout"/>
+      </FrameLayout>
         </android.support.v4.widget.SwipeRefreshLayout>
+
 </LinearLayout>
