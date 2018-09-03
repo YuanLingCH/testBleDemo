@@ -5,14 +5,18 @@ import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hansion.h_ble.BleController;
@@ -27,6 +31,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,6 +40,7 @@ import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
 import fangzuzu.com.ding.dfu.DfuService;
+import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import no.nordicsemi.android.dfu.DfuProgressListener;
@@ -58,6 +64,7 @@ public class dfuActivity extends BaseActivity {
     byte[]token2=new byte[4];
     byte[] adminPswBytes;//管理员
     ProgressDialog progressDialog;
+
     public static final String REQUESTKEY_SENDANDRECIVEACTIVITY = "dfuActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +79,15 @@ public class dfuActivity extends BaseActivity {
         setContentView(R.layout.dfu_activity_layout);
         toolbar= (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setStatusBar();
-
+        lockNumber = MainApplication.getInstence().getMac();
 initlize();
         //初始化蓝牙
-        mBleController = BleController.getInstance().init(dfuActivity.this);
+        mBleController = BleController.getInstance();
         initReceiveData();
         EventBus.getDefault().register(this);
     }
@@ -170,30 +178,48 @@ initlize();
      */
     String name;
     List dataname=new ArrayList();
+
+List addressDfu=new ArrayList();
     private void scanBle() {
         Log.d("TAG","扫描开始");
-        mBleController.scanBle(10000, new ScanCallback() {
+        mBleController.scanBle(4000, new ScanCallback() {
             @Override
             public void onSuccess() {
                 Log.d("TAG","扫描结束");
                 // 进入升级模式  名字会改变    DfuTarg
                 hideProgressDialog();
 
-                if (dataname.contains("DfuTarg")){
-                  //  startDFU();  // 启动升级
+                if (dataname.contains("H_DFU")){
+
+            startDFU();  // 启动升级
+
+                }else {
+                    Log.d("TAG","正常情况");
+                    connectBle();  //  正常模式
                 }
+
+
             }
 
             @Override
             public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                String address = device.getAddress();
+
                 String named = device.getName();
                 if (!dataname.contains(named)){
                     dataname.add(named);
                 }
 
-                Log.d("TAG","重新扫描"+address+"名字"+ named );
+                if (!StringUtils.isEmpty(named)){
+                if (named.equals("H_DFU")){
+                    String address1 = device.getAddress();
 
+                    if (!addressDfu.contains(address1)){
+                        addressDfu.add(address1 );
+                    }
+
+                    Log.d("TAG","重新扫描"+"名字"+ named+"蓝牙地址"+address1 );
+                }
+                }
             }
         });
     }
@@ -223,7 +249,7 @@ initlize();
             @Override
             public void onSuccess() {
                 Log.d("TAG","dfu发送成功");
-                scanBle();
+            //  scanBle();
 
             }
             @Override
@@ -243,32 +269,44 @@ initlize();
         if (!mBleController.isEnable()){
             mBleController.openBle();
         }else {
-            showProgressDialog("","正在连接蓝牙...");
-            lockNumber = MainApplication.getInstence().getMac();
-            Log.d("TAG","mac地址"+lockNumber);
-            // 7D:8D:22:4A:85:C7
-            mBleController.connect(0, lockNumber, new ConnectCallback() {
-                @Override
-                public void onConnSuccess() {
-                    // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
-                    Log.d("TAG","连接成功");
-                    jiaoyan();
+            scanBle();
 
-                }
-
-                @Override
-                public void onConnFailed() {
-                    //如果失败连接  考虑重连蓝牙   递归
-                    mBleController.closeBleConn();
-                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                    hideProgressDialog();
-
-                }
-
-            });
 
         }
     }
+
+
+    public void connectBle(){
+
+       // showProgressDialog("","正在连接蓝牙...");
+     //   mStringBuilder.append("正在连接蓝牙...");
+        tv.setText("正在连接蓝牙...");
+        Log.d("TAG","mac地址"+lockNumber);
+        // 7D:8D:22:4A:85:C7
+        mBleController.connect(0, lockNumber, new ConnectCallback() {
+            @Override
+            public void onConnSuccess() {
+                // Toast.makeText(MainApplication.getInstence(), "连接成功", Toast.LENGTH_SHORT).show();
+                Log.d("TAG","连接成功");
+                jiaoyan();
+
+            }
+
+            @Override
+            public void onConnFailed() {
+                //如果失败连接  考虑重连蓝牙   递归
+                mBleController.closeBleConn();
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+               // hideProgressDialog();
+              //  mStringBuilder.append("蓝牙连接失败,请重试");
+                tv.setText("蓝牙连接失败,请重试");
+            }
+
+        });
+    }
+
+
+
 
     private void jiaoyan(){
         //身份校验
@@ -289,6 +327,8 @@ initlize();
                     @Override
                     public void onFailed(int state) {
                         Log.d("TAG","身份校验失败"+state);
+                        hideProgressDialog();
+                        mBleController.closeBleConn();
                     }
                 });
             }
@@ -401,16 +441,58 @@ initlize();
      * 连接蓝牙进去dfu模式
      * @param view
      */
+    private StringBuilder mStringBuilder;
+ TextView tv;
+    AlertDialog dialog;
     public void butClick(View view) {
+        mStringBuilder = new StringBuilder();
         Log.d("TAG","点击升级");
-        initConnectBle();
+        // 弹出对话框  提示用户 正在升级
 
-            dfuLize();
+
+        View viewname = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+       tv = (TextView) viewname.findViewById(R.id.dialog_editname);
+        TextView tv_cancle= (TextView) viewname.findViewById(R.id.add_cancle);
+        EditText et_yanzhenpasw= (EditText) viewname.findViewById(R.id.et_yanzhenpasw);
+        et_yanzhenpasw.setVisibility(View.INVISIBLE);
+        TextView tv1= (TextView) viewname.findViewById(R.id.tv);
+        tv1.setVisibility(View.INVISIBLE);
+      //  mStringBuilder.append("给锁升级,需要一分钟左右，请勿离开锁");
+        tv.setText("给锁升级,需要一分钟左右，请勿离开锁");
+        tv.setTextSize(16);
+        tv.setGravity(Gravity.CENTER);
+        TextView tv_submit= (TextView) viewname.findViewById(R.id.add_submit);
+        dialog = new AlertDialog.Builder(dfuActivity.this)
+                .setView(viewname)
+                .create();
+        dialog.show();
+        tv_cancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+
+            }
+        });
+        tv_submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                initConnectBle();
+            }
+        });
+
+
+
+
+
+
+
+
+
+
     }
 
-    private void dfuLize() {
 
-    }
 
     /**
      * ota升级的监听
@@ -430,6 +512,8 @@ initlize();
     @Override
     public void onDfuProcessStarting(String deviceAddress) {
         Log.d("TAG","升级准备开始的时候调用");
+      //  mStringBuilder.append("准备升级");
+        tv.setText("准备升级");
     }
         //设备开始升级
     @Override
@@ -444,7 +528,12 @@ initlize();
         //升级过程中的回调
     @Override
     public void onProgressChanged(String deviceAddress, int percent, float speed, float avgSpeed, int currentPart, int partsTotal) {
-        Log.d("TAG","升级过程中的回调");
+        Log.d("TAG","升级过程中的回调"+"percent"+percent+"speed"+speed+"avgSpeed"+avgSpeed+"currentPart"+currentPart+"partsTotal"+partsTotal);
+       // mStringBuilder.append("正在升级"+percent+"%");
+        tv.setText("正在升级"+percent+"%");
+
+
+
     }
         //固件验证
     @Override
@@ -460,21 +549,33 @@ initlize();
     @Override
     public void onDeviceDisconnected(String deviceAddress) {
         Log.d("TAG","设备已经断开");
+      mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
     }
         //升级完成
     @Override
     public void onDfuCompleted(String deviceAddress) {
         Log.d("TAG","升级完成");
+        Toast.makeText(MainApplication.getInstence(), "锁升级完成", Toast.LENGTH_SHORT).show();
+        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+      //  mStringBuilder.append("升级完成");
+        tv.setText("升级完成");
+        dialog.dismiss();
     }
 
     @Override
     public void onDfuAborted(String deviceAddress) {
         Log.d("TAG","当DFU进程已中止时调用的方法");
+        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+
     }
         //升级失败
     @Override
     public void onError(String deviceAddress, int error, int errorType, String message) {
         Log.d("TAG","升级失败");
+        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+        Toast.makeText(MainApplication.getInstence(), "锁升级失败", Toast.LENGTH_SHORT).show();
+        tv.setText("升级失败");
+        dialog.dismiss();
     }
 };
 
@@ -519,13 +620,19 @@ initlize();
      * @param //filePath        约定匹配的ZIP文件的路径。
      */
     private void startDFU() {
-        final DfuServiceInitiator stater = new DfuServiceInitiator("F9:E5:64:39:0E:03")
-                .setDeviceName("DfuTarg")
+        String addDFU=null;
+        Iterator iterator = addressDfu.iterator();
+        while (iterator.hasNext()){
+            addDFU = (String) iterator.next();
+        }
+        Log.d("TAG","升级蓝牙地址"+addDFU);
+        final DfuServiceInitiator stater = new DfuServiceInitiator(addDFU)
+                .setDeviceName("H_DFU"+addDFU)
                 .setKeepBond(true)
                 .setForceDfu(true);
              // .setPacketsReceiptNotificationsEnabled(PacketsReceipt);
               //  .setPacketsReceiptNotificationsValue(numberOfPackets);
-        stater.setZip(R.raw.test_dfu);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
+        stater.setZip(R.raw.test_dfu_0830);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
         stater.start(this, DfuService.class);
     }
 

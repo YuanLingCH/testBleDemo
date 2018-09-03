@@ -6,8 +6,10 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -164,11 +166,11 @@ public class addICCardOneStepActivity extends BaseActivity {
         bytestype = StringUtils.toByteArray(str);
 
     }
-
+ String lockName;
     byte[] bytesstartTime;
     byte[] bytesstartendTime;
     private void initEvent() {
-
+        electfrg_key_name=(EditText) findViewById(R.id.electfrg_key_name);
         Log.d("TAG","存储数据 aesks"+mBleController.bytesToHexString(aesks) + "\r\n");
 
         Log.d("TAG","存储数据 token3"+mBleController.bytesToHexString(token3) + "\r\n");
@@ -177,6 +179,7 @@ public class addICCardOneStepActivity extends BaseActivity {
         but_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                lockName = electfrg_key_name.getText().toString().trim();
                 initReceiveData();
                 initConnectBle();
 
@@ -208,8 +211,8 @@ public class addICCardOneStepActivity extends BaseActivity {
 
         }else {
 
-
-            String s = unixTime.dateToStampone(createtime);
+            String trim = currentTime.getText().toString().trim();
+            String s = unixTime.dateToStampone(trim);
             Log.d("TAG","开始时间戳"+s);
             String substring1 = s.substring(0, s.length() - 3);
             int startTime = Integer.parseInt(substring1);
@@ -440,7 +443,7 @@ public class addICCardOneStepActivity extends BaseActivity {
                     public void onSuccess() {
                         Log.d("TAG","发送成功");
                         tongbuTime();
-                        sendicorAoth();
+
                     }
                     @Override
                     public void onFailed(int state) {
@@ -485,7 +488,7 @@ public class addICCardOneStepActivity extends BaseActivity {
             @Override
             public void onSuccess() {
                 Log.d("TAG","发送成功");
-
+                sendicorAoth();
             }
             @Override
             public void onFailed(int state) {
@@ -547,8 +550,8 @@ public class addICCardOneStepActivity extends BaseActivity {
                 Log.d("TAG","解密addICCardOneStepActivity"+mBleController.bytesToHexString(decrypt) + "\r\n");
                 if (decrypt[0]==04&&decrypt[2]==01&&decrypt[3]==00){
                     hideProgressDialog();
-                    Toast.makeText(addICCardOneStepActivity.this,"请刷卡",Toast.LENGTH_LONG).show();
-
+                   // Toast.makeText(addICCardOneStepActivity.this,"请刷卡",Toast.LENGTH_LONG).show();
+                    dialog("请刷IC 卡");
                 }if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
                     System.arraycopy(decrypt,3,token2,0,token2.length);
                     token3=new byte[4];
@@ -571,16 +574,40 @@ public class addICCardOneStepActivity extends BaseActivity {
                     Toast.makeText(addICCardOneStepActivity.this,"设置失败",Toast.LENGTH_LONG).show();
                 }else if (decrypt[0]==04&&decrypt[3]==0xFF){
                     Toast.makeText(addICCardOneStepActivity.this,"无权限操作",Toast.LENGTH_LONG).show();
-                }else if (decrypt[0]==04&&decrypt[1]==03&&decrypt[2]==06&&decrypt[3]==03&&decrypt[4]==01){
+                }else if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==03){
                     System.arraycopy(decrypt,0,bytezuqi,0,bytezuqi.length); //设置租期
                     setzuqiTime();//设置租期范围
-                    Toast.makeText(addICCardOneStepActivity.this,"添加卡片成功",Toast.LENGTH_LONG).show();
+                 //   Toast.makeText(addICCardOneStepActivity.this,"添加卡片成功",Toast.LENGTH_LONG).show();
+                    mBleController.closeBleConn();
+                    dialog("添加IC卡成功");
 
                 }
             }
         });
     }
 
+
+    private void dialog(String conncet) {
+        View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_deviceslayut, null);
+        final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+        TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+        tv.setText(conncet);
+        tv.setTextColor(Color.BLACK);
+        tv.setTextSize(14);
+        tv.setGravity(Gravity.CENTER);
+        TextView tv_de_me= (TextView)viewDialog.findViewById(R.id.tv_de_me);
+        final AlertDialog dialog = new AlertDialog.Builder(addICCardOneStepActivity.this)
+                .setView(viewDialog)
+                .create();
+      //  dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        tv_de_me.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
     /**
      * 提交数据到服务器
      */
@@ -592,7 +619,7 @@ public class addICCardOneStepActivity extends BaseActivity {
     private void upData() {
 
         //接收数据
-        final String lockName = electfrg_key_name.getText().toString().trim();
+
         final String allow = MainApplication.getInstence().getAllow();
         final String lockid = MainApplication.getInstence().getLockid();
         final String uid = SharedUtils.getString("uid");

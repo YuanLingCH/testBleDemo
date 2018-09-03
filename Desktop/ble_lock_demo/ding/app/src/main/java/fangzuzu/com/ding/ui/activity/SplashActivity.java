@@ -62,8 +62,6 @@ public class SplashActivity extends BaseActivity {
             String name = user.name;
             if (!StringUtils.isEmpty(name)){
                 Log.d("TAG","直接走了啊");
-
-
                 Intent intent=new Intent(SplashActivity.this, mqttService.class);
                 startService(intent);
 

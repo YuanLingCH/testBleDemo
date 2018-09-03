@@ -29,7 +29,9 @@ import fangzuzu.com.ding.utils.NetWorkTesting;
 public class mqttService extends Service {
     public  String clientID;
     private static MqttAndroidClient client;
-    public String serverIP="www.fzhuzhu.cn";
+  //  public String serverIP="www.fzhuzhu.cn";
+    // http://192.168.0.121:8799/news/PointToPoint
+  public String serverIP="www.fzhuzhu.cn";
     public String port="1883";
     String uid;
     @Nullable
@@ -117,10 +119,13 @@ public class mqttService extends Service {
             conOpt.setConnectionTimeout(3000);
             /**设计心跳间隔时间300秒*/
             conOpt.setKeepAliveInterval(300);
+            conOpt.setCleanSession(true);
+
             /**
              * 创建连接对象
              */
             client = new MqttAndroidClient(this,uri, clientID);
+
             /**
              * 连接后设计一个回调
              */

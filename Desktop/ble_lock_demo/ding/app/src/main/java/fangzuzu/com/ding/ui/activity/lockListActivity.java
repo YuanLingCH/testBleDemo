@@ -761,8 +761,15 @@ public String topic="fzzchat/PTP";
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
         String string = event.getString();
-        Log.d("TAG","收到消息mqtt走了lockList"+topic);
-            getUserLockList();
+        Log.d("TAG","收到消息mqtt走了lockList");
+        String code = event.getCode();
+        if (!StringUtils.isEmpty(code)){
+            if (code.equals("10086")){
+                getUserLockList();
+            }
+        }
+
+
 
     }
 

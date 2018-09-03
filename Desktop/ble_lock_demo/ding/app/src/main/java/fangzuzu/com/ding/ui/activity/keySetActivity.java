@@ -82,6 +82,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
     private StringBuffer mReciveString = new StringBuffer();
     boolean isKitKat = false;
     LinearLayout  ll_dfu;
+    View v_1,v_2;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,6 +136,8 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
     String id;
     private void initlize() {
        id = getIntent().getStringExtra("id");
+        v_1=(View) findViewById(R.id.v_1);
+        v_2=(View) findViewById(R.id.v_2);
         set_keymanager= (TextView) findViewById(R.id.set_keymanager);
         tv_time= (TextView) findViewById(R.id.tv_time_clock);
         ll_set_managerPasw= (LinearLayout) findViewById(R.id.ll_set_managerPasw);
@@ -199,8 +202,10 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                         final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
                         TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
                         TextView tv1= (TextView) viewDialog.findViewById(R.id.tv);
+                        final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
                         tv1.setVisibility(View.INVISIBLE);
                         tv.setText("你不是锁管理员，没有权限操作");
+                        et.setVisibility(View.INVISIBLE);
                         tv.setTextColor(Color.RED);
                         tv.setGravity(Gravity.CENTER);
                         TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
@@ -371,11 +376,13 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                 View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                 final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
                 TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+                final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
                 tv.setText("你不是锁管理员，没有权限操作");
                 TextView tv1= (TextView) viewDialog.findViewById(R.id.tv);
                 tv1.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.RED);
                 tv.setGravity(Gravity.CENTER);
+                et.setVisibility(View.INVISIBLE);
                 TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
                 final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                         .setView(viewDialog)
@@ -405,12 +412,60 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
 
         //ble dfus升级
         ll_dfu=(LinearLayout)findViewById(R.id.ll_dfu);
+        if (uid.equals(adminUserId)){
+            ll_dfu.setVisibility(View.VISIBLE);
+            v_1.setVisibility(View.VISIBLE);
+            v_2.setVisibility(View.VISIBLE);
+        }
+
         ll_dfu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent intent=new Intent(MainApplication.getInstence(),dfuActivity.class);
-                startActivity(intent);
+
+                    View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                    final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
+                    TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
+                    final EditText et= (EditText) viewDialog.findViewById(R.id.et_yanzhenpasw);
+                    final TextView tv_tishi = (TextView) viewDialog.findViewById(R.id.tv);
+                    tv_tishi.setText("密码验证");
+
+                    // tv.setText("谨慎操作，导致数据丢失...");
+                    // tv.setTextColor(Color.RED);
+                    tv.setVisibility(View.GONE);
+                    tv.setGravity(Gravity.CENTER);
+                    TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
+                    final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
+                            .setView(viewDialog)
+                            .create();
+                    dialog.show();
+                    final String pasw = SharedUtils.getString("pasw");
+                    tv_cancle.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+
+                        }
+                    });
+                    tv_submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            String pas = et.getText().toString().trim();
+                            if (pas.equals(pasw)){
+
+                                Intent intent=new Intent(MainApplication.getInstence(),dfuActivity.class);
+                                startActivity(intent);
+
+                            }else {
+                                Toast.makeText(keySetActivity.this,"你的密码错误", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+
+
+
             }
         });
 

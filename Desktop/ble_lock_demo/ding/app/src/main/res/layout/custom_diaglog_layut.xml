@@ -36,16 +36,20 @@
         android:layout_margin="20dp"
         android:layout_below="@+id/et_yanzhenpasw"
         android:text="取消"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:gravity="center"
+        android:background="@drawable/gray_5dp"
+        android:layout_width="60dp"
+        android:layout_height="30sp" />
     <TextView
+        android:gravity="center"
         android:id="@+id/add_submit"
-        android:textColor="#F09C59"
+        android:textColor="#Fff"
         android:textSize="15sp"
         android:layout_margin="20dp"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/et_yanzhenpasw"
-        android:text="确认"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:text="确定"
+        android:background="@drawable/blue_5dp"
+        android:layout_width="60dp"
+        android:layout_height="30dp" />
 </RelativeLayout>

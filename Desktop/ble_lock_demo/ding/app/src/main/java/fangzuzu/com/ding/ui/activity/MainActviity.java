@@ -29,6 +29,7 @@ import fangzuzu.com.ding.ui.fragment.CenterFragment;
 import fangzuzu.com.ding.ui.fragment.HomeFragment;
 import fangzuzu.com.ding.ui.fragment.SmartDevice;
 import fangzuzu.com.ding.utils.NetWorkTesting;
+import fangzuzu.com.ding.utils.StringUtils;
 
 /**
  * Created by Administrator on 2016/12/1.
@@ -106,15 +107,16 @@ public class MainActviity extends BaseActivity {
      */
    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-
-
         Log.d("TAG","收到消息main函数走了。。。。。。。。。。。。。。。。。。。。。。。。。。");
        String code = event.getCode();
-       if (code.equals("10086")){
-           Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
-        startActivity(intent);
-        finish();
+       if(!StringUtils.isEmpty(code)){
+           if (code.equals("10086")){
+               Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
+               startActivity(intent);
+               finish();
+           }
        }
+
 
 
 

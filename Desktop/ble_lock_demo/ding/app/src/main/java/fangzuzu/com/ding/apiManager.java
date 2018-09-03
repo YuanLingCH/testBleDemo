@@ -117,6 +117,10 @@ Call<String>upDatalockName(@Field("sysLockModel") String sysLockModel);
     //Mqtt  https://127.0.0.1:9053/permissionsUsers/news/PointToPoint
     // http://192.168.0.119:443
     //https://www.fzzsaas.com/permissionsUsers/news/PointToPoint
+
+
+    // http://192.168.0.121:8799/news/PointToPoint
+    //https://www.fzzsaas.com/permissionsUsers/news/PointToPoint
     @FormUrlEncoded
     @POST("https://www.fzzsaas.com/permissionsUsers/news/PointToPoint")
     Call<String>sendMqtt(@Field("topicMqttv3") String topicMqttv3);
@@ -126,4 +130,8 @@ Call<String>upDatalockName(@Field("sysLockModel") String sysLockModel);
     //删除锁
     @GET("https://www.fzzsaas.com/lockingSystem/sysLock/delete")
     Call<String>delctLock(@Query("id") String id);
+
+    //检查app 版本
+    @GET("http://192.168.0.119:7956/sysLock/findVersion?")
+    Call<String>getAppVersion(@Query("elseId") String elseId);
 }

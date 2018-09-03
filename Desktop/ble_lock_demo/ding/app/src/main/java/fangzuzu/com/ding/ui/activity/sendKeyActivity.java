@@ -64,6 +64,7 @@ import fangzuzu.com.ding.event.createtimeMessage;
 import fangzuzu.com.ding.event.losetimeMessage;
 import fangzuzu.com.ding.unixTime;
 import fangzuzu.com.ding.utils.StringUtils;
+import fangzuzu.com.ding.utils.phoneCheck;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import fangzuzu.com.ding.widget.DatePicier;
 import fangzuzu.com.ding.widget.EditTextDrawableClick;
@@ -93,7 +94,7 @@ public class sendKeyActivity extends BaseActivity {
     EditTextDrawableClick electfrg_inputaccount;
     RecyclerView rc;
     PermissionAdapter adapter;
-
+LinearLayout ll_bg;
     String  parentid;
     TextView select_author;
     String str=new String();
@@ -129,6 +130,8 @@ public class sendKeyActivity extends BaseActivity {
 
 
     }
+
+
 
     protected void setStatusBar() {
         if (isKitKat){
@@ -253,7 +256,7 @@ public class sendKeyActivity extends BaseActivity {
         loseTime = (LinearLayout) findViewById(R.id.lose_time);
         but_send = (Button) findViewById(R.id.but_send);
         electfrg_key_name = (EditText) findViewById(R.id.electfrg_key_name);
-       // electfrg_key_name.setText(lockName);
+   electfrg_key_name.setText(lockName);
         StringUtils.fixInputMethodManagerLeak(sendKeyActivity.this);
         electfrg_inputaccount = (EditTextDrawableClick) findViewById(R.id.electfrg_inputaccount);
         electfrg_inputaccount.setDrawableRightListener(new EditTextDrawableClick.DrawableRightListener() {
@@ -272,6 +275,7 @@ public class sendKeyActivity extends BaseActivity {
             }
         });
         //检查电话号码是不是注册
+
         electfrg_inputaccount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -279,19 +283,31 @@ public class sendKeyActivity extends BaseActivity {
                 if (!hasFocus){
 
                     if (!StringUtils.isEmpty(usernumber)){
-                        String s = usernumber.replaceAll("-", "");
+                        final String s = usernumber.replaceAll("-", "");
                         Log.d("TAG","电话切割"+s.length());
-                        if (s.length()==11){
-                            getPermision(s);
+
+                        if (phoneCheck.isChinaPhoneLegal(s)){
+                            if (s.length()==11){
+                                getPermision(s);
+                            }
+                        }else {
+                            Toast.makeText(sendKeyActivity.this, "不是电话号码", Toast.LENGTH_LONG).show();
                         }
+
 
                         }
                   else if (!StringUtils.isEmpty(electfrg_inputaccount.getText().toString().trim())){
-                        String phone = electfrg_inputaccount.getText().toString().trim();
-                        Log.d("TAG","电话切割"+phone.length());
-                        if (phone.length()==11){
-                            getPermision(phone);
+                        final String phone = electfrg_inputaccount.getText().toString().trim();
+                        if (phoneCheck.isChinaPhoneLegal(phone)){
+                            Log.d("TAG","电话切割"+phone.length());
+                            if (phone.length()==11){
+                                getPermision(phone);
+                            }
+                        }else {
+                            Toast.makeText(sendKeyActivity.this, "不是电话号码", Toast.LENGTH_LONG).show();
                         }
+
+
 
                     }
                 }
@@ -299,6 +315,9 @@ public class sendKeyActivity extends BaseActivity {
 
 
         });
+
+
+
 
         create_time.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -424,11 +443,11 @@ public class sendKeyActivity extends BaseActivity {
 
              }
                         if (authordata.size()>0){
+
+
                     Log.d("TAG","userID"+ parentid);
                     if (!StringUtils.isEmpty(userId)){
-
-
-                    Map map = new HashMap<>();
+                        Map map = new HashMap<>();
                     map.put("lockId", lockid);
                     map.put("userId", userId);
                     map.put("keyName", electfrg_key_name.getText().toString().trim());
@@ -533,6 +552,8 @@ public class sendKeyActivity extends BaseActivity {
         select_author.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //  让账号失去焦点
+                electfrg_inputaccount.setFocusable(false);
             //弹出对话框
                 final View view = getLayoutInflater().inflate(R.layout.select_author_layout, null);
                 rc= (RecyclerView) view.findViewById(R.id.rc_select);
@@ -588,6 +609,12 @@ public class sendKeyActivity extends BaseActivity {
 
                             Toast.makeText(sendKeyActivity.this,"至少选择一个模块",Toast.LENGTH_LONG).show();
                         }else if (authordata.size()>0){
+                            if (!authordata.contains("83a33756-7b89-11e8-9505-00163e06d99e")){
+                                authordata.add("83a33756-7b89-11e8-9505-00163e06d99e");
+                            }
+                            if (!authordata.contains("83a3378a-7b89-11e8-9505-00163e06d99e")){
+                                authordata.add("83a3378a-7b89-11e8-9505-00163e06d99e");
+                            }
                             authStr = authordata.toArray(new String[authordata.size()]);
                             for (int i = 0; i < authStr.length; i++) {
                                 Log.d("TAG", "上传数据" + authStr[i]);
@@ -598,6 +625,16 @@ public class sendKeyActivity extends BaseActivity {
 
                     }
                 });
+            }
+        });
+
+        electfrg_inputaccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                electfrg_inputaccount.setFocusable(true);
+                electfrg_inputaccount.setFocusableInTouchMode(true);
+                electfrg_inputaccount.requestFocus();
+                electfrg_inputaccount.findFocus();
             }
         });
 

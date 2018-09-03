@@ -39,7 +39,7 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
     }
 
     public interface OnItemLongClickListener{
-        void onItemLongClick(View view,int position,String id);
+        void onItemLongClick(View view,int position,String id,String userId);
     }
     public void setOnItemLongClickListener(OnItemLongClickListener mOnItemLongClickListener) {
         this.mOnItemLongClickListener = mOnItemLongClickListener;
@@ -122,6 +122,7 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
         }
 
         final String id = dataBean.getId();
+        final String userId = dataBean.getUserId();
         Log.d("TAG",""+timestamp);
 
         if(mOnItemLongClickListener != null){
@@ -129,7 +130,7 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
                 @Override
                 public boolean onLongClick(View v) {
                     int position =holder. getLayoutPosition();
-                    mOnItemLongClickListener.onItemLongClick(holder.itemView,position, id);
+                    mOnItemLongClickListener.onItemLongClick(holder.itemView,position, id,userId);
                     //返回true 表示消耗了事件 事件不会继续传递
                     return true;
                 }

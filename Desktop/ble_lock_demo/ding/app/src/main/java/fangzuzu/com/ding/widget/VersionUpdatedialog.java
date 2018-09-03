@@ -164,6 +164,7 @@ public class VersionUpdatedialog extends BaseDialog{
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+
                 InputStream is = null;
                 BufferedSource source=null;
                 byte[] buf = new byte[10*1024];
@@ -189,21 +190,24 @@ public class VersionUpdatedialog extends BaseDialog{
                         sum += len;
                         int progress = (int) (sum * 1.0f / total * 100);
                         // 下载中
+
                         final int index = len;
                         final int iddex1 = progress;
-                        new Activity().runOnUiThread(new Runnable() {
+                        activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (index >0){
+
                                     setSpeedShow((long)index,iddex1);
                                 }
                             }
                         });
-
                     }
                     out.flush();
+                    Log.d("TAG","下载中完成！");
                     // 下载完成
-                    installAPK(file);//安装
+                  installAPK(file);//安装
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("TAG","下载失败！"+e.getMessage());
@@ -269,6 +273,7 @@ public class VersionUpdatedialog extends BaseDialog{
      * 安装下载下来的最新APK
      */
     private void installAPK(File file) {
+        Log.d("TAG","升级路径"+Uri.fromFile(file));
         //如果当前版本小于6.0,则用普通方式安装
         if(Build.VERSION.SDK_INT < 23){
             // 通过隐式意图去开启activity

@@ -41,7 +41,7 @@
             android:text="@string/file_size"
             android:textColor="@color/black" />
 
-        <com.txxc.testdemo.widget.DashedLineView
+        <fangzuzu.com.ding.widget.DashedLineView
             android:layout_width="match_parent"
             android:layout_height="@dimen/space_5"
             android:layout_marginTop="@dimen/space_10" />

@@ -310,14 +310,17 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
 
 
                 String string1 = mBleController.bytesToHexString(scanRecord);
-                Log.d("TAG", "蓝牙设备" + string1);
+                final String address = device.getAddress();
+                final String name1 = device.getName();
+
+                Log.d("TAG", "蓝牙设备" + name1 +"地址"+address+"广播数据"+string1);
                 String str = string1.replaceAll(" ", "").trim();
                 if (str.indexOf("5453")!=-1){
                         if (!bluetoothDevices.contains(device)) {
-                            name = device.getName();
+                            addSmartActivity.this.name = device.getName();
                             int length = str.length();
                             Log.d("TAG", "长度" + length);
-                            Log.d("TAG", "蓝牙设备" + name);
+                            Log.d("TAG", "蓝牙设备" + addSmartActivity.this.name);
                            bluetoothDevices.add(device);
                            String[] split = str.split("5453");
                             Log.d("TAG","切割后面的"+split[1]);

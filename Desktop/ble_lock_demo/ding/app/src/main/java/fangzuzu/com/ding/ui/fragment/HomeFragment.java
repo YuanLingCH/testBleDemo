@@ -457,6 +457,7 @@ public class HomeFragment extends BaseFragment {
      */
     String  strbiaozhi;
     List   bledata=new ArrayList();
+    List blename=new ArrayList();
     private void initConnectBle() {
 
         if(Build.VERSION.SDK_INT>=23){
@@ -493,7 +494,10 @@ public class HomeFragment extends BaseFragment {
                                 }else{
                                     if (strbiaozhi.equals("02")){
                                         hideProgressDialog();
-                                        connect();
+                                        if (!blename.contains("H_DFU")){
+                                            connect();
+                                        }
+
                                     }
 
                                 }
@@ -530,6 +534,14 @@ public class HomeFragment extends BaseFragment {
                             }
 
                         }
+                        String name = device.getName();
+                        if (!StringUtils.isEmpty(name)){
+                            if (name.equals("H_DFU")){
+                                blename.add(name);
+                                Toast.makeText(MainApplication.getInstence(), "你的锁已处于升级模式，请升级完成才能正常使用", Toast.LENGTH_SHORT).show();
+                            return;
+                            }
+                        }
 
                     }
                 });
@@ -555,6 +567,7 @@ public class HomeFragment extends BaseFragment {
 
 
     public void connect(){
+
         showProgressDialog("","正在连接蓝牙...");
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override

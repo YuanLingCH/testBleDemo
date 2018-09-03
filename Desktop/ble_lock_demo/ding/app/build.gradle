@@ -7,9 +7,13 @@ android {
         applicationId "fangzuzu.com.ding"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 9
+        versionName "1.8.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
     buildTypes {
         release {
@@ -70,6 +74,8 @@ dependencies {
     //BLE DUF
     compile 'no.nordicsemi.android:dfu:1.7.0'
 
+    compile 'com.tencent.bugly:crashreport:latest.release'
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'
 
 
 

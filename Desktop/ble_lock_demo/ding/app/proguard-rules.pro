@@ -141,3 +141,6 @@
 -keepattributes EnclosingMethod
 #蓝牙升级包
 -keep class no.nordicsemi.android.dfu.** { *; }
+
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

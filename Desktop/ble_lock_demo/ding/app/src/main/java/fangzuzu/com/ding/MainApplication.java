@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 
+import com.tencent.bugly.crashreport.CrashReport;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,15 @@ public class MainApplication extends Application {
     String pasword;
     String elect;
     String mac;
+    String appVersion;
 
+    public String getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.appVersion = appVersion;
+    }
 
     public String getMac() {
         return mac;
@@ -110,7 +120,7 @@ public class MainApplication extends Application {
 
         oList = new ArrayList<Activity>();
 
-
+        CrashReport.initCrashReport(MainApplication.getInstence(), "09743bc044", false);
 
 
 

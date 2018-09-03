@@ -191,7 +191,7 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
 
                     adapter.setOnItemLongClickListener(new  KeyManageAdapter.OnItemLongClickListener() {
                         @Override
-                        public void onItemLongClick(View view, final int position, final String id) {
+                        public void onItemLongClick(View view, final int position, final String id , final String userId) {
 
                             View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
                             final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
@@ -216,7 +216,7 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
                                 @Override
                                 public void onClick(View v) {
                                     dialog.dismiss();
-                                    delectData(id,position);
+                                    delectData(id,position ,userId);
 
                                 }
                             });
@@ -241,7 +241,7 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
 
     }
 
-    public void delectData(String id, final int postion){
+    public void delectData(String id, final int postion, final String userId){
         Retrofit re=new Retrofit.Builder()
                 .baseUrl(apiManager.baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -255,15 +255,17 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
                 String body = response.body();
                 Gson gson=new Gson();
                 msg m = gson.fromJson(body, new TypeToken<msg>() {}.getType());
+
                 int code = m.getCode();
                 if (code==1001){
                     Log.d("TAG","删除成功");
                     Toast.makeText(ElectKeyManagerActivity.this,"删除成功",Toast.LENGTH_LONG).show();
+
                     data3.remove(postion);
                     adapter.notifyDataSetChanged();
                     MqttPresenter presenter=new MqttPresenter();
-                    presenter.sendMqtt("az"+uid,ElectKeyManagerActivity.this);
-                    presenter.sendMqtt("ios"+uid,ElectKeyManagerActivity.this);
+                    presenter.sendMqtt("az"+userId,ElectKeyManagerActivity.this);
+                    presenter.sendMqtt("ios"+userId,ElectKeyManagerActivity.this);
                 }
             }
 
