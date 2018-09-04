@@ -107,13 +107,18 @@ public class MainActviity extends BaseActivity {
      */
    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        Log.d("TAG","收到消息main函数走了。。。。。。。。。。。。。。。。。。。。。。。。。。");
+
        String code = event.getCode();
+       String frome = event.getFrome();
+       Log.d("TAG","收到消息main函数走了。。。。。。。。。。。。。。。。frome。。。。。。。。。。"+frome);
        if(!StringUtils.isEmpty(code)){
            if (code.equals("10086")){
-               Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
-               startActivity(intent);
-               finish();
+               if (!uid.equals(frome)){
+                   Intent intent=new Intent(MainApplication.getInstence(),lockListActivity.class);
+                   startActivity(intent);
+                   finish();
+               }
+
            }
        }
 

@@ -763,8 +763,11 @@ public String topic="fzzchat/PTP";
         String string = event.getString();
         Log.d("TAG","收到消息mqtt走了lockList");
         String code = event.getCode();
+        String frome = event.getFrome();
+
         if (!StringUtils.isEmpty(code)){
             if (code.equals("10086")){
+                if (!uid.equals(frome))
                 getUserLockList();
             }
         }

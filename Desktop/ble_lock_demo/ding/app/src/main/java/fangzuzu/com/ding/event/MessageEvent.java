@@ -14,6 +14,16 @@ public class MessageEvent {
     private MqttMessage mqttMessage;
     private String string="";
     private  String code;
+  private   String frome;
+
+    public String getFrome() {
+        return frome;
+    }
+
+    public void setFrome(String frome) {
+        this.frome = frome;
+    }
+
     public MessageEvent() {
     }
 
@@ -25,10 +35,11 @@ public class MessageEvent {
         this.code = code;
     }
 
-    public MessageEvent(String topic, MqttMessage mqttMessage, String code) {
+    public MessageEvent(String topic, MqttMessage mqttMessage, String code, String frome) {
         this.topic = topic;
         this.mqttMessage = mqttMessage;
         this.code=code;
+        this.frome=frome;
     }
 
     public MessageEvent(String str) {

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fangzuzu.com.ding.MainApplication;
+import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.msg;
 import fangzuzu.com.ding.impl.OnMqttListener;
@@ -27,6 +28,7 @@ public class MqttPresenter {
     public MqttPresenter() {
     }
     public void sendMqtt(String to, final OnMqttListener listener){
+        String uid = SharedUtils.getString("uid");
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .baseUrl(apiManager.baseUrl)
@@ -34,8 +36,8 @@ public class MqttPresenter {
                 .build();
         apiManager api = retrofit.create(apiManager.class);
         Map<String ,String> data=new HashMap<>();
-        data.put("from","");
-        data.put("to","");
+        data.put("from",uid);
+        data.put("to",to);
         data.put("text","发内容");
         data.put("time","2018_06");
         final Map msg=new HashMap<>();

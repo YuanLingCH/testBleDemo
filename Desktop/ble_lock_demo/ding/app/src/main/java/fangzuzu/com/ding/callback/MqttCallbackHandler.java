@@ -54,13 +54,15 @@ public class MqttCallbackHandler implements MqttCallback {
         Gson gson=new Gson();
         mqttBean bean = gson.fromJson(s1, new TypeToken<mqttBean>() {}.getType());
         final String code = bean.getCode();
+        mqttBean.DataBean data = bean.getData();
+        final String from = data.getFrom();
 
-        Log.d("TAG","消息"+code);
+        Log.d("TAG","消息"+code+"from"+from);
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                EventBus.getDefault().post(new MessageEvent(s,mqttMessage,code));
+                EventBus.getDefault().post(new MessageEvent(s,mqttMessage,code,from ));
             }
         },1000);
 
