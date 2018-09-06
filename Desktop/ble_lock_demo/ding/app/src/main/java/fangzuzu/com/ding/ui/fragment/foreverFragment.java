@@ -41,6 +41,7 @@ public class foreverFragment extends BaseFragment {
     TextView tv_pasw;
     TextView tv;
     public static int flag = 0;
+
     @Override
     protected int getLayoutId() {
         return R.layout.forever_fragment_layout;
@@ -54,6 +55,7 @@ public class foreverFragment extends BaseFragment {
         final String allow = MainApplication.getInstence().getAllow();
         final String lockid = MainApplication.getInstence().getLockid();
         final String uid = SharedUtils.getString("uid");
+        final String  adminUserId = SharedUtils.getString("adminUserId");
         Log.d("TAG","接收数据"+lockName);
         Log.d("TAG","接收数据"+allow);
         Log.d("TAG","接收数据"+lockid );
@@ -67,6 +69,8 @@ public class foreverFragment extends BaseFragment {
         but_send_pasw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (uid.equals(adminUserId)){
+
 
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm");// HH:mm:ss
@@ -136,11 +140,14 @@ public class foreverFragment extends BaseFragment {
                 });
 
 
-
+                }else {
+                    Toast.makeText(MainApplication.getInstence(),"你不是管理员，没永久密码权限",Toast.LENGTH_LONG).show();
+                }
 
 
 
             }
+
         });
 
 

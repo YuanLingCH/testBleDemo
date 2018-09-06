@@ -67,6 +67,8 @@ public interface apiManager {
     Call<String>queryPermison();*/
 
     //查询锁用户列表  http://192.168.0.118:7956/sysLock/selectAll
+    //  https://www.fzzsaas.com/lockingSystem/sysLock/selectAll
+    // http://192.168.0.135:7956/sysLock/selectAll
     @GET("https://www.fzzsaas.com/lockingSystem/sysLock/selectAll")
     Call<String>getLockUserList(@Query("parentId") String parentId,@Query("userId") String userId);
     //锁添加蓝牙管理员后初始化   http://192.168.0.118:7956/sysLock/initLockModel

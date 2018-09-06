@@ -364,7 +364,7 @@ public class customFragment extends BaseFragment {
 
             // 点击生成密码 连接蓝牙
                 String loseTime = currentDate.getText().toString().trim();
-                if (app_input.isChecked()){
+              /*  if (app_input.isChecked()){*/
 
                 senddata = tv_pasw.getText().toString().trim(); //获取输入密码
                 Log.d("TAG","senddata"+senddata);
@@ -378,11 +378,11 @@ public class customFragment extends BaseFragment {
                     initConnectBle(senddata);
 
                 }
-                }else if (lock_input.isChecked()){
+               /* }else if (lock_input.isChecked()){
                     Log.d("TAG","锁端输入");
                     initReceiveData();
                     initConnectBle("");
-                }
+                }*/
 
                 }else {
                     Toast.makeText(getActivity(),"失效时间不能小于生效时间，并且2个时间不能相同",Toast.LENGTH_LONG).show();
