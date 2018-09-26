@@ -12,7 +12,6 @@
     <ImageView
         android:id="@+id/iv"
         android:layout_gravity="center"
-
         android:layout_width="35dp"
         android:layout_height="35dp" />
     <LinearLayout
@@ -31,13 +30,24 @@
                 android:layout_marginTop="3dp"
                 android:drawablePadding="5dp"
                 android:text="IC卡"
-                android:layout_weight="3"
+                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <TextView
+                android:layout_marginTop="3dp"
                 android:layout_marginRight="@dimen/space_10"
                 android:gravity="center"
-                android:textColor="#00ff00"
+                android:id="@+id/lock_state_one"
+                android:layout_gravity="center"
+                android:text="已生效"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_marginTop="3dp"
+                android:layout_marginRight="@dimen/space_10"
+                android:gravity="right"
                 android:id="@+id/lock_state"
                 android:layout_gravity="center"
                 android:text="已生效"

@@ -38,6 +38,9 @@ public class openLockRecodeAdapter extends RecyclerView.Adapter<openLockRecodeAd
         return holder;
     }
 
+  //  开锁类型0：密码开锁，1：蓝牙开锁，2：指纹开锁，3：IC卡开锁，4：身份证开锁
+
+
     @Override
     public void onBindViewHolder(openLockRecodeAdapter.keyViewHolder holder, int position) {
         openLockRecoderBean.DataBeanX.DataBean dataBean = mDatas.get(position);
@@ -45,6 +48,7 @@ public class openLockRecodeAdapter extends RecyclerView.Adapter<openLockRecodeAd
         int unlockType = dataBean.getUnlockType();
         String substring1 = unlockTime.substring(0, unlockTime.length() - 2);
         holder.lock_open_time.setText(substring1);
+        holder.open_user.setText(dataBean.getUserId());
         if (unlockType==1){
             holder.open_type.setText("APP开锁");
             holder.iv_open_lock.setImageResource(R.mipmap.portrait);
@@ -69,7 +73,7 @@ public class openLockRecodeAdapter extends RecyclerView.Adapter<openLockRecodeAd
         return mDatas.size();
     }
     class keyViewHolder extends RecyclerView.ViewHolder{
-TextView lock_open_time,open_type;
+TextView lock_open_time,open_type,open_user;
         ImageView iv_open_lock;
 
         public keyViewHolder(View itemView) {
@@ -77,6 +81,7 @@ TextView lock_open_time,open_type;
             lock_open_time= (TextView) itemView.findViewById(R.id.lock_open_time);
             open_type= (TextView) itemView.findViewById(R.id.open_type);
             iv_open_lock= (ImageView) itemView.findViewById(R.id.iv_open_lock);
+            open_user=(TextView) itemView.findViewById(R.id.open_user);
         }
     }
 }

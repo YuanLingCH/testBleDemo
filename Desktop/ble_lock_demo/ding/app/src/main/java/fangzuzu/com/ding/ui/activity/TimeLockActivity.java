@@ -164,12 +164,13 @@ public class TimeLockActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnFailed() {
-                    //如果失败连接  考虑重连蓝牙   递归
-                    mBleController.closeBleConn();
-                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                    hideProgressDialog();
+                  hideProgressDialog();
+                        mBleController.closeBleConn();
+                        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
 
                 }
+
 
             });
 

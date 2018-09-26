@@ -59,12 +59,18 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
         Icbean.DataBeanX.DataBean  bean= mDatas.get(position);
         final String unlockName = bean.getUnlockName();
         final String addPerson = bean.getAddPerson();
-        final int unlockType = bean.getUnlockType();
+        final int addType = bean.getAddType();
+       final int unlockType = bean.getUnlockType();
+
+        final    String unlockFlag = bean.getUnlockFlag();
+        Log.d("TAG","开锁类型"+unlockType);
         final String id = bean.getId();
-        if (unlockType==0){
+        if (addType==0){
             holder.lock_elcet.setText("IC卡");
-        }else if (unlockType==1){
+        }else if (addType==1){
             holder.lock_elcet.setText("身份证");
+        }else if (addType==2){
+            holder.lock_elcet.setText("指纹");
         }
         String Starttime =  bean.getStartTime();
         String endtime = bean.getEndTime();
@@ -95,43 +101,61 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
             Log.d("TAG",""+current);
             if (startTime-current>0){
                 holder.lock_state.setText("未生效");
+                holder.lock_state.setTextColor(Color.BLACK);
                 holder.lock_state.setBackgroundColor(Color.parseColor("#EC8325"));
              //   holder.lock_state.setTextColor(Color.parseColor("#6B6B6B"));
                 holder.re_adapter.setEnabled(false);
                 holder.re_adapter.setBackgroundColor(220);
-                if (unlockType==0){
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_unable);
 
-                }else if (unlockType==1){
+                }else if (addType==1){
                     holder.iv.setImageResource(R.mipmap.shengfz_unable);
+
+                }
+                else if (addType==2){
+                    holder.iv.setImageResource(R.mipmap.zeiwen_unable);
 
                 }
 
             }else if (startTime-current<0&&end-current>0){
-                holder.lock_state.setText("已生效");
-                holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
+
+                holder.lock_state.setText("限时");
+                holder.lock_state_one.setTextColor(Color.GREEN);
+                holder.lock_state.setTextColor(Color.BLACK);
+                holder.lock_state_one.setText("已生效");
+             //   holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
              //   holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
                 holder.re_adapter.setEnabled(true);
-                if (unlockType==0){
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_enable);
-                }else if (unlockType==1){
+                }else if (addType==1){
 
                     holder.iv.setImageResource(R.mipmap.shengfz_enable);
+                } else if (addType==2){
+                    holder.iv.setImageResource(R.mipmap.ziwen);
+
                 }
 
 
             }else if (end-current<0&&!Starttime.equals(endtime)){
                 //  holder.iv.setImageResource(R.drawable.door_logo);
-                holder.lock_state.setText("已过期");
+                holder.lock_state.setText("限时");
+                holder.lock_state.setTextColor(Color.BLACK);
+                holder.lock_state_one.setText("已过期");
+                holder.lock_state_one.setTextColor(Color.RED);
              //   holder.lock_state.setTextColor(Color.parseColor("#EE0000"));
               //  holder.re_adapter.setEnabled(false);
-                holder.lock_state.setBackgroundColor(Color.RED);
-                holder.re_adapter.setBackgroundColor(Color.parseColor("#E5E5E5"));
-                if (unlockType==0){
+             //   holder.lock_state.setBackgroundColor(Color.TRANSPARENT);
+              //  holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_unable);
 
-                }else if (unlockType==1){
+                }else if (addType==1){
                     holder.iv.setImageResource(R.mipmap.shengfz_unable);
+
+                }else if (addType==2){
+                    holder.iv.setImageResource(R.mipmap.zeiwen_unable);
 
                 }
 
@@ -139,39 +163,62 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
 
 
             }else if(Starttime.equals(endtime)){
-                holder.lock_state.setText("已生效");
-                holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
+              //  holder.lock_state.setText("已生效");
+                holder.lock_state.setText("永久");
+                holder.lock_state.setTextColor(Color.BLACK);
+                holder.lock_state_one.setText("已生效");
+                holder.lock_state_one.setTextColor(Color.GREEN);
+              //  holder.lock_state.setTextColor(Color.TRANSPARENT);
+
+              //  holder.lock_state.setBackgroundColor(Color.parseColor("#F14448"));
                // holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
                 holder.re_adapter.setEnabled(true);
-                if (unlockType==0){
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_enable);
-                }else if (unlockType==1){
+                }else if (addType==1){
                     holder.iv.setImageResource(R.mipmap.shengfz_enable);
+                }else if (addType==2){
+                    holder.iv.setImageResource(R.mipmap.ziwen);
+
                 }
 
 
 
             }else if(StringUtils.isEmpty(Starttime)){
-                holder.lock_state.setText("已生效");
-                holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
+                holder.lock_state.setText("永久");
+                holder.lock_state.setTextColor(Color.BLACK);
+                holder.lock_state_one.setText("已生效");
+                holder.lock_state_one.setTextColor(Color.GREEN);
+              //  holder.lock_state.setTextColor(Color.TRANSPARENT);
+              //  holder.lock_state.setBackgroundColor(Color.parseColor("#F14448"));
               //  holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
                 holder.re_adapter.setEnabled(true);
-                if (unlockType==0){
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_enable);
-                }else if (unlockType==1){
+                }else if (addType==1){
                     holder.iv.setImageResource(R.mipmap.shengfz_enable);
+                }else if (addType==2){
+                    holder.iv.setImageResource(R.mipmap.ziwen);
+
                 }
 
             }else if (Starttime.equals(endtime)){
-                holder.lock_state.setText("已生效");
-                holder.lock_state.setBackgroundColor(Color.parseColor("#31A14B"));
+                holder.lock_state.setText("永久");
+                holder.lock_state.setTextColor(Color.BLACK);
+                holder.lock_state_one.setText("已生效");
+                holder.lock_state_one.setTextColor(Color.GREEN);
+              //  holder.lock_state.setTextColor(Color.TRANSPARENT);
+              //  holder.lock_state.setBackgroundColor(Color.parseColor("#F14448"));
              //   holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
                 holder.re_adapter.setEnabled(true);
-                if (unlockType==0){
+                if (addType==0){
                     holder.iv.setImageResource(R.mipmap.ic_enable);
-                }else if (unlockType==1){
+                }else if (addType==1){
                     holder.iv.setImageResource(R.mipmap.shengfz_enable);
                 }
+            }else if (addType==2){
+                holder.iv.setImageResource(R.mipmap.ziwen);
+
             }
 
         }
@@ -191,19 +238,22 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
         String endTime = bean.getEndTime();
         String startTime = bean.getStartTime();
         if (endTime==null||startTime==null){
-            holder.lock_time.setText("永久");
-            if (unlockType==0){
+            holder.lock_state.setText("永久");
+            holder.lock_state_one.setTextColor(Color.GREEN);
+            holder.lock_state.setTextColor(Color.BLACK);
+            holder.lock_state_one.setText("已生效");
+            if (addType==0){
                 holder.iv.setImageResource(R.mipmap.ic_enable);
-            }else if (unlockType==1){
+            }else if (addType==1){
                 holder.iv.setImageResource(R.mipmap.shengfz_enable);
             }
         }else {
             String substringStart = startTime.substring(0, startTime.length() - 5);
             String substringendTime  = endTime .substring(0, endTime .length() - 5);
             holder.lock_time.setText(substringStart+"至"+substringendTime);
-            if (unlockType==0){
+            if (addType==0){
                 holder.iv.setImageResource(R.mipmap.ic_enable);
-            }else if (unlockType==1){
+            }else if (addType==1){
                 holder.iv.setImageResource(R.mipmap.shengfz_enable);
             }
         }
@@ -213,7 +263,7 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
                 @Override
                 public boolean onLongClick(View v) {
 
-                    mOnItemLongClickListener.onItemLongClick(v,position,unlockType);
+                    mOnItemLongClickListener.onItemLongClick(v,position,addType);
                     //返回true 表示消耗了事件 事件不会继续传递
                     return true;
                 }
@@ -227,8 +277,10 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
                Intent  intent=new Intent(mContext, icLockItemMessageActvity.class);
                     intent.putExtra("unlockName",unlockName);
                 intent.putExtra("addPerson",addPerson);
-                intent.putExtra("unlockType",unlock);
+                intent.putExtra("addType",unlock);
                 intent.putExtra("id",id );
+                intent.putExtra("unlockFlag",unlockFlag);
+                intent.putExtra("addTypeFlag",addType+"");
                 mContext.startActivity(intent);
             }
         });
@@ -240,7 +292,7 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
     }
 
     public class IcViewHolder extends RecyclerView.ViewHolder{
-       TextView  lock_time,lock_state,lock_elcet;
+       TextView  lock_time,lock_state,lock_elcet,lock_state_one;
         LinearLayout re_adapter;
         ImageView iv;
         public IcViewHolder(View itemView) {
@@ -250,6 +302,7 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
             re_adapter= (LinearLayout) itemView.findViewById(R.id.re_adapter);
             lock_elcet= (TextView) itemView.findViewById(R.id.lock_elcet);
             iv= (ImageView) itemView.findViewById(R.id.iv);
+            lock_state_one=itemView.findViewById(R.id.lock_state_one);
         }
     }
 }

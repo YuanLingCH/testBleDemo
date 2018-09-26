@@ -411,6 +411,7 @@ public void stopScan(){
     /**
      * 蓝牙GATT连接及操作事件回调
      */
+    int state;
     private class BleGattCallback extends BluetoothGattCallback {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -425,10 +426,11 @@ public void stopScan(){
                 reset();
 
             }
+            state=status;
             if (status==133||status==62||status==34||status==22){
                 Log.d("TAG","蓝牙状态码不对");
                 bleStateMessage message=new bleStateMessage();
-                EventBus.getDefault().post(message);
+                EventBus.getDefault().postSticky(message);
 
             }
 

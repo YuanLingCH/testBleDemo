@@ -5,10 +5,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
@@ -35,8 +35,10 @@ import java.util.TimerTask;
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.apiManager;
+import fangzuzu.com.ding.bean.msg;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
 import fangzuzu.com.ding.utils.StringUtils;
+import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -113,6 +115,8 @@ public class icLockItemMessageActvity extends BaseActivity {
 
 
     String id;
+    String unlockFlag;  //  指纹 ic 身份证  id   16进制的字符串
+    String addType;  //  2 指纹    3ic    4身份证
     public void getData() {
         tv_name= (TextView) findViewById(R.id.tv_ic_name);
         tv_addphone= (TextView) findViewById(R.id.tv_ic_phone);
@@ -120,9 +124,11 @@ public class icLockItemMessageActvity extends BaseActivity {
         but_delet= (Button) findViewById(R.id.but_ic_delect);
         String unlockName = getIntent().getStringExtra("unlockName");
         String addPerson = getIntent().getStringExtra("addPerson");
-        final String unlockType = getIntent().getStringExtra("unlockType");
-      id = getIntent().getStringExtra("id");
-        Log.d("TAG",unlockName+addPerson+":"+unlockType);
+        final String unlockType = getIntent().getStringExtra("addType");
+  unlockFlag = getIntent().getStringExtra("unlockFlag");
+    addType = getIntent().getStringExtra("addTypeFlag");
+        id = getIntent().getStringExtra("id");
+        Log.d("TAG",unlockName+addPerson+":"+unlockType+"unlockFlag"+unlockFlag+addType);
         tv_name.setText(unlockName);
         tv_addphone.setText(addPerson);
         if (unlockType.equals("0")){
@@ -134,32 +140,11 @@ public class icLockItemMessageActvity extends BaseActivity {
         but_delet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
-                final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
-                TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
-                tv.setText("谨慎操作，导致数据丢失...");
-                tv.setTextColor(Color.RED);
-                tv.setGravity(Gravity.CENTER);
-                TextView tv_submit= (TextView)viewDialog.findViewById(R.id.add_submit);
-                final AlertDialog dialog = new AlertDialog.Builder(icLockItemMessageActvity.this)
-                        .setView(viewDialog)
-                        .create();
-                dialog.show();
-                tv_cancle.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-
-                    }
-                });
-                tv_submit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
                         //1 根据当前uid 来判断  和锁里面的uid 是不是蓝牙管理员和普通用户
                         //连接蓝牙 和删除服务器数据
+                Log.d("TAG","点击删除"+addType);
                         initReceiveData();
-                        if (unlockType.equals("0")){
+                        if (addType.equals("0")){
                             //删除ic
                             String lockType="3";
                             String sb1=new String();
@@ -170,9 +155,20 @@ public class icLockItemMessageActvity extends BaseActivity {
 
                             final byte[]  lockTp= StringUtils.toByteArray(type);
                             initConnectBle(lockTp,"0");
-                        }else if (unlockType.equals("1")){
+                        }else if (addType.equals("1")){
                             //删除身份证
                             String lockType="4";
+                            String sb1=new String();
+                            sb1 = lockType.replace("", "0");
+
+                            String type = sb1.substring(0, sb1.length() - 1);
+                            Log.d("TAG","拼接allow"+type);
+
+                            final byte[]  lockTp= StringUtils.toByteArray(type);
+                            initConnectBle(lockTp,"1");
+                        }else if (addType.equals("2")){
+                            //删除指纹
+                            String lockType="2";
                             String sb1=new String();
                             sb1 = lockType.replace("", "0");
 
@@ -185,8 +181,7 @@ public class icLockItemMessageActvity extends BaseActivity {
 
 
 
-                    }
-                });
+
 
             }
         });
@@ -240,12 +235,22 @@ public class icLockItemMessageActvity extends BaseActivity {
                 .client(MainApplication.getInstence().getClient())
                 .build();
         apiManager api= retrofit.create(apiManager.class);
-        Call<String> call = api.delectunlock("3",id,"");
+        Call<String> call = api.delectunlock(addType,id,"");
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
-                Log.d("TAG","删除"+body);
+                if (!StringUtils.isEmpty(body)){
+                    Log.d("TAG","删除"+body);
+                    Gson gson=new Gson();
+                    msg o = gson.fromJson(body, new TypeToken<msg>() {}.getType());
+                    int code = o.getCode();
+                    if (code==1001){
+                        finish();  //返回到首页
+                    }
+                }
+
+
 
             }
 
@@ -259,7 +264,7 @@ public class icLockItemMessageActvity extends BaseActivity {
     /**
      * 连接蓝牙
      */
-    byte[] bylock=new byte[1];
+    byte[] bylock=new byte[1]; // 开锁类型
     String unlock; //开锁方式
     private void initConnectBle( byte[]  lockTp,String unlockTY) {
         bylock[0]=lockTp[0];
@@ -280,6 +285,8 @@ public class icLockItemMessageActvity extends BaseActivity {
                 jiaoyan();
 
             }
+
+
 
             @Override
             public void onConnFailed() {
@@ -414,19 +421,124 @@ public class icLockItemMessageActvity extends BaseActivity {
 
     }
     public void  delectBleData(){
-        byte[]data80=new byte[16];
-        data80[0]=0x04;
-        data80[1]=0x05;
-        data80[2]=0x01;
-        data80[3]=bylock[0];
-        data80[4]=token3[0];
-        data80[5]=token3[1];
-        data80[6]=token3[2];
-        data80[7]=token3[3];
-        byte[] encrypt40 = jiamiandjiemi.Encrypt(data80, aesks);
-        Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt40) + "\r\n");
 
-        mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
+     if (unlockFlag.length()>14){
+            //切割
+            String substring = unlockFlag.substring(0, 14);
+            Log.d("TAG","切割数据"+ substring);
+
+         final byte[] byteID = StringUtils.toByteArray(substring);      //  bylock  开锁类型  第一条
+
+         String length = byteID.length+1+"";
+         String pas=new String();
+         pas = length.replace("", "0");
+         pas =  pas.substring(0,  pas.length()-1);
+         Log.d("TAG","拼接pas"+ pas);
+         byte[] len = StringUtils.toByteArray(pas);
+         Log.d("TAG","密码长度"+length);
+         //根据长度分包
+         byte[] head=new byte[4];
+         head[0]=0x04;
+         head[1]=0x05;
+         head[2]=len[0];   //长度
+         head[3]=bylock[0];  //类型
+         byte []flag=new byte[1];
+         flag[0]=0x01;
+         byte[] bytes = byteCunchu.unitByteArray(head, byteID);
+         byte[] bytesOne = byteCunchu.unitByteArray(bytes, token3);
+         byte[] bytesflag = byteCunchu.unitByteArray( bytesOne, flag);
+         byte[]data16=new byte[16];
+         for (int i = 0; i < bytesflag.length; i++) {
+             data16[i]= bytesflag[i];
+         }
+         byte[] encrypt40 = jiamiandjiemi.Encrypt(data16, aesks);
+         byte[] decrypt = jiamiandjiemi.Decrypt(encrypt40, aesks);
+         Log.d("TAG","解密"+mBleController.bytesToHexString(decrypt) + "\r\n");
+
+         mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
+             @Override
+             public void onSuccess() {
+                 Log.d("TAG","发送成功");
+
+             }
+             @Override
+             public void onFailed(int state) {
+
+             }
+         });
+         Timer timer=new Timer();
+         timer.schedule(new TimerTask() {
+             @Override
+             public void run() {
+                String substring1 = unlockFlag.substring(14, unlockFlag.length());
+                 Log.d("TAG","切割数据"+ substring1);
+                 byte[] byteID = StringUtils.toByteArray(substring1);  //第二条
+                 String length = byteID.length+"";
+                 String pas=new String();
+                 pas = length.replace("", "0");
+                 pas =  pas.substring(0,  pas.length()-1);
+                 Log.d("TAG","拼接pas"+ pas);
+                 byte[] len = StringUtils.toByteArray(pas);
+                 Log.d("TAG","密码长度"+length);
+                 //根据长度分包
+                 byte[] head=new byte[4];
+                 head[0]=0x04;
+                 head[1]=0x05;
+                 head[2]=len[0];   //长度
+                 byte []flag=new byte[1];
+                 flag[0]=0x00;
+                 byte[] bytes = byteCunchu.unitByteArray(head, byteID);
+                 byte[] bytesOne = byteCunchu.unitByteArray(bytes, token3);
+                 byte[] bytesflag = byteCunchu.unitByteArray( bytesOne, flag);
+                 byte[]data16=new byte[16];
+                 for (int i = 0; i < bytesflag.length; i++) {
+                     data16[i]= bytesflag[i];
+                 }
+                 byte[] encrypt40 = jiamiandjiemi.Encrypt(data16, aesks);
+                 byte[] decrypt = jiamiandjiemi.Decrypt(encrypt40, aesks);
+                 Log.d("TAG","解密"+mBleController.bytesToHexString(decrypt) + "\r\n");
+
+                 mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
+                     @Override
+                     public void onSuccess() {
+                         Log.d("TAG","发送成功");
+
+                     }
+                     @Override
+                     public void onFailed(int state) {
+
+                     }
+                 });
+             }
+         },500);
+
+     }else {  //不纷纷包
+         byte[] byteID = StringUtils.toByteArray(unlockFlag);      //  bylock  开锁类型
+         String length = byteID.length+1+"";
+         String pas=new String();
+         pas = length.replace("", "0");
+         pas =  pas.substring(0,  pas.length()-1);
+         Log.d("TAG","拼接pas"+ pas);
+         byte[] len = StringUtils.toByteArray(pas);
+         Log.d("TAG","密码长度"+length);
+         //根据长度分包
+         byte[] head=new byte[4];
+         head[0]=0x04;
+         head[1]=0x05;
+         head[2]=len[0];   //长度
+         head[3]=bylock[0];  //类型
+
+         byte[] bytes = byteCunchu.unitByteArray(head, byteID);
+         byte[] bytesOne = byteCunchu.unitByteArray(bytes, token3);
+         byte[]data16=new byte[16];
+         for (int i = 0; i < bytesOne.length; i++) {
+             data16[i]= bytesOne[i];
+         }
+         byte[] encrypt40 = jiamiandjiemi.Encrypt(data16, aesks);
+         byte[] decrypt = jiamiandjiemi.Decrypt(encrypt40, aesks);
+         Log.d("TAG","解密"+mBleController.bytesToHexString(decrypt) + "\r\n");
+
+     mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
             @Override
             public void onSuccess() {
                 Log.d("TAG","发送成功");
@@ -437,6 +549,8 @@ public class icLockItemMessageActvity extends BaseActivity {
 
             }
         });
+     }
+
 
     }
     @Override

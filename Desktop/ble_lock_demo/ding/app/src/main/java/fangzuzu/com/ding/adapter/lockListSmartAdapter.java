@@ -76,29 +76,49 @@ public class lockListSmartAdapter extends RecyclerView.Adapter<lockListSmartAdap
             int end = Integer.parseInt(substring1t);
             Log.d("TAG","时间"+ end);
 
+            final int[] current = {0};
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
 
+                    String websiteDatetime = unixTime.getWebsiteDatetime("http://www.baidu.com")+"";
+                    String substring = websiteDatetime.substring(0, websiteDatetime.length() - 3);
+                    current[0] = Integer.parseInt(substring);
+                    Log.d("TAG","北京时间撮"+substring);
+                }
+            }.start();
 
-            long timeStampSec = System.currentTimeMillis()/1000;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+         /*   long timeStampSec = System.currentTimeMillis()/1000;
             String timestamp = String.format("%010d", timeStampSec);
             Log.d("TAG",""+timestamp);
-            int current = Integer.parseInt(timestamp);
-            Log.d("TAG",""+current);
-            if (startTime-current>0){
+            int current = Integer.parseInt(timestamp);*/
+            Log.d("TAG",""+ current[0]);
+            if (startTime- current[0] >0){
                 holder.lock_state.setText("未生效");
-                holder.lock_state.setTextColor(Color.parseColor("#EE0000"));
+                holder.lock_state.setTextColor(Color.WHITE);
+                holder.lock_state.setBackgroundResource(R.color.weishengxiao);
                 holder.re_adapter.setEnabled(false);
                 holder.re_adapter.setBackgroundColor(Color.parseColor("#E5E5E5"));
                 holder.iv.setBackground(ContextCompat.getDrawable(mContext,R.mipmap.lock_uneable));
-            }else if (startTime-current<0&&end-current>0&&!Starttime.equals(endtime)){
+            }else if (startTime- current[0] <0&&end- current[0] >0&&!Starttime.equals(endtime)){
                 holder.lock_state.setText("已生效");
-                    holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
+                holder.lock_state.setTextColor(Color.WHITE);
+                holder.lock_state.setBackgroundResource(R.color.yishengxiao);
                 holder.re_adapter.setEnabled(true);
 
-            }else if (end-current<0&&!Starttime.equals(endtime)){
+            }else if (end- current[0] <0&&!Starttime.equals(endtime)){
               //  holder.iv.setImageResource(R.drawable.door_logo);
                 holder.lock_state.setText("已过期");
-                holder.lock_state.setTextColor(Color.parseColor("#EE0000"));
+                holder.lock_state.setTextColor(Color.WHITE);
                 holder.re_adapter.setEnabled(false);
+                holder.lock_state.setBackgroundResource(R.color.yiguoqi);
                 holder.re_adapter.setBackgroundColor(Color.parseColor("#E5E5E5"));
                 holder.iv.setBackground(ContextCompat.getDrawable(mContext,R.mipmap.lock_uneable));
               //  holder.iv.setImageDrawable(ContextCompat.getDrawable(mContext,R.drawable.door_logo));
@@ -106,13 +126,15 @@ public class lockListSmartAdapter extends RecyclerView.Adapter<lockListSmartAdap
 
             }else if(Starttime.equals(endtime)){
                 holder.lock_state.setText("已生效");
-                holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
+                holder.lock_state.setBackgroundResource(R.color.yishengxiao);
+                holder.lock_state.setTextColor(Color.WHITE);
                 holder.re_adapter.setEnabled(true);
 
 
             }else if(StringUtils.isEmpty(Starttime)){
                 holder.lock_state.setText("已生效");
-                holder.lock_state.setTextColor(Color.parseColor("#00ff00"));
+                holder.lock_state.setBackgroundResource(R.color.yishengxiao);
+                holder.lock_state.setTextColor(Color.WHITE);
                 holder.re_adapter.setEnabled(true);
 
 
@@ -159,6 +181,8 @@ public class lockListSmartAdapter extends RecyclerView.Adapter<lockListSmartAdap
         String startTime = (String) userLockBean.getStartTime();
         if (endTime==null||startTime==null){
             holder.lock_time.setText("永久");
+            holder.lock_state.setText("已生效");
+            holder.lock_state.setBackgroundResource(R.color.yishengxiao);
         }else if (endTime.equals(startTime)){
             String substringStart = startTime.substring(0, startTime.length() - 5);
             String kaishi = startTime.substring(0, startTime.length() - 9);
@@ -187,7 +211,7 @@ public class lockListSmartAdapter extends RecyclerView.Adapter<lockListSmartAdap
             lock_name= (TextView) itemView.findViewById(R.id.lock_name);
             lock_elect= (TextView) itemView.findViewById(R.id.lock_elcet);
             lock_time= (TextView) itemView.findViewById(R.id.lock_time);
-            lock_state= (TextView) itemView.findViewById(R.id.lock_state);
+            lock_state= (TextView) itemView.findViewById(R.id.lock_state_smart);
             re_adapter= (LinearLayout) itemView.findViewById(R.id.re_adapter);
             iv= (ImageView) itemView.findViewById(R.id.iv);
         }

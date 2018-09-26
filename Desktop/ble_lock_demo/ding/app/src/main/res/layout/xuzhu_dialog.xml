@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:textSize="15sp"
+        android:id="@+id/tv"
+        android:gravity="center"
+        android:text="确定删除?"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <TextView
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:id="@+id/add_submit"
+        android:textColor="#Fff"
+        android:textSize="15sp"
+      android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
+        android:text="确定"
+        android:background="@drawable/blue_5dp"
+        android:layout_width="80dp"
+        android:layout_height="30dp" />
+</LinearLayout>

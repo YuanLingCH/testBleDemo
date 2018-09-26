@@ -7,8 +7,8 @@ android {
         applicationId "fangzuzu.com.ding"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 9
-        versionName "1.8.0"
+        versionCode 11
+        versionName "1.11.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             // 设置支持的SO库架构
@@ -76,6 +76,11 @@ dependencies {
 
     compile 'com.tencent.bugly:crashreport:latest.release'
     compile 'com.tencent.bugly:nativecrashreport:latest.release'
+    compile 'com.github.franmontiel:PersistentCookieJar:v1.0.1'
+    compile 'com.guoqi.widget:iosdialog:0.2'
+
+
+
 
 
 

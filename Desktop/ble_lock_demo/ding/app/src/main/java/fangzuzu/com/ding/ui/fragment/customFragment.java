@@ -96,12 +96,16 @@ public class customFragment extends BaseFragment {
         Log.d("TAG","状态刷新");
     }
     StringBuffer buf;
+    byte []cunzai=new byte[1];
     private void initReceiveData() {
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, aesks);
                 Log.d("TAG","customFragment"+mBleController.bytesToHexString(decrypt) + "\r\n");
+                if (decrypt!=null&&decrypt.length!=0){
+
+
                 if (decrypt[0]==04&&decrypt[1]==04&&decrypt[2]==01&&decrypt[3]==00){
 
                     hideProgressDialog();
@@ -161,6 +165,12 @@ public class customFragment extends BaseFragment {
                     Log.d("TAG","密码回来值"+buf);
                     sumbitmima(byteData);
 
+                } if (decrypt[0]==04&&decrypt[1]==01&&decrypt[4]==-16){
+                        System.arraycopy(decrypt,4,cunzai,0,cunzai.length);
+                    dialog("该密码已经存在");
+                    mBleController.closeBleConn();
+                    mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                }
                 }
             }
         });
@@ -374,8 +384,13 @@ public class customFragment extends BaseFragment {
                     Toast.makeText(MainApplication.getInstence(), "请输入密码", Toast.LENGTH_SHORT).show();
                 }
                 else if(!StringUtils.isEmpty(senddata)&&!StringUtils.isEmpty(endtime)) {
-                    initReceiveData();
-                    initConnectBle(senddata);
+                 if(senddata.length()==6){
+                     initReceiveData();
+                     initConnectBle(senddata);
+                 }else {
+                     Toast.makeText(MainApplication.getInstence(), "请输入6位数字", Toast.LENGTH_SHORT).show();
+                 }
+
 
                 }
                /* }else if (lock_input.isChecked()){
@@ -385,7 +400,7 @@ public class customFragment extends BaseFragment {
                 }*/
 
                 }else {
-                    Toast.makeText(getActivity(),"失效时间不能小于生效时间，并且2个时间不能相同",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(),"失效时间必须比当前时间和生效时间晚",Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -415,12 +430,14 @@ String blepasw;
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                hideProgressDialog();
+
+                  hideProgressDialog();
+                    mBleController.closeBleConn();
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
 
             }
+
 
         });
 
@@ -593,6 +610,8 @@ String blepasw;
     byte[] bytesstartendTime;
 
     private void sendDataToBle(String senddata) {
+            if (cunzai[0]!=-16){
+
 
 
           String pas1=new String();
@@ -644,7 +663,7 @@ String blepasw;
             }
         });
 
-
+            }
 
     }
 

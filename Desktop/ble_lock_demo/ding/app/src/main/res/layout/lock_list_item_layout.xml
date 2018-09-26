@@ -31,15 +31,16 @@ android:layout_marginLeft="10dp"
             android:layout_height="wrap_content" />
 
         <TextView
+            android:gravity="center"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
             android:layout_alignParentRight="true"
             android:textColor="#fff"
-            android:id="@+id/lock_state"
+            android:id="@+id/lock_state_list"
             android:layout_gravity="center"
             android:text="已生效"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="50dp"
+            android:layout_height="20dp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -74,7 +75,6 @@ android:layout_marginLeft="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
-
     <TextView
         android:layout_marginBottom="3dp"
         android:textColor="#000"
@@ -85,6 +85,8 @@ android:layout_marginLeft="10dp"
         android:text="时间"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+
 </LinearLayout>
 
 

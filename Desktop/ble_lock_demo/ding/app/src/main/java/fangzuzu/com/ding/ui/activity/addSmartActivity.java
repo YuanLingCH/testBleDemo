@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,7 +77,9 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
     ImageView add_smart_iv;
     RecyclerView add_smart_lv;
     String name;
-
+    ImageView iv_no_data;
+    TextView tv_no_data;
+    LinearLayout ll_no_data;
     ProgressDialog progressDialog;
     //搜索结果列表
     private List<BluetoothDevice> bluetoothDevices = new ArrayList<BluetoothDevice>();
@@ -142,33 +145,11 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
         // TODO  第二步：搜索设备，获取列表后进行展示
         mBleController.openBle();
         initreceiveBleData();
-        // 进界面弹出对话框   自定义啊
-        dialog();
         scanDevices();
         EventBus.getDefault().register(this);
     }
 
-    private void dialog() {
-        View viewDialog = getLayoutInflater().inflate(R.layout.custom_diaglog_deviceslayut, null);
-        final TextView tv = (TextView) viewDialog.findViewById(R.id.dialog_editname);
-        TextView tv_cancle= (TextView) viewDialog.findViewById(R.id.add_cancle);
-        tv.setText("触碰屏幕，锁可以进入添加状态");
-        tv.setTextColor(Color.BLACK);
-        tv.setTextSize(14);
-        tv.setGravity(Gravity.CENTER);
-        TextView tv_de_me= (TextView)viewDialog.findViewById(R.id.tv_de_me);
-        final AlertDialog dialog = new AlertDialog.Builder(addSmartActivity.this)
-                .setView(viewDialog)
-                .create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        tv_de_me.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-    }
+
 
 
     protected void setStatusBar() {
@@ -194,7 +175,7 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
-
+                if (value.length!=0){
                 mReciveString.append(mBleController.bytesToHexString(value) + "\r\n");
                 Log.d("TAG",mReciveString.toString());
                 src=value;
@@ -252,11 +233,9 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
 
                     Log.d("TAG","解密"+mBleController.bytesToHexString(decrypt) + "\r\n");
 
-
-
-
                 }
 
+            }
             }
         });
 
@@ -296,11 +275,16 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
             public void onSuccess() {
                 hideProgressDialog();
                if (bluetoothDevices.size() > 0) {
+                   ll_no_data.setVisibility(View.GONE);
                        mDeviceList.setAdapter(new DeviceListAdapter(addSmartActivity.this, bledata));
                     //   tv.setText("设备列表");
                        mDeviceList.setOnItemClickListener(addSmartActivity.this);
 
                 } else {
+                 //  lv.setVisibility(View.GONE);
+                   ll_no_data.setVisibility(View.VISIBLE);
+                   iv_no_data.setImageResource(R.mipmap.un_shebei);
+                   tv_no_data.setText("暂无设备");
                     Toast.makeText(addSmartActivity.this, "未搜索到Ble设备", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -366,6 +350,10 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
        /* tv= (TextView) findViewById(R.id.tv);
         tv.setText("搜索设备");*/
       //  add_smart_iv= (ImageView) findViewById(R.id.add_smart_iv);
+
+        ll_no_data=(LinearLayout) findViewById(R.id.ll_nodata);
+        iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
+        tv_no_data=(TextView) findViewById(R.id.tv_no_data);
         mDeviceList= (ListView) findViewById(R.id.add_smart_lv);
        adapter=new DeviceListAdapter(this, bluetoothDevices);
         //lv.setAdapter(adapter);
@@ -456,7 +444,15 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
                         .setView(view)
                     .create();
                 dialog.setCanceledOnTouchOutside(false);
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -487,13 +483,14 @@ public class addSmartActivity extends BaseActivity implements AdapterView.OnItem
 
 
             }
+                    @Override
+                    public void onConnFailed() {
+                            hideProgressDialog();
+                            mBleController.closeBleConn();
+                            Toast.makeText(addSmartActivity.this, "连接超时，请重试", Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void onConnFailed() {
-                hideProgressDialog();
-                mBleController.closeBleConn();
-                Toast.makeText(addSmartActivity.this, "连接超时，请重试", Toast.LENGTH_SHORT).show();
-            }
+                    }
+
         });
 
                   }

@@ -1,20 +1,26 @@
 package fangzuzu.com.ding.ui.fragment;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -81,23 +87,44 @@ public class CenterFragment extends BaseFragment {
         exit_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+             //   IOSDialog alertDialog = new IOSDialog(getActivity())
+
+           /*     IOSDialog alertDialog = new IOSDialog(getActivity())
+                        .builder()
+                        .setCancelable(true)
+                        .setTitle("确定退出登录")
+                        .setPosColor(R.color.weishengxiao_)
+                        .setPositiveButton("确定",new View.OnClickListener() {
+                            @Override public void onClick(View v) {
+                                Toast.makeText(MainApplication.getInstence(), "确定", Toast.LENGTH_SHORT).show();
+                            } })
+
+                        .setNegativeButton("取消", new View.OnClickListener() {
+                            @Override public void onClick(View v) { Toast.makeText(MainApplication.getInstence(), "取消", Toast.LENGTH_SHORT).show();
+                            } });
+                        alertDialog.show();*/
 
 
-                View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
-                final TextView tv = (TextView) view.findViewById(R.id.dialog_editname);
+                View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut_exit_app, null);
+                final TextView tv = (TextView) view.findViewById(R.id.tv);
                 TextView tv_cancle= (TextView) view.findViewById(R.id.add_cancle);
-                EditText et_yanzhenpasw= (EditText) view.findViewById(R.id.et_yanzhenpasw);
-                et_yanzhenpasw.setVisibility(View.INVISIBLE);
-                TextView tv1= (TextView) view.findViewById(R.id.tv);
-                tv1.setVisibility(View.INVISIBLE);
-                tv.setText("确定退出登陆");
-                tv.setTextSize(16);
+                tv.setText("确定退出登录");
+                tv.setTextSize(18);
                 tv.setGravity(Gravity.CENTER);
                 TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
                 final AlertDialog dialog = new AlertDialog.Builder(getActivity())
                         .setView(view)
                         .create();
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+             WindowManager manager=getActivity().getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
+
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -109,7 +136,7 @@ public class CenterFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         dialog.dismiss();
-
+                        exitAPP();
                         UserBean user = SharedUtils.getUser();
                         if (user != null) {
                             String name = user.name;
@@ -145,6 +172,29 @@ public class CenterFragment extends BaseFragment {
 
         getAppVersion();
     }
+
+    public void exitAPP(){
+        Retrofit retrofit=new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(MainApplication.getInstence().getClient())
+                .baseUrl(apiManager.baseUrl)
+                .build();
+        apiManager manager = retrofit.create(apiManager.class);
+        Call<String> call = manager.ExitAPP();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String body = response.body();
+                Log.d("TAG","退出APP"+body);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
    String versionName;
     @Override
     protected void initEvents() {
@@ -164,7 +214,7 @@ public class CenterFragment extends BaseFragment {
                 if (versionName.equals(newVersionNum)){
                     Toast.makeText(MainApplication.getInstence(),"当前已是最新版本",Toast.LENGTH_SHORT).show();
                 }else {
-
+                    verifyStoragePermissions(getActivity());
                     getAppUpdate();
                 }
 
@@ -273,5 +323,31 @@ public class CenterFragment extends BaseFragment {
             }
         });
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
+
+
+    public static void verifyStoragePermissions(Activity activity) {
+
+        try {
+            //检测是否有写的权限
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // 没有写的权限，去申请写的权限，会弹出对话框
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

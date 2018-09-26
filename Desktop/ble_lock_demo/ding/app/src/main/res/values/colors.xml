@@ -11,7 +11,7 @@
 
     <color name="background">#FFFFFF</color>
     <color name="split_line">#11112233</color>
-    <color name="text1">#59B29C</color>
+    <color name="text1">#EC8325</color>
     <color name="text2">#333333</color>
 
     <color name="color1">#F0F0F0</color>
@@ -31,7 +31,9 @@
     <color name="text_gray">#d6d6d6</color>
     <!-- 标题蓝色背景 -->
     <color name="title_blue">#14B3F3</color>
-    <color name="yishengxiao">#31A14B  </color>
-    <color name="weishengxiao">#EC8325 </color>
-    <color name="yiguoqi">#d14000 </color>
+    <color name="yishengxiao">#F14448 </color>
+    <color name="weishengxiao">#C0C0C0 </color>
+    <color name="yiguoqi">#0098EF </color>
+    <color name="weishengxiao_">#EC8325</color>
+    <color name="dialog">#F8F8F8</color>
 </resources>

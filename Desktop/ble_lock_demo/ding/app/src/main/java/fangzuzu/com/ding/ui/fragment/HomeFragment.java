@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -59,24 +61,31 @@ import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.adapter.PermissionLockhomeAdapter;
 import fangzuzu.com.ding.apiManager;
+import fangzuzu.com.ding.bean.msg;
 import fangzuzu.com.ding.bean.permisonBean;
+import fangzuzu.com.ding.bean.xuzhuBean;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
 import fangzuzu.com.ding.ui.activity.ElectKeyManagerActivity;
+import fangzuzu.com.ding.ui.activity.FingerPrintManageActivity;
 import fangzuzu.com.ding.ui.activity.PasswordManagementActivity;
 import fangzuzu.com.ding.ui.activity.addICCardActivity;
 import fangzuzu.com.ding.ui.activity.keySetActivity;
 import fangzuzu.com.ding.ui.activity.openLockRecodeActivity;
 import fangzuzu.com.ding.ui.activity.sendKeyActivity;
 import fangzuzu.com.ding.ui.activity.sendPassWordActivity;
+import fangzuzu.com.ding.unixTime;
 import fangzuzu.com.ding.utils.ScreenSizeUtils;
 import fangzuzu.com.ding.utils.StringUtils;
 import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
+import fangzuzu.com.ding.view.RoundProgressBarWidthNumber;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+import static android.R.attr.x;
 
 /**
  * Created by yuanling on 2018/5/12.
@@ -88,7 +97,7 @@ public class HomeFragment extends BaseFragment {
     private StringBuffer mReciveString = new StringBuffer();
     ProgressDialog progressDialog;
     Toolbar toolbar;
-   Button tv_ding;
+    Button tv_ding;
     public  int REQUEST_ACCESS_COARSE_LOCATION=1;
     private byte[] token3=new byte[4];
     byte[]jiesouTock=new byte[16];
@@ -96,9 +105,27 @@ public class HomeFragment extends BaseFragment {
     MediaPlayer mediaPlayer01;
     TextView tv_lock_name,elect;
      RecyclerView re_auth_list;
-    PermissionLockhomeAdapter adapter;
+    PermissionLockhomeAdapter adapter;    //Type 0 为正常  1为过期
     List authData;
     boolean isKitKat = false;
+    LinearLayout ll_home;
+    String type="0";
+    RoundProgressBarWidthNumber  mRoundProgressBar;
+   // private HorizontalProgressBarWithNumber mProgressBar;
+    private static final int MSG_PROGRESS_UPDATE = 0x110;
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+          //  int progress = mProgressBar.getProgress();
+            int roundProgress = mRoundProgressBar.getProgress();
+         //   mProgressBar.setProgress(++progress);
+            mRoundProgressBar.setProgress(++roundProgress);
+         /*   if (progress >= 100) {
+                mHandler.removeMessages(MSG_PROGRESS_UPDATE);
+            }*/
+            mHandler.sendEmptyMessageDelayed(MSG_PROGRESS_UPDATE, 100);
+        };
+    };
 
     @Override
     protected int getLayoutId() {
@@ -109,14 +136,311 @@ public class HomeFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBleController = BleController.getInstance().init(getActivity());
+
         initgetData();
         EventBus.getDefault().register(this);
+
+        //  initThinkTime();
+
+    }
+
+
+    /**
+     * 判断时间 是不是过期
+     */
+    private void initPanDuanTime() {
+        final int[] current = {0};
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+
+                String websiteDatetime = unixTime.getWebsiteDatetime("http://www.baidu.com")+"";
+                String substring = websiteDatetime.substring(0, websiteDatetime.length() - 3);
+               current[0] = Integer.parseInt(substring);
+                Log.d("TAG","北京时间撮"+substring);
+            }
+        }.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    /*    long timeStampSec = System.currentTimeMillis()/1000;
+        String timestamp = String.format("%010d", timeStampSec);
+        Log.d("TAG",""+timestamp);
+        int current = Integer.parseInt(timestamp);*/
+        if (!StringUtils.isEmpty(StartTime)&&!StringUtils.isEmpty(endTime)){
+
+        String substring = StartTime.substring(0,StartTime.length()-2);
+        Log.d("TAG","时间"+ substring);
+        String s = unixTime.dateToStamp(substring);
+        String substring1 = s.substring(0, s.length() - 3);
+        int startTime = Integer.parseInt(substring1);
+        Log.d("TAG","时间"+ startTime);
+        String substringt = endTime.substring(0,endTime.length()-2);
+        Log.d("TAG","时间"+ substring);
+        String st = unixTime.dateToStamp(substringt);
+        String substring1t = st.substring(0, s.length() - 3);
+        int end = Integer.parseInt(substring1t);
+        Log.d("TAG","时间"+ end);
+
+        if (startTime- current[0] >0){
+        //未生效
+
+            tv_ding.setEnabled(false);
+            tv_ding.setBackgroundResource(R.mipmap.ding_unable);
+            type="1";
+            View view = getLayoutInflater().inflate(R.layout.xuzhu_dialog, null);
+            final TextView tv = (TextView) view.findViewById(R.id.tv);
+            tv.setText("锁未生效，暂时不能使用");
+            tv.setTextSize(16);
+            tv.setGravity(Gravity.CENTER);
+            TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+            tv_submit.setText("我知道了");
+
+            final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setView(view)
+                    .create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+     /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+
+                }
+            });*/
+           tv_submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                      dialog.dismiss();
+                 //   xuzhuGetdata();
+
+
+                }
+            });
+
+        }else if (end- current[0] <0&&!StartTime.equals(endTime)){
+    //已过期
+            type="1";
+            if (!StringUtils.isEmpty(updataFlag)){
+
+
+                if (updataFlag.equals("2")){
+                    //  弹出对话框
+
+                    zhuqiBiaozhi="1";   //
+                    View view = getLayoutInflater().inflate(R.layout.xuzhu_dialog, null);
+                    final TextView tv = (TextView) view.findViewById(R.id.tv);
+                    tv.setText("续租请激活锁,需要一分钟左右,请靠近锁");
+                    tv.setTextSize(16);
+                    tv.setGravity(Gravity.CENTER);
+                    TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+                    tv_submit.setText("确认续租");
+                    tv_submit.setGravity(Gravity.CENTER);
+                    final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                            .setView(view)
+                            .create();
+                    dialog.setCanceledOnTouchOutside(false);
+                    dialog.show();
+
+     /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+
+                }
+            });*/
+                    tv_submit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //  dialog.dismiss();
+                            xuzhuGetdata();
+
+
+                        }
+                    });
+                }
+            }else {
+
+
+
+            tv_ding.setEnabled(false);
+            tv_ding.setBackgroundResource(R.mipmap.ding_unable);
+         /*   re_auth_list.setVisibility(View.INVISIBLE);*/
+
+            View view = getLayoutInflater().inflate(R.layout.xuzhu_dialog, null);
+            final TextView tv = (TextView) view.findViewById(R.id.tv);
+            tv.setText("锁已过期，不能使用");
+            tv.setTextColor(Color.RED);
+            tv.setTextSize(16);
+            tv.setGravity(Gravity.CENTER);
+            TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+            tv_submit.setText("我知道了");
+
+            tv_submit.setGravity(Gravity.CENTER);
+
+            final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setView(view)
+                    .create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+     /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+
+                }
+            });*/
+          tv_submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                     dialog.dismiss();
+                   // xuzhuGetdata();
+
+
+                }
+            });
+            }
+        }
+        }
+
+
+    }
+
+    /**
+     * 判断是不是过期   updataFlag 去判断   0  正常   1过期   2续租
+     */
+    String zhuqiBiaozhi=null;
+    private void initThinkTime() {
+        updataFlag="2";
+        if (updataFlag.equals("2")){
+            //  弹出对话框
+
+            //
+            View view = getLayoutInflater().inflate(R.layout.xuzhu_dialog, null);
+            final TextView tv = (TextView) view.findViewById(R.id.tv);
+            tv.setText("续租请激活锁,需要一分钟左右,请靠近锁");
+            tv.setTextSize(16);
+            tv.setGravity(Gravity.CENTER);
+            TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+            tv_submit.setText("确认续租");
+            tv_submit.setGravity(Gravity.CENTER);
+            final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setView(view)
+                    .create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+     /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+
+                }
+            });*/
+            tv_submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                  //  dialog.dismiss();
+                    xuzhuGetdata();
+
+
+                }
+            });
+        }
+
+    }
+
+    /**
+     * 请求服务器 拿到IC 指纹  身份证id
+     */
+    List ic_data;
+    List ic_shengfenzheng;
+    List ic_zhiwen;
+    private void xuzhuGetdata() {
+        ic_data=new ArrayList();
+        ic_shengfenzheng=new ArrayList();
+        ic_zhiwen=new ArrayList();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(apiManager.baseUrl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+
+                .client(MainApplication.getInstence().getClient())
+                .build();
+        apiManager manager = retrofit.create(apiManager.class);
+        Call<String> call = manager.getxuzhuID(Lockid, uid);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String body = response.body();
+                if (StringUtils.isEmpty(body)){
+
+                }else {
+                    Log.d("TAGT", "续租id" + body);
+                    Gson gson = new Gson();
+                    xuzhuBean bean = gson.fromJson(body, new TypeToken<xuzhuBean>() {}.getType());
+                    int code = bean.getCode();
+                    if (code==1001){
+                        List<xuzhuBean.DataBean> data = bean.getData();
+                        Iterator<xuzhuBean.DataBean> iterator = data.iterator();
+                        while (iterator.hasNext()){
+                            xuzhuBean.DataBean next = iterator.next();
+                            String addType = next.getAddType()+"";   //  0 ic   1省份在   2指纹
+                            String unlockFlag = next.getUnlockFlag();   //id
+                          if (addType.equals("0")){
+                              if (!ic_data.contains(unlockFlag)){
+                                  ic_data.add(unlockFlag);
+                              }
+
+                          }else if (addType.equals("1")){
+                              if (!ic_shengfenzheng.contains(unlockFlag)){
+                                  ic_shengfenzheng.add(unlockFlag);
+                              }
+                          }else if (addType.equals("2")){
+                              if (!ic_zhiwen.contains(unlockFlag)){
+                                  ic_zhiwen.add(unlockFlag);
+                              }
+                          }
+
+                        }
+                        for (int i = 0; i < ic_data.size(); i++) {
+                            Log.d("TAGT", "续租ic" +ic_data.get(i) );
+                        }
+                        for (int i = 0; i < ic_shengfenzheng.size(); i++) {
+                            Log.d("TAGT", "续租shengfenz" +ic_shengfenzheng.get(i) );
+                        }
+
+
+                        // 连接蓝牙  改变租期   租期 服务器传过来  统一改为一样的
+                        initReceiveData(); //接收数据
+                        initConnectBle();  //连接蓝牙
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
 
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
+       // hideProgressDialog();
+        mRoundProgressBar.setVisibility(View.GONE);
+        flag=false;
         Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
         Log.d("TAG","状态刷新");
     }
@@ -158,12 +482,15 @@ public class HomeFragment extends BaseFragment {
                     }
                 }
                 }
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(MainApplication.getInstence(), 4);
+               GridLayoutManager gridLayoutManager = new GridLayoutManager(MainApplication.getInstence(), 4);
                 gridLayoutManager.setOrientation(OrientationHelper.VERTICAL);
                 re_auth_list.setLayoutManager(gridLayoutManager);
-                adapter=new PermissionLockhomeAdapter( authData,MainApplication.getInstence());
+                adapter=new PermissionLockhomeAdapter( authData,MainApplication.getInstence(),type);
                 re_auth_list.setAdapter(adapter);
-                authClick();
+                if (type.equals("0")){
+                    authClick();
+                }
+
 
             }
 
@@ -202,6 +529,9 @@ public class HomeFragment extends BaseFragment {
                     Intent intent=new Intent(MainApplication.getInstence(), addICCardActivity.class);
                     startActivity(intent);
                 }else if (id.equals("指纹")){
+                    Log.d("TAG", "点击权限指纹");
+                    Intent intent=new Intent(MainApplication.getInstence(), FingerPrintManageActivity.class);
+                    startActivity(intent);
 
                 }else if (id.equals("操作记录")){
                     Intent intent=new Intent(MainApplication.getInstence(),  openLockRecodeActivity.class);
@@ -232,7 +562,7 @@ public class HomeFragment extends BaseFragment {
             window.setStatusBarColor(Color.TRANSPARENT);
             isKitKat = true;
         }
-
+        ll_home=(LinearLayout) root.findViewById(R.id.ll_home);
         toolbar = (Toolbar)root. findViewById(R.id.toolbar);
         toolbar.setTitle("");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -246,13 +576,21 @@ public class HomeFragment extends BaseFragment {
 
 
         re_auth_list= (RecyclerView) root.findViewById(R.id.re_auth_list);
+        re_auth_list.setNestedScrollingEnabled(false);
         initgetAuthor();
 
         tv_lock_name= (TextView) root.findViewById(R.id.tv_lock_name);
         tv_lock_name.setText(lockName);
         elect= (TextView) root.findViewById(R.id.elect);
         elect.setText(electricity+"%");
+        tv_ding= (Button) root.findViewById(R.id.tv_ding);
+
         setStatusBar();
+        initPanDuanTime();
+
+    //  mProgressBar = (HorizontalProgressBarWithNumber)root. findViewById(R.id.id_progressbar01);
+     mRoundProgressBar = (RoundProgressBarWidthNumber)root. findViewById(R.id.id_progress02);
+        mHandler.sendEmptyMessage(MSG_PROGRESS_UPDATE);
     }
 
     protected void setStatusBar() {
@@ -272,6 +610,7 @@ public class HomeFragment extends BaseFragment {
     /**
      * 蓝牙接收数据
      */
+    byte []batt=new byte[1]; //电量
     private void initReceiveData() {
 
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
@@ -308,12 +647,34 @@ public class HomeFragment extends BaseFragment {
                       sendFirstCode(); //发送锁标识
 
                     }if (decrypt[0]==02&&decrypt[1]==02&&decrypt[2]==04&&decrypt[3]==00) {
-                        sendSecond();//开锁
+                        if (StringUtils.isEmpty(zhuqiBiaozhi)){
+                            sendSecond();//开锁
+                        }else if (zhuqiBiaozhi.equals("1")){
+                            sendxuZuData(); // 续租
+                        }
 
-                    }if (decrypt[0]==6&&decrypt[1]==1&&decrypt[2]==1&&decrypt[3]==0){
+
+                    }  if (decrypt[0]==02&&decrypt[1]==02&&decrypt[2]==04&&decrypt[3]==00){
+                        //上传电量
+                        System.arraycopy(decrypt,4,batt,0,batt.length);
+                        String s = mBleController.bytesToHexString(batt).trim();
+                        Log.d("TAG","电量"+  s);
+                        int iValue = Integer.parseInt(s, 16);
+                        Log.d("TAG","电量s"+  iValue);
+                   //     long dec_num = Long.parseLong(s, 16);
+                     //   Log.d("TAG","电量"+dec_num);s
+                if (!electricity.equals(iValue+"")){
+                    sendBattData(iValue);
+                }
+
+                    }
+
+                    if (decrypt[0]==6&&decrypt[1]==1&&decrypt[2]==1&&decrypt[3]==0){
                         hideProgressDialog();
                         Log.d("TAG","开锁成功");
 
+                        flag=false;
+                            mRoundProgressBar.setVisibility(View.GONE);
                         mediaPlayer01 = MediaPlayer.create(getActivity(), R.raw.sound_for_connect);
                         mediaPlayer01.start();
                         upDataOpenRecoder();
@@ -356,12 +717,163 @@ public class HomeFragment extends BaseFragment {
                         tongbuTime();  //同步时间
                     }
 
+                    if (decrypt[0]==04&&decrypt[1]==01&&decrypt[4]==00){
+                        Log.d("TAG","续租租期");
+                        sendToBleZuQiTime();
+                    }
 
                 }
             }
         });
     }
 
+    /**
+     * 上传电量
+     */
+    private void sendBattData(int b) {
+
+
+
+
+
+        Log.d("TAG","上传电量"+x );
+        String lockid = MainApplication.getInstence().getLockid();
+        String uid = MainApplication.getInstence().getUid();
+
+        String pasword = MainApplication.getInstence().getPasword();
+        String lockName = MainApplication.getInstence().getLockName();
+        Map<String,String>map=new HashMap<>();
+        map.put("id",lockid );
+        map.put("adminUserId",uid );
+        map.put("lockName",lockName );
+        map.put("adminPsw",pasword );
+        map.put("electricity",b+"" );
+        final Gson gson=new Gson();
+        String s = gson.toJson(map);
+        Log.d("TAG","电量json"+s);
+        Retrofit re=new Retrofit.Builder()
+                .baseUrl(apiManager.baseUrl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(MainApplication.getInstence().getClient())
+                .build();
+        apiManager manager = re.create(apiManager.class);
+        Call<String> call = manager.upDatalockName(s);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String body = response.body();
+                Log.d("TAG","修改"+body);
+                msg s = gson.fromJson(body, new TypeToken<msg>() {}.getType());
+                int code = s.getCode();
+               if (code==1001){
+                   // Toast.makeText(MainApplication.getInstence(), "修改电量成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    /**
+     * 续租发送租期
+     * 这个租期是服务器统一给的时间  开始时间  结束时间
+     */
+    private void sendToBleZuQiTime() {
+        byte[] head=new byte[3];
+        head[0]=0x04;
+        head[1]=0x04;
+        head[2]=0x08;
+
+
+        long startTime=1536288422;
+        String  start = Integer.toHexString((int) startTime);
+        Log.d("TAG","续租租时间"+ start);
+
+        long endTime=1536288722;
+        String  end = Integer.toHexString((int) endTime);
+
+       byte[] byteStart = jiamiandjiemi.hexString2Bytes(start);
+        byte[] byteEnd = jiamiandjiemi.hexString2Bytes(end);
+        byte[] byteOne = byteCunchu.unitByteArray(head, byteStart);
+        byte[] byteTow = byteCunchu.unitByteArray( byteOne, byteEnd);
+        byte[] datathree = byteCunchu.unitByteArray(byteTow , token3);
+        byte []data=new byte[16];
+        for (int i = 0; i < datathree.length; i++) {
+            data[i]= datathree[i];
+        }
+        byte[] encrypt = jiamiandjiemi.Encrypt(data, secretKeyBytes);
+
+        mBleController.writeBuffer(encrypt, new OnWriteCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d("TAG","续租租期发送成功");
+                // sendFirstCode();  //发送锁标识符
+            }
+            @Override
+            public void onFailed(int state) {
+                Log.d("TAG","续租租期发送失败"+state);
+            }
+        });
+    }
+
+    /**
+     * 向锁端发送续租命令
+     */
+    private void sendxuZuData() {
+        Log.d("TAG","续租方法走了");
+        // ic  0  身份证 1  指纹 2
+        byte []sendIC;
+
+        for (int i = 0; i < ic_data.size(); i++) {
+            String o = (String) ic_data.get(i);
+            Log.d("TAG","续租"+o);
+            byte[] bytes = jiamiandjiemi.hexString2Bytes(o);
+
+
+            for (int i1 = 0; i1 < bytes.length; i1++) {
+                Log.d("TAG","续租数组"+bytes[i1]);
+            }
+            // 长度
+            byte []icLength=new byte[1];
+            icLength[0]= (byte) (bytes.length+1);
+            byte []type=new byte[1];
+            type[0]=0x03;
+            sendDataXuzuToBle(bytes,icLength,type);
+        }
+
+    }
+
+    private void sendDataXuzuToBle( byte[] bytes,byte []icLength, byte []type) {
+        byte []head=new byte[4];
+        head[0]=0x04;
+        head[1]=0x01;
+        head[2]=icLength[0];
+        head[3]=type[0];
+        byte[] byteOne = byteCunchu.unitByteArray(head, bytes);
+         byte[] byteTwo = byteCunchu.unitByteArray(byteOne, token3);
+        byte[]data=new byte[16];
+        for (int i = 0; i < byteTwo.length; i++) {
+            data[i]= byteTwo[i];
+        }
+        byte[] encrypt = jiamiandjiemi.Encrypt(data, secretKeyBytes);
+        byte[] decrypt = jiamiandjiemi.Decrypt(encrypt, secretKeyBytes);
+        Log.d("TAG","续租"+mBleController.bytesToHexString(data) + "\r\n");
+        mBleController.writeBuffer(encrypt, new OnWriteCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d("TAG","续租发送成功");
+                // sendFirstCode();  //发送锁标识符
+            }
+            @Override
+            public void onFailed(int state) {
+                Log.d("TAG","续租发送失败"+state);
+            }
+        });
+
+    }
 
 
     TextView tv_time;
@@ -378,6 +890,9 @@ public class HomeFragment extends BaseFragment {
     String uid;
     String  adminPsw1;
     String jihe;
+    String StartTime;
+    String endTime;
+    String updataFlag;
     private void initgetData() {
         Lockid =getActivity(). getIntent().getStringExtra("id");
         secretKey= getActivity().getIntent().getStringExtra("secretKey");
@@ -389,8 +904,9 @@ public class HomeFragment extends BaseFragment {
         String adminUserId = getActivity().getIntent().getStringExtra("adminUserId");
         SharedUtils.putString("adminUserId",adminUserId);
         jihe = getActivity().getIntent().getStringExtra("jihe");
-
-
+        StartTime= getActivity().getIntent().getStringExtra("startTime");
+        endTime = getActivity().getIntent().getStringExtra("endTime");  //updataFlag
+        updataFlag = getActivity().getIntent().getStringExtra("updataFlag");
         uid= SharedUtils.getString("uid");
 
         Log.d("TAG","传过来的Id"+Lockid);
@@ -398,14 +914,18 @@ public class HomeFragment extends BaseFragment {
         Log.d("TAG","lockNumber"+lockNumber);
         Log.d("TAG","adminPsw"+adminPsw);
         Log.d("TAG"," allow"+allow);
+        Log.d("TAG","  endTime "+ endTime );
+        Log.d("TAG"," StartTime"+StartTime);
         MainApplication.getInstence().setAllow(allow1);
         MainApplication.getInstence().setLockid(Lockid);
         MainApplication.getInstence().setLockName(lockName);
         MainApplication.getInstence().setPasword(adminPsw1);
         MainApplication.getInstence().setElect(electricity);
         MainApplication.getInstence().setMac(lockNumber);
-
+        MainApplication.getInstence().setStartTime(StartTime);
+        MainApplication.getInstence().setEndTime(endTime);
         Log.d("TAG","adminPsw1"+adminPsw1);
+
 
         String sb=new String();
         for (int i = 0; i < adminPsw1.length(); i++) {
@@ -483,12 +1003,14 @@ public class HomeFragment extends BaseFragment {
                 mBleController.scanBleone(0, new ScanCallback() {
                     @Override
                     public void onSuccess() {
-                        hideProgressDialog();
-                        Log.d("TAG","蓝牙扫描结束");
+                      //  hideProgressDialog();
+                        Log.d("TAG","蓝牙扫描结束ces");
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
+                              mRoundProgressBar.setVisibility(View.GONE);
+                                   flag=false;
 
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
@@ -505,12 +1027,12 @@ public class HomeFragment extends BaseFragment {
                             }
                         });
                      //
-                        hideProgressDialog();
+                       // hideProgressDialog();
                     }
 
                     @Override
                     public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                        showProgressDialog("","正在连接蓝牙...");
+                       // showProgressDialog("","正在连接蓝牙...");
                         String address = device.getAddress();
                         if (address.equals(lockNumber)){
                             if (!bledata.contains(lockNumber)){
@@ -525,7 +1047,9 @@ public class HomeFragment extends BaseFragment {
                                     Log.d("TAG","切割后面的"+split[1]);
                                   strbiaozhi= split[1].substring(14, 16);
                                     if (!strbiaozhi.equals("02")){
-                                        hideProgressDialog();
+                                      //  hideProgressDialog();
+                                        mRoundProgressBar.setVisibility(View.GONE);
+                                        flag=false;
                                         Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
@@ -538,6 +1062,8 @@ public class HomeFragment extends BaseFragment {
                         if (!StringUtils.isEmpty(name)){
                             if (name.equals("H_DFU")){
                                 blename.add(name);
+                                mRoundProgressBar.setVisibility(View.GONE);
+                                flag=false;
                                 Toast.makeText(MainApplication.getInstence(), "你的锁已处于升级模式，请升级完成才能正常使用", Toast.LENGTH_SHORT).show();
                             return;
                             }
@@ -549,8 +1075,10 @@ public class HomeFragment extends BaseFragment {
                 Log.d("TAG","没扫描");
                 if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
                     Log.d("TAG","标准"+strbiaozhi);
+                    mRoundProgressBar.setVisibility(View.GONE);
+                    flag=false;
                     Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
-                            hideProgressDialog();
+                         //   hideProgressDialog();
                     return;
                 }else {
                     Log.d("TAG","连接");
@@ -568,17 +1096,26 @@ public class HomeFragment extends BaseFragment {
 
     public void connect(){
 
-        showProgressDialog("","正在连接蓝牙...");
+
+
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
                 jiaoyan();
             }
 
+
             @Override
             public void onConnFailed() {
 
+                   hideProgressDialog();
+                    mRoundProgressBar.setVisibility(View.GONE);
+                    flag=false;
+                    Toast.makeText(MainApplication.getInstence(), "连接蓝牙失败", Toast.LENGTH_SHORT).show();
+
             }
+
+
         });
     }
 
@@ -605,6 +1142,7 @@ public class HomeFragment extends BaseFragment {
                     }
                     @Override
                     public void onFailed(int state) {
+                        hideProgressDialog();
                         Log.d("TAG","身份校验失败"+state);
                     }
                 });
@@ -749,6 +1287,7 @@ public class HomeFragment extends BaseFragment {
         map1.put("unlockTime",simpleDateFormat.format(date));
         map1.put("unlockType","1");
         map1.put("lockId",Lockid);
+        map1.put("userId",uid);
         map.put("operatinList",map1);
         Gson gson=new Gson();
         String s = gson.toJson(map);
@@ -774,23 +1313,31 @@ public class HomeFragment extends BaseFragment {
     /**
      * 蓝牙开锁
      */
+    boolean flag=false;
     @Override
     protected void initEvents() {
-        tv_ding= (Button) root.findViewById(R.id.tv_ding);
+
         tv_ding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                    if (!flag){
+                        int tv_width = tv_ding.getMeasuredWidth();
+                        int tv_height = tv_ding.getMeasuredHeight();
+                        Log.d("TAG","控件的宽度"+tv_width+"控件的高度"+tv_height);
 
-                    initReceiveData(); //接收数据
-                  initConnectBle();  //连接蓝牙
-               // showProgressDialog("","正在连接蓝牙...");
-           /*     final bleConnectUtils utils=new bleConnectUtils();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        utils.bleConnect(mBleController,secretKeyBytes,allowbyt,lockNumber);
+                        ViewGroup.LayoutParams layoutParams = mRoundProgressBar.getLayoutParams();
+                        layoutParams.width=tv_width-70;
+                        layoutParams.height=tv_height-70;
+                        mRoundProgressBar.setLayoutParams(layoutParams);
+                        mRoundProgressBar.setVisibility(View.VISIBLE);
+                        mRoundProgressBar.setProgress(0);
+                        initReceiveData(); //接收数据
+                        initConnectBle();  //连接蓝牙
+                        flag=true;
                     }
-                });*/
+
+
+
 
 
 

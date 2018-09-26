@@ -51,13 +51,17 @@ public class SplashActivity extends BaseActivity {
 
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);// 设置全屏
         setContentView(R.layout.splash_activity_layout);
-
-       initlize();
+/*   Intent intent=new Intent(MainApplication.getInstence(),LoginActivity.class);
+        startActivity(intent);
+        finish();*/
+   initlize();
 
     }
 
     private void initlize() {
         UserBean user = SharedUtils.getUser();
+
+
         if (user!=null){
             String name = user.name;
             if (!StringUtils.isEmpty(name)){
@@ -94,6 +98,9 @@ public class SplashActivity extends BaseActivity {
     String allow;
     String id1;
     String lockNumber;
+    String endTime;
+    String startTime;
+    String updataFlag;
     public void getUserLockList() {
         data3=new ArrayList();
         String partid = SharedUtils.getString("partid");
@@ -114,11 +121,11 @@ public class SplashActivity extends BaseActivity {
                 public void onResponse(Call<String> call, Response<String> response) {
                     String body = response.body();
                     if (StringUtils.isEmpty(body)){
-                        Log.d("TAG","网络错误"+body);
-                        finish();
+                        Log.d("TAG","网络错误11"+body);
+                      finish();
 
                     }else {
-                        Log.d("TAG","测试一把手锁"+body );
+                        Log.d("TAG","测试一test把手锁"+body );
                         Gson gson=new Gson();
                         userLockBean bean = gson.fromJson(body, new TypeToken<userLockBean>() {}.getType());
                         int code = bean.getCode();
@@ -144,6 +151,9 @@ public class SplashActivity extends BaseActivity {
                                 String keyId = next.getKeyId();
                                 SharedUtils.putString("keyId",keyId);
                                 id1 = next.getId();
+                             updataFlag = next.getUpdataFlag()+"";
+                                endTime = next.getEndTime();
+                           startTime = next.getStartTime();
                                 lockNumber = next.getLockNumber();
                                 Log.d("TAG","锁命"+lockName);
                                 data3.add(next);
@@ -167,6 +177,9 @@ public class SplashActivity extends BaseActivity {
                                         intent.putExtra("lockName",lockName);
                                         intent.putExtra("jihe","1");
                                         intent.putExtra("adminUserId",adminUserId);
+                                        intent.putExtra("startTime",startTime);
+                                        intent.putExtra("endTime",endTime); //updataFlag
+                                        intent.putExtra("updataFlag",updataFlag);
                                         startActivity(intent);
                                         finish();
                                     }
@@ -187,7 +200,7 @@ public class SplashActivity extends BaseActivity {
 
 
                         }else if(code==1002){
-                            Log.d("TAG","网络错误");
+                            Log.d("TAG","网络错误1002");
 
                         }
 

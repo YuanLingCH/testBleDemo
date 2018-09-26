@@ -1,6 +1,10 @@
 package fangzuzu.com.ding;
 
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -73,18 +77,48 @@ public static String getStrTime(String timeStamp){
 
 
 
+
+public static String NowString (long timeStamp){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+    // 时间戳转换成时间
+        return  df.format(new Date(timeStamp));
+        }
     /*
  * 将时间戳转换为时间
  */
-public static String stampToDate(long timeMillis){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date(timeMillis);
-        return simpleDateFormat.format(date);
-        }
-public static String NowString (){
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+    public static String stampToTime(long stamp) {
+        String time;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+        Date date = new Date(stamp*1000);
+        time = simpleDateFormat.format(date);
+        return time;
+    }
 
-        return df.format(new Date());
+
+    /**
+     * 获取指定网站的日期时间
+     *
+     * @param webUrl
+     * @return
+     */
+    public static long getWebsiteDatetime(String webUrl){
+        try {
+            URL url = new URL(webUrl);// 取得资源对象
+            URLConnection uc = url.openConnection();// 生成连接对象
+            uc.connect();// 发出连接
+            long ld = uc.getDate();// 读取网站日期时间
+            return ld;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+
         }
+        return 0;
+    }
+
         }

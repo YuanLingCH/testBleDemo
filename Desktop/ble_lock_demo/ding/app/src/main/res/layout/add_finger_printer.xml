@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:background="@color/backgroundjiemian"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
+        android:background="@color/backgroundtoolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
         <TextView
@@ -15,33 +17,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
-
-    <RelativeLayout
-
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srf"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true"
-            android:background="@mipmap/addfinger"
-            android:id="@+id/add_finger"
-            android:text="添加指纹"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:background="@mipmap/addfinger"
-            android:layout_marginLeft="10dp"
-            android:id="@+id/cler_finger"
-            android:text="清空指纹"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
-    <ListView
+        android:layout_height="wrap_content"
+        >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/finger_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+        <include layout="@layout/no_data_layout"/>
+    </FrameLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

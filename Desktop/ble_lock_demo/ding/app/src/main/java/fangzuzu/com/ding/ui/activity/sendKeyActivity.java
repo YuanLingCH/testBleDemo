@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -94,12 +96,14 @@ public class sendKeyActivity extends BaseActivity {
     EditTextDrawableClick electfrg_inputaccount;
     RecyclerView rc;
     PermissionAdapter adapter;
-LinearLayout ll_bg;
+LinearLayout ll_yao_type;
     String  parentid;
     TextView select_author;
     String str=new String();
   List<String> authordata=new ArrayList();
     boolean isKitKat = false;
+    String adminUserId;
+    View view_1,view_2;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,10 +123,13 @@ LinearLayout ll_bg;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setStatusBar();
         parentid = SharedUtils.getString("uid");
+        Log.d("TAG","parentid"+parentid);
+        adminUserId = SharedUtils.getString("adminUserId");
+        initHid();
         initgetdata();
         onclick();
 
-        DatePicier.initDatePicker(currentDate, currentTime, sendKeyActivity.this);
+
         EventBus.getDefault().register(this);
         initView();
 
@@ -131,6 +138,17 @@ LinearLayout ll_bg;
 
     }
 
+    private void initHid() {
+        if (!parentid.equals(adminUserId)){
+            //  隐藏永久
+            view_1=(View) findViewById(R.id.view_1);
+            view_2=(View) findViewById(R.id.view_2);
+            ll_yao_type=(LinearLayout) findViewById(R.id.ll_yao_type);
+            view_1.setVisibility(View.GONE);
+            view_2.setVisibility(View.GONE);
+            ll_yao_type.setVisibility(View.GONE);
+        }
+    }
 
 
     protected void setStatusBar() {
@@ -201,10 +219,15 @@ LinearLayout ll_bg;
                     Iterator<permisonBean.DataBean> iterator = data.iterator();
                     while (iterator.hasNext()){
                         permisonBean.DataBean next = iterator.next();
-                        data3.add(next);
-                    }
-                }
+                        String description = next.getDescription();
+                        if (!description.equals("钥匙管理")&&!description.equals("密码管理")){
+                            data3.add(next);
+                        }
 
+                    }
+
+
+                }
 
 
             }
@@ -245,8 +268,7 @@ LinearLayout ll_bg;
 
 
     }
-    String s2=null;
-    String s4=null;
+
     public void onclick() {
         currentTime = (TextView) findViewById(R.id.electfrg_effect_time);
         create_time = (LinearLayout) findViewById(R.id.create_time);
@@ -259,6 +281,7 @@ LinearLayout ll_bg;
    electfrg_key_name.setText(lockName);
         StringUtils.fixInputMethodManagerLeak(sendKeyActivity.this);
         electfrg_inputaccount = (EditTextDrawableClick) findViewById(R.id.electfrg_inputaccount);
+        DatePicier.initDatePicker(currentDate, currentTime, sendKeyActivity.this);
         electfrg_inputaccount.setDrawableRightListener(new EditTextDrawableClick.DrawableRightListener() {
             @Override
             public void onDrawableRightClick(View view) {
@@ -374,7 +397,7 @@ LinearLayout ll_bg;
                 String name = electfrg_key_name.getText().toString().trim();
                 if (StringUtils.isEmpty(phone)||StringUtils.isEmpty(name)){
                     Log.d("TAG","锁命"+name);
-                    Toast.makeText(sendKeyActivity.this,"请填写信息",Toast.LENGTH_LONG).show();
+                    Toast.makeText(sendKeyActivity.this,"请输入接收者注册账号",Toast.LENGTH_LONG).show();
                 }else {
                     if (!StringUtils.isEmpty(name)&&!StringUtils.isEmpty(phone)){
 
@@ -391,10 +414,11 @@ LinearLayout ll_bg;
                     // time1.setText("Date获取当前日期时间"+simpleDateFormat.format(date));
 
                     Log.d("TAG","当前时间"+simpleDateFormat.format(date));
-                    s2=simpleDateFormat.format(date);
+                  String  s2=simpleDateFormat.format(date);
                     Log.d("TAG","当前s2时间"+simpleDateFormat.format(date));
-                    s4=s2;
+                 String   s4=s2;
                     Log.d("TAG","当前s4时间"+simpleDateFormat.format(date));
+                    sendData(s2,s4);
 
                 } else  {
                 //!StringUtils.isEmpty(currentTime+"")&&!StringUtils.isEmpty(endtime)
@@ -406,8 +430,6 @@ LinearLayout ll_bg;
                     int startTime = Integer.parseInt(substring1);
                     Log.d("TAG","开始时间"+ startTime);
 
-//  currentDate
-
                     String endtime = currentDate.getText().toString().trim();
                     String send = unixTime.dateToStampone(endtime);
                     Log.d("TAG","结束时间戳"+send);
@@ -415,9 +437,6 @@ LinearLayout ll_bg;
                     int endTime = Integer.parseInt(substring1end);
                     Log.d("TAG","结束时间"+ endTime);
                     if (startTime<endTime&&startTime!=endTime){
-
-
-
                     String s1 = currentTime.getText().toString().trim().replaceAll(" ", "-");
                     String s;
                     if (usernumber != null) {
@@ -426,117 +445,27 @@ LinearLayout ll_bg;
                         s = electfrg_inputaccount.getText().toString().trim();
                     }
                     Log.d("TAG", "usernumbler" + s);
-                    s2 = s1.replaceAll(":", "-");
+                   String s2 = s1.replaceAll(":", "-");
                     Log.d("TAG", "s2" + s2);
+                        String  s4=null;
                     if (!StringUtils.isEmpty(endtime)) {
                         String s3 = endtime.replaceAll(" ", "-");
-                        s4 = s3.replaceAll(":", "-");
+                      s4 = s3.replaceAll(":", "-");
                     }
 
                     String s2time = unixTime. dateToStamptow(s2);
                     String s4time = unixTime. dateToStamptow(s4);
                     Log.d("TAG", "s2time" + s2time);
                     Log.d("TAG", "s4time" + s4time);
+                        sendData(s2,s4);
+
                     }else {
                         Toast.makeText(sendKeyActivity.this,"失效时间不能小于生效时间，并且2个时间不能相同",Toast.LENGTH_LONG).show();
+
                     }
 
              }
-                        if (authordata.size()>0){
 
-
-                    Log.d("TAG","userID"+ parentid);
-                    if (!StringUtils.isEmpty(userId)){
-                        Map map = new HashMap<>();
-                    map.put("lockId", lockid);
-                    map.put("userId", userId);
-                    map.put("keyName", electfrg_key_name.getText().toString().trim());
-                    map.put("startTime", s2);
-                    map.put("endTime", s4);
-                    map.put("parentId",  parentid);
-                        map.put("firstPermissionIds",authStr);
-
-
-
-                        showProgressDialog("","加载数据...");
-                    final Gson gson = new Gson();
-                    final String body = gson.toJson(map);
-                    Log.d("TAG", "上传json" + body);
-                    Retrofit retrofit = new Retrofit.Builder()
-                            .addConverterFactory(ScalarsConverterFactory.create())
-                            .baseUrl(apiManager.baseUrl)
-                            .client(MainApplication.getInstence().getClient())
-                            .build();
-                    apiManager manager = retrofit.create(apiManager.class);
-                    Call<String> call = manager.sendkey(body);
-                    call.enqueue(new Callback<String>() {
-                        @Override
-                        public void onResponse(Call<String> call, Response<String> response) {
-                            String value = response.body();
-                            Log.d("TAG", "发送电子钥匙" + value);
-                            msg s = gson.fromJson(value ,new TypeToken<msg>() {}.getType());
-                            int code1 = s.getCode();
-                            String code = s.getCode()+"";
-                            Log.d("TAG", "上传数据2" + code1);
-                            if (code.equals("1012")){
-                                Toast.makeText(sendKeyActivity.this,"锁已经存在",Toast.LENGTH_LONG).show();
-                                hideProgressDialog();
-                            }else if (code.equals("1010")){
-                                Toast.makeText(sendKeyActivity.this,"锁已被删除",Toast.LENGTH_LONG).show();
-                                hideProgressDialog();
-                            }else if (code.equals("1001")){
-                                Log.d("TAG", "本地接口调用锁" + authordata.size());
-                                sendMqtt("ios"+userId);
-                                sendMqtt("az"+userId);
-                                View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
-                                final TextView tv = (TextView) view.findViewById(R.id.dialog_editname);
-                                TextView tv_cancle= (TextView) view.findViewById(R.id.add_cancle);
-                                EditText et_yanzhenpasw= (EditText) view.findViewById(R.id.et_yanzhenpasw);
-                                et_yanzhenpasw.setVisibility(View.INVISIBLE);
-                                TextView tv1= (TextView) view.findViewById(R.id.tv);
-                                tv1.setVisibility(View.INVISIBLE);
-                                tv.setText("发送钥匙成功");
-                                tv.setGravity(Gravity.CENTER);
-                                TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
-                                final AlertDialog dialog = new AlertDialog.Builder(sendKeyActivity.this)
-                                        .setView(view)
-                                        .create();
-                                dialog.setCanceledOnTouchOutside(false);
-                                dialog.show();
-                                tv_cancle.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        hideProgressDialog();
-                                    }
-                                });
-                                tv_submit.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                        hideProgressDialog();
-                                    }
-                                });
-
-                            }else if (code.equals("1002")){
-                                Toast.makeText(sendKeyActivity.this,"发送失败",Toast.LENGTH_LONG).show();
-                                hideProgressDialog();
-                            }
-
-                        }
-
-                        @Override
-                        public void onFailure(Call<String> call, Throwable t) {
-
-                        }
-                    });
-                    }else {
-                        Toast.makeText(sendKeyActivity.this,"钥匙只能发给已注册的账号",Toast.LENGTH_LONG).show();
-                    }
-
-                    }else {
-                        Toast.makeText(sendKeyActivity.this,"请选择授权模块",Toast.LENGTH_LONG).show();
-                    }
 
                     }else {
                         Toast.makeText(sendKeyActivity.this,"给锁命名",Toast.LENGTH_LONG).show();
@@ -553,7 +482,7 @@ LinearLayout ll_bg;
             @Override
             public void onClick(View v) {
                 //  让账号失去焦点
-                electfrg_inputaccount.setFocusable(false);
+            //    electfrg_inputaccount.setFocusable(false);
             //弹出对话框
                 final View view = getLayoutInflater().inflate(R.layout.select_author_layout, null);
                 rc= (RecyclerView) view.findViewById(R.id.rc_select);
@@ -561,8 +490,9 @@ LinearLayout ll_bg;
 
                 final TextView tv_submit = (TextView) view.findViewById(R.id.auth_sbumit);
 
+                Log.d("TAG", "权限大小" + data3.size());
                 adapter=new PermissionAdapter(sendKeyActivity.this.data3,sendKeyActivity.this);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(sendKeyActivity.this, 4);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(sendKeyActivity.this, 3);
                 gridLayoutManager.setOrientation(OrientationHelper.VERTICAL);
                 rc.setLayoutManager(gridLayoutManager);
                 rc.setAdapter(adapter);
@@ -593,8 +523,15 @@ LinearLayout ll_bg;
                         .setView(view)
                         .create();
                 dialog.setCanceledOnTouchOutside(false);
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
-
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -605,15 +542,21 @@ LinearLayout ll_bg;
                     @Override
                     public void onClick(View v) {
 
-                        if (authordata.size()==0){
+                      /*  if (authordata.size()==0){
 
                             Toast.makeText(sendKeyActivity.this,"至少选择一个模块",Toast.LENGTH_LONG).show();
-                        }else if (authordata.size()>0){
-                            if (!authordata.contains("83a33756-7b89-11e8-9505-00163e06d99e")){
+                        }else if (authordata.size()>0){*/
+                            if (!authordata.contains("83a33756-7b89-11e8-9505-00163e06d99e")){ //操作记录
                                 authordata.add("83a33756-7b89-11e8-9505-00163e06d99e");
                             }
-                            if (!authordata.contains("83a3378a-7b89-11e8-9505-00163e06d99e")){
+                            if (!authordata.contains("83a3378a-7b89-11e8-9505-00163e06d99e")){  //设置
                                 authordata.add("83a3378a-7b89-11e8-9505-00163e06d99e");
+                            }
+                            if (authordata.contains("83a332dc-7b89-11e8-9505-00163e06d99e")){   //发送钥匙    如果有发送钥匙 就添加钥匙管理
+                                authordata.add("83a335e3-7b89-11e8-9505-00163e06d99e");//钥匙管理
+                            }
+                            if (authordata.contains("83a334f9-7b89-11e8-9505-00163e06d99e")){   //发送密码    如果有发送密码  就添加密码管理
+                                authordata.add("83a33657-7b89-11e8-9505-00163e06d99e");//密码管理
                             }
                             authStr = authordata.toArray(new String[authordata.size()]);
                             for (int i = 0; i < authStr.length; i++) {
@@ -621,7 +564,7 @@ LinearLayout ll_bg;
                             }
 
                             dialog.dismiss();
-                        }
+                      //  }
 
                     }
                 });
@@ -640,6 +583,156 @@ LinearLayout ll_bg;
 
     }
 
+ public void sendData(final String starTime, final String endTime){
+    /* if (authordata.size()>0){*/
+/*     if (!authordata.contains("83a33756-7b89-11e8-9505-00163e06d99e")){ //操作记录
+         authordata.add("83a33756-7b89-11e8-9505-00163e06d99e");
+     }
+     if (!authordata.contains("83a3378a-7b89-11e8-9505-00163e06d99e")){  //设置
+         authordata.add("83a3378a-7b89-11e8-9505-00163e06d99e");
+     }*/
+
+     //  让账号失去焦点
+     electfrg_inputaccount.setFocusable(false);
+        Timer timer=new Timer();
+     timer.schedule(new TimerTask() {
+         @Override
+         public void run() {
+
+
+     if (authordata.size()==0){
+                authordata.add("83a33756-7b89-11e8-9505-00163e06d99e");
+                authordata.add("83a3378a-7b89-11e8-9505-00163e06d99e");
+                authStr = authordata.toArray(new String[authordata.size()]);
+            }
+         Log.d("TAG","userID"+ parentid);
+         if (!StringUtils.isEmpty(userId)){
+
+             Map map = new HashMap<>();
+             map.put("lockId", lockid);
+             map.put("userId", userId);
+             map.put("keyName", electfrg_key_name.getText().toString().trim());
+             map.put("startTime", starTime);
+             map.put("endTime", endTime);
+             map.put("parentId",  parentid);
+             map.put("firstPermissionIds",authStr);
+new Thread(){
+    @Override
+    public void run() {
+        super.run();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            showProgressDialog("","加载数据...");
+            }
+        });
+    }
+}.start();
+
+             final Gson gson = new Gson();
+             final String body = gson.toJson(map);
+             Log.d("TAG", "上传json" + body);
+             Retrofit retrofit = new Retrofit.Builder()
+                     .addConverterFactory(ScalarsConverterFactory.create())
+                     .baseUrl(apiManager.baseUrl)
+                     .client(MainApplication.getInstence().getClient())
+                     .build();
+             apiManager manager = retrofit.create(apiManager.class);
+             Call<String> call = manager.sendkey(body);
+             call.enqueue(new Callback<String>() {
+                 @Override
+                 public void onResponse(Call<String> call, Response<String> response) {
+                     String value = response.body();
+                     Log.d("TAG", "发送电子钥匙" + value);
+                     msg s = gson.fromJson(value ,new TypeToken<msg>() {}.getType());
+                     int code1 = s.getCode();
+                     String code = s.getCode()+"";
+                     Log.d("TAG", "上传数据2" + code1);
+                     if (code.equals("1012")){
+                         Toast.makeText(sendKeyActivity.this,"钥匙已存在",Toast.LENGTH_LONG).show();
+                         hideProgressDialog();
+                     }else if (code.equals("1010")){
+                         Toast.makeText(sendKeyActivity.this,"钥匙已被删除",Toast.LENGTH_LONG).show();
+                         hideProgressDialog();
+                     }else if (code.equals("1001")){
+                         Log.d("TAG", "本地接口调用锁" + authordata.size());
+                         sendMqtt("ios"+userId);
+                         sendMqtt("az"+userId);
+                         hideProgressDialog();
+                         Toast.makeText(sendKeyActivity.this,"发送钥匙成功",Toast.LENGTH_LONG).show();
+                /*         View view = getLayoutInflater().inflate(R.layout.custom_diaglog_layut, null);
+                         final TextView tv = (TextView) view.findViewById(R.id.dialog_editname);
+                         TextView tv_cancle= (TextView) view.findViewById(R.id.add_cancle);
+                         EditText et_yanzhenpasw= (EditText) view.findViewById(R.id.et_yanzhenpasw);
+                         et_yanzhenpasw.setVisibility(View.INVISIBLE);
+                         TextView tv1= (TextView) view.findViewById(R.id.tv);
+                         tv1.setVisibility(View.INVISIBLE);
+                         tv.setText("发送钥匙成功");
+                         tv.setGravity(Gravity.CENTER);
+                         TextView tv_submit= (TextView) view.findViewById(R.id.add_submit);
+                         final AlertDialog dialog = new AlertDialog.Builder(sendKeyActivity.this)
+                                 .setView(view)
+                                 .create();
+                         dialog.setCanceledOnTouchOutside(false);
+                         dialog.show();
+                         tv_cancle.setOnClickListener(new View.OnClickListener() {
+                             @Override
+                             public void onClick(View v) {
+                                 dialog.dismiss();
+                                 hideProgressDialog();
+                             }
+                         });
+                         tv_submit.setOnClickListener(new View.OnClickListener() {
+                             @Override
+                             public void onClick(View v) {
+                                 dialog.dismiss();
+                                 hideProgressDialog();
+                             }
+                         });*/
+
+                     }else if (code.equals("1002")){
+                         Toast.makeText(sendKeyActivity.this,"发送失败",Toast.LENGTH_LONG).show();
+                         hideProgressDialog();
+                     }else if (code.equals("1004")){
+                         //Toast.makeText(sendKeyActivity.this,"发送失败",Toast.LENGTH_LONG).show();
+                         hideProgressDialog();
+
+                         Intent intent=new Intent(MainApplication.getInstence(),LoginActivity.class);
+                         startActivity(intent);
+                         finish();
+                     }
+
+
+                 }
+
+                 @Override
+                 public void onFailure(Call<String> call, Throwable t) {
+
+                 }
+             });
+         }else {
+
+             new Thread(){
+                 @Override
+                 public void run() {
+                     super.run();
+                     runOnUiThread(new Runnable() {
+                         @Override
+                         public void run() {
+                             Toast.makeText(sendKeyActivity.this,"该号码未注册，请改发送密码钥匙",Toast.LENGTH_LONG).show();
+                         }
+                     });
+                 }
+             }.start();
+
+         }
+
+   /* }else {
+         Toast.makeText(sendKeyActivity.this,"请选择授权模块",Toast.LENGTH_LONG).show();
+     }*/
+         }
+     },500);
+ }
 
 
     String[] authStr;

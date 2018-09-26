@@ -132,12 +132,12 @@
                 android:layout_weight="2" />
 
             <TextView
+
                 android:id="@+id/minute_text"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/minute"
                 android:textColor="@color/text2"
                 android:textSize="18sp" />
 

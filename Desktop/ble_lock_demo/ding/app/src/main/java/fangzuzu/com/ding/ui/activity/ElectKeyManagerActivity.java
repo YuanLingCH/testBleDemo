@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -189,7 +187,7 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
                     Log.d("TAG", body );
                     adapter=new KeyManageAdapter(data3,ElectKeyManagerActivity.this);
 
-                    adapter.setOnItemLongClickListener(new  KeyManageAdapter.OnItemLongClickListener() {
+    /*                adapter.setOnItemLongClickListener(new  KeyManageAdapter.OnItemLongClickListener() {
                         @Override
                         public void onItemLongClick(View view, final int position, final String id , final String userId) {
 
@@ -222,7 +220,7 @@ public class ElectKeyManagerActivity extends BaseActivity implements OnMqttListe
                             });
 
                         }
-                    });
+                    });*/
 
                     key_manage_lv.setAdapter(adapter);
 

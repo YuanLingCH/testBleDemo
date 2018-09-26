@@ -79,6 +79,7 @@ ImageView pasw_show;
     String uid;
     List dataPart=new ArrayList();
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,9 +108,9 @@ ImageView pasw_show;
         initStep(); //点击事件
 
 
-        boardHelper = new KeyBoardHelper(this);
-        boardHelper.onCreate();
-        boardHelper.setOnKeyBoardStatusChangeListener(onKeyBoardStatusChangeListener);
+       boardHelper = new KeyBoardHelper(this);
+       boardHelper.onCreate();
+       boardHelper.setOnKeyBoardStatusChangeListener(onKeyBoardStatusChangeListener);
         etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -162,13 +163,9 @@ ImageView pasw_show;
 
         @Override
         public void OnKeyBoardPop(int keyBoardheight) {
-
-
-
-
                 final ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) layoutContent
                         .getLayoutParams();
-                lp.topMargin = (int) -(keyBoardheight/1.2);
+                lp.topMargin = (int) -(keyBoardheight/1.4);
                 layoutContent.setLayoutParams(lp);
 
 
@@ -369,6 +366,8 @@ ImageView pasw_show;
     String allow;
     String id1;
     String lockNumber;
+    String startTime;
+    String endTime;
     public void getUserLockList() {
         data3=new ArrayList();
         String partid = SharedUtils.getString("partid");
@@ -416,6 +415,8 @@ ImageView pasw_show;
                                 electricity = next.getElectricity();
                                 allow = next.getAllow();
                                 id1 = next.getId();
+                                endTime = next.getEndTime();
+                                startTime = next.getStartTime();
                                 lockNumber = next.getLockNumber();
                                 Log.d("TAG","锁命"+lockName);
                                 data3.add(next);
@@ -434,6 +435,8 @@ ImageView pasw_show;
                                 intent.putExtra("adminPsw",adminPsw);
                                 intent.putExtra("lockName",lockName);
                                 intent.putExtra("jihe","1");
+                                intent.putExtra("startTime",startTime);
+                                intent.putExtra("endTime",endTime);
                                 intent.putExtra("adminUserId",adminUserId);
                                 startActivity(intent);
                                 finish();

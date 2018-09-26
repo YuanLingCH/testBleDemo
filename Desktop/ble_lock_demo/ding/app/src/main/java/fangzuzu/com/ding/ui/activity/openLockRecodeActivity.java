@@ -38,11 +38,15 @@ import java.util.TimerTask;
 
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
+import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.adapter.openLockRecodeAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.openLockRecoderBean;
+import fangzuzu.com.ding.bean.xuzhuBean;
 import fangzuzu.com.ding.ble.jiamiandjiemi;
+import fangzuzu.com.ding.unixTime;
 import fangzuzu.com.ding.utils.StringUtils;
+import fangzuzu.com.ding.utils.byteCunchu;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -81,6 +85,7 @@ public class openLockRecodeActivity extends BaseActivity {
     FrameLayout fr_no_two;
     ImageView iv_no_data;
     TextView tv_no_data;
+    String uid;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,11 +107,14 @@ public class openLockRecodeActivity extends BaseActivity {
         //初始化蓝牙
        lockid = getIntent().getStringExtra("Lockid");
         Log.d("TAG","传过来的id"+lockid);
-
+        uid= SharedUtils.getString("uid");
+        getIDData();
         initlize();
         initEvent();
         getOpenLockRecoder("");
         initSearch();
+
+
     }
 
 
@@ -136,8 +144,9 @@ public class openLockRecodeActivity extends BaseActivity {
         //获取密钥
         aesks = getbyte("secretKeyBytes");
         allowbyt= getbyte("allowbyt");
-        initReceiveData();
-        initConnectBle();
+
+
+
     }
 
     /**
@@ -162,12 +171,14 @@ public class openLockRecodeActivity extends BaseActivity {
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
+                    mBleController.closeBleConn();
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
 
 
             }
+
 
         });
 
@@ -236,7 +247,7 @@ public class openLockRecodeActivity extends BaseActivity {
                     public void onSuccess() {
                         Log.d("TAG","发送成功");
                         tongbuTime();
-                        sendopenLockrecode();
+
                     }
                     @Override
                     public void onFailed(int state) {
@@ -283,7 +294,7 @@ public class openLockRecodeActivity extends BaseActivity {
             @Override
             public void onSuccess() {
                 Log.d("TAG","发送成功");
-
+                sendData();
             }
             @Override
             public void onFailed(int state) {
@@ -292,37 +303,87 @@ public class openLockRecodeActivity extends BaseActivity {
         });
 
     }
+    //  0 ic   1身份证   2指纹     2：获取指纹开锁记录；3：获取用户IC卡开锁记录；4：获取用户身份证开锁记录；
+    List ziwenData=new ArrayList();
+    List ICData=new ArrayList();
+    List shenfenzData=new ArrayList();
+    int numbler=0;
+    byte []byteType=new byte[1];
+    public void  sendData(){
 
-    private void sendopenLockrecode() {
+        if (ziwenData.size()>0) {
+            Log.d("TAG", "指纹大小" + ziwenData.size());
+            byteType[0] = 0x02;
+            for (int i = 0; i < ziwenData.size(); i++) {
+                sendopenLockrecode((String) ziwenData.get(i), byteType);
+                Log.d("TAG", "ic卡Id" + ziwenData.get(i));
+            }
+        }
+       if (ICData.size()>0) {
+
+                byteType[0]=0x03;
+                for (int i = 0; i < ICData.size(); i++) {
+                    sendopenLockrecode((String) ICData.get(i),byteType);
+
+                }
+        }
+
+        if (shenfenzData.size()>0) {
+
+            byteType[0]=0x04;
+            for (int i = 0; i < shenfenzData.size(); i++) {
+                sendopenLockrecode((String) shenfenzData.get(i),byteType);
+
+            }
+        }
+    }
+
+
+
+    /**
+     *  发送蓝牙数据获取开锁记录
+     */
+    private void sendopenLockrecode(final String unlockFlag, final byte[] byteType ) {
 
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    byte[]data14a=new byte[16];
-                    data14a[0]=0x05;
-                    data14a[1]=0x01;
-                    data14a[2]=0x01;
-                    data14a[3]=0x00;
-                    data14a[4]=token3[0];
-                    data14a[5]=token3[1];
-                    data14a[6]=token3[2];
-                    data14a[7]=token3[3];
+                    //  7dc2f302
+                  //  String str="0700";
+                    if (!StringUtils.isEmpty(unlockFlag)){
 
-                    byte[] encrypt10a = jiamiandjiemi.Encrypt(data14a, aesks);
-                    Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt10a) + "\r\n");
 
+                    byte[] bytes = StringUtils.toByteArray(unlockFlag);
+                    byte[]length=new byte[1];
+                    length[0]= (byte) (bytes.length+1);
+                    byte []head=new byte[4];
+                    head[0]=0x05;
+                    head[1]=0x01;
+                    head[2]=length[0];
+                    head[3]=byteType[0];  //类型
+                    byte[] byteOne = byteCunchu.unitByteArray(head, bytes);
+                    byte[] byteTwo = byteCunchu.unitByteArray(byteOne, token3);
+                    byte[]data16=new byte[16];
+                    for (int i = 0; i < byteTwo.length; i++) {
+                        data16[i]= byteTwo[i];
+                    }
+
+                    byte[] encrypt10a = jiamiandjiemi.Encrypt(data16, aesks);
+
+                    byte[] decrypt = jiamiandjiemi.Decrypt(encrypt10a, aesks);
+                    Log.d("TAG","发送数据"+mBleController.bytesToHexString(decrypt) + "\r\n");
                     mBleController.writeBuffer(encrypt10a, new OnWriteCallback() {
                         @Override
                         public void onSuccess() {
                             Log.d("TAG","发送成功");
-                            sendopenLockrecodeone();
+
                         }
                         @Override
                         public void onFailed(int state) {
                         }
                     });
-
+                    }
                 }
             },500);
 
@@ -351,13 +412,13 @@ public class openLockRecodeActivity extends BaseActivity {
                 data14a[7]=token3[3];
 
                 byte[] encrypt10a = jiamiandjiemi.Encrypt(data14a, aesks);
-                Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt10a) + "\r\n");
+             //   Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt10a) + "\r\n");
 
                 mBleController.writeBuffer(encrypt10a, new OnWriteCallback() {
                     @Override
                     public void onSuccess() {
-                        Log.d("TAG","发送成功");
-                        sendopenLockrecodetow();
+                    //    Log.d("TAG","发送成功");
+
                     }
                     @Override
                     public void onFailed(int state) {
@@ -391,12 +452,12 @@ public class openLockRecodeActivity extends BaseActivity {
                 data14a[7]=token3[3];
 
                 byte[] encrypt10a = jiamiandjiemi.Encrypt(data14a, aesks);
-                Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt10a) + "\r\n");
+            //    Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt10a) + "\r\n");
 
                 mBleController.writeBuffer(encrypt10a, new OnWriteCallback() {
                     @Override
                     public void onSuccess() {
-                        Log.d("TAG","发送成功");
+                     //   Log.d("TAG","发送成功");
                     }
                     @Override
                     public void onFailed(int state) {
@@ -409,13 +470,19 @@ public class openLockRecodeActivity extends BaseActivity {
 
 
     }
-
+    byte [] bleToAppDataOne=new byte[1];
+    byte [] bleToAppDataTow=new byte[1];
+    byte [] bleToAppDataThree=new byte[1];
+    byte [] bleToAppDataFore=new byte[1];
     private void initReceiveData() {
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, aesks);
                 Log.d("TAG","解密获取开锁记录"+mBleController.bytesToHexString(decrypt) + "\r\n");
+                if (value.length>0){
+
+
              if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
                     System.arraycopy(decrypt,3,token2,0,token2.length);
                     token3=new byte[4];
@@ -431,10 +498,45 @@ public class openLockRecodeActivity extends BaseActivity {
                 }if (decrypt[0]==03&&decrypt[1]==04&&decrypt[2]==01&&decrypt[3]==01){
                     tongbuTime();  //同步时间
                 }
+                if (decrypt[0]==05&&decrypt[1]==03&&decrypt[2]==05){
+                    sendopenLockrecodetow();  //第二次确认
+                }
+                if (decrypt[0]==05&&decrypt[1]==01&&decrypt[3]==00){
+                    sendopenLockrecodeone();  //第一次确认
+                }
+                if (decrypt[0]==05&&decrypt[1]==03&&decrypt[2]==05) {
+                    // 蓝牙返回开锁时间
+                    System.arraycopy(decrypt, 3, bleToAppDataOne, 0, bleToAppDataOne.length);
+                    System.arraycopy(decrypt, 4, bleToAppDataTow, 0, bleToAppDataTow.length);
+                    System.arraycopy(decrypt, 5, bleToAppDataThree, 0, bleToAppDataThree.length);
+                    System.arraycopy(decrypt, 6, bleToAppDataFore, 0, bleToAppDataFore.length);
+                    String s1 = mBleController.bytesToHexString(bleToAppDataOne).toString().trim().replaceAll(" ", "");
+                    String s2 = mBleController.bytesToHexString(bleToAppDataTow).toString().trim().replaceAll(" ", "");
+                    String s3 = mBleController.bytesToHexString(bleToAppDataThree).toString().trim().replaceAll(" ", "");
+                    String s4 = mBleController.bytesToHexString(bleToAppDataFore).toString().trim().replaceAll(" ", "");
+                    // String s1 = CharAtreverse(s);
+                    String time = s4 + s3 + s2 + s1;
+                    long x = Integer.parseInt(time, 16);
+                    String s = unixTime. stampToTime(x);
+                    Log.d("TAG", "开锁时间撮" + x);
+                    Log.d("TAG", "开锁时间" + s);
+                    //  0 ic   1身份证   2指纹     2：获取指纹开锁记录；3：获取用户IC卡开锁记录；4：获取用户身份证开锁记录；
 
-            }
+                    if (byteType[0]==0x02){
+                        upDataOpenRecoder(s,"2");
+                    }else if (byteType[0]==0x03){
+                        upDataOpenRecoder(s,"3");
+                    }else if (byteType[0]==0x04){
+                        upDataOpenRecoder(s,"4");
+                    }
+                    //   upDataOpenRecoder(s,"");
+                }
+                }
+                }
         });
     }
+
+
 
     @Override
     protected void onDestroy() {
@@ -477,6 +579,14 @@ public class openLockRecodeActivity extends BaseActivity {
      * 获取开锁记录
      */
     public void getOpenLockRecoder(String key) {
+        //adminUserId
+        String adminUserId = SharedUtils.getString("adminUserId");
+        String lockuesr;
+        if (adminUserId.equals(uid)){
+            lockuesr="";
+        }else {
+            lockuesr=uid;
+        }
         Retrofit re=new Retrofit.Builder()
                 .baseUrl(apiManager.baseUrl)
                 .client(MainApplication.getInstence().getClient())
@@ -484,10 +594,11 @@ public class openLockRecodeActivity extends BaseActivity {
                 .build();
         apiManager manager = re.create(apiManager.class);
         Map<String,String>map=new HashMap<>();
-        map.put("pageSize","50");
+        map.put("pageSize","100");
         map.put("currentPage","1");
         map.put("key",key);
         map.put("lockId",lockid);
+        map.put("userId",lockuesr);
         final Gson gson=new Gson();
         String s = gson.toJson(map);
         data3.clear();
@@ -496,37 +607,41 @@ public class openLockRecodeActivity extends BaseActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
-                if (!StringUtils.isEmpty(body)){
+                if (!StringUtils.isEmpty(body)) {
 
 
-                Log.d("TAG",body);
-                openLockRecoderBean bean = gson.fromJson(body, new TypeToken<openLockRecoderBean>() {}.getType());
-                openLockRecoderBean.DataBeanX data = bean.getData();
+                    Log.d("TAG", body);
+                    openLockRecoderBean bean = gson.fromJson(body, new TypeToken<openLockRecoderBean>() {
+                    }.getType());
 
-                List<openLockRecoderBean.DataBeanX.DataBean> data1 = data.getData();
-                    if (data1.size()==0){
+                    int code = bean.getCode();
+                    if (code == 1001) {
+                    openLockRecoderBean.DataBeanX data = bean.getData();
+                    List<openLockRecoderBean.DataBeanX.DataBean> data1 = data.getData();
+                    if (data1.size() == 0) {
                         ll_no_noe.setVisibility(View.GONE);
                         fr_no_two.setVisibility(View.GONE);
                         ll_nodata.setVisibility(View.VISIBLE);
-                       iv_no_data.setImageResource(R.mipmap.no_open_door);
+                        iv_no_data.setImageResource(R.mipmap.no_open_door);
                         tv_no_data.setText("暂无开锁记录");
 
-                    } else if (data1.size()>0){
+                    } else if (data1.size() > 0) {
                         ll_nodata.setVisibility(View.GONE);
                         ll_no_noe.setVisibility(View.VISIBLE);
                         fr_no_two.setVisibility(View.VISIBLE);
 
-                Iterator<openLockRecoderBean.DataBeanX.DataBean> iterator = data1.iterator();
-                while (iterator.hasNext()){
-                    openLockRecoderBean.DataBeanX.DataBean next = iterator.next();
-                    data3.add(next);
+                        Iterator<openLockRecoderBean.DataBeanX.DataBean> iterator = data1.iterator();
+                        while (iterator.hasNext()) {
+                            openLockRecoderBean.DataBeanX.DataBean next = iterator.next();
+                            data3.add(next);
 
-                }
-                adapter=new openLockRecodeAdapter(data3,openLockRecodeActivity.this);
-                rc.setAdapter(adapter);
-                re_reach.setAdapter(adapter);
-                }else {
-                    Toast.makeText(MainApplication.getInstence(), "没有数据", Toast.LENGTH_SHORT).show();
+                        }
+                        adapter = new openLockRecodeAdapter(data3, openLockRecodeActivity.this);
+                        rc.setAdapter(adapter);
+                        re_reach.setAdapter(adapter);
+                    } else {
+                        Toast.makeText(MainApplication.getInstence(), "没有数据", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
             }
@@ -660,5 +775,126 @@ public class openLockRecodeActivity extends BaseActivity {
             }
         });
 
+    }
+
+    /**
+     * 得到ID
+     */
+    List< xuzhuBean.DataBean > idData;
+    List typeData;
+
+    public void getIDData() {
+        idData=new ArrayList();
+        typeData=new ArrayList();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(apiManager.baseUrl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+
+                .client(MainApplication.getInstence().getClient())
+                .build();
+        apiManager manager = retrofit.create(apiManager.class);
+        Call<String> call = manager.getxuzhuID(lockid, uid);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String body = response.body();
+                if (StringUtils.isEmpty(body)){
+
+                }else {
+                    Log.d("TAGT", "续租id" + body);
+                    Gson gson = new Gson();
+                    xuzhuBean bean = gson.fromJson(body, new TypeToken<xuzhuBean>() {}.getType());
+                    int code = bean.getCode();
+                    if (code==1001){
+                        List<xuzhuBean.DataBean> data = bean.getData();
+                        Iterator<xuzhuBean.DataBean> iterator = data.iterator();
+                        idData.clear();
+                        typeData.clear();
+                        while (iterator.hasNext()){
+                            xuzhuBean.DataBean next = iterator.next();
+                            String addType = next.getAddType()+"";   //  0 ic   1省份在   2指纹
+                            String unlockFlag = next.getUnlockFlag();   //id
+                             idData.add(next);
+                           //  typeData.add(addType);
+
+                            if (addType.equals("0")){   //  0 ic   1身份证   2指纹     2：获取指纹开锁记录；3：获取用户IC卡开锁记录；4：获取用户身份证开锁记录；
+                                ICData.add(unlockFlag);
+
+                            }else if (addType.equals("1")){
+                                shenfenzData.add(unlockFlag);
+
+                            }else if (addType.equals("2")){
+
+                                ziwenData.add(unlockFlag);
+                                Log.d("TAGT", "指纹走了");
+
+                            }
+
+
+
+                        }
+                        if (idData.size()>0){   // 有id 才连接蓝牙
+                            Log.d("TAG","蓝牙方法走了");
+                            initReceiveData();
+                            initConnectBle();
+                        }
+
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+
+    }
+
+    /**
+     * 上传开锁记录
+     *
+     */
+    private void upDataOpenRecoder(String time,String unLocktype) {
+
+
+
+        Retrofit retrofit=new Retrofit.Builder()
+                .baseUrl(apiManager.baseUrl)
+                .client(MainApplication.getInstence().getClient())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        apiManager manager = retrofit.create(apiManager.class);
+        Map<String,Map<String,String>>map=new HashMap<>();
+        Map<String,String>map1=new HashMap<>();
+        map1.put("unlockPwd","");
+        map1.put("unlockTime",time);
+        map1.put("unlockType",unLocktype);
+        map1.put("lockId",lockid);
+        map1.put("userId",uid);
+        map.put("operatinList",map1);
+        Gson gson=new Gson();
+        String s = gson.toJson(map);
+        Log.d("TAG","拼接json上传开锁记录"+s);
+        Call<String> call = manager.upDataOpenlockRecoder(s);
+      call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                int code = response.code();
+                Log.d("TAG","上传"+code);
+                String body = response.body();
+                Log.d("TAG","上传"+body);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("TAG","错误"+t.toString());
+
+            }
+        });
     }
 }

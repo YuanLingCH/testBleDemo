@@ -85,10 +85,10 @@ public class dfuActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setStatusBar();
         lockNumber = MainApplication.getInstence().getMac();
-initlize();
+        initlize();
         //初始化蓝牙
         mBleController = BleController.getInstance();
-        initReceiveData();
+
         EventBus.getDefault().register(this);
     }
 
@@ -138,9 +138,7 @@ initlize();
         mBleController.registReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY, new OnReceiverCallback() {
             @Override
             public void onRecive(byte[] value) {
-        if (value.length>0){
-
-
+        if (value!=null&&value.length!=0){
                 byte[] decrypt = jiamiandjiemi.Decrypt(value, aesks);
                 Log.d("TAG","解密dfuActivity"+mBleController.bytesToHexString(decrypt) + "\r\n");
                 if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
@@ -205,21 +203,24 @@ List addressDfu=new ArrayList();
             public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
 
                 String named = device.getName();
+                Log.d("TAG","升级扫描"+"名字"+ named);
                 if (!dataname.contains(named)){
                     dataname.add(named);
                 }
 
                 if (!StringUtils.isEmpty(named)){
-                if (named.equals("H_DFU")){
+                    if (named.equals("H_DFU")){
                     String address1 = device.getAddress();
 
                     if (!addressDfu.contains(address1)){
                         addressDfu.add(address1 );
                     }
 
-                    Log.d("TAG","重新扫描"+"名字"+ named+"蓝牙地址"+address1 );
+                        Log.d("TAG","重新扫描"+"名字"+ named+"蓝牙地址"+address1 );
                 }
+
                 }
+
             }
         });
     }
@@ -294,13 +295,19 @@ List addressDfu=new ArrayList();
 
             @Override
             public void onConnFailed() {
-                //如果失败连接  考虑重连蓝牙   递归
-                mBleController.closeBleConn();
-                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-               // hideProgressDialog();
-              //  mStringBuilder.append("蓝牙连接失败,请重试");
-                tv.setText("蓝牙连接失败,请重试");
+
+                    mBleController.closeBleConn();
+                    hideProgressDialog();
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+                    // hideProgressDialog();
+                    //  mStringBuilder.append("蓝牙连接失败,请重试");
+                    tv.setText("蓝牙连接失败,请重试");
+
             }
+
+
+
+
 
         });
     }
@@ -476,8 +483,9 @@ List addressDfu=new ArrayList();
         tv_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                initReceiveData();
                 initConnectBle();
+
             }
         });
 
@@ -632,7 +640,7 @@ List addressDfu=new ArrayList();
                 .setForceDfu(true);
              // .setPacketsReceiptNotificationsEnabled(PacketsReceipt);
               //  .setPacketsReceiptNotificationsValue(numberOfPackets);
-        stater.setZip(R.raw.test_dfu_0830);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
+        stater.setZip(R.raw.app_dfu);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
         stater.start(this, DfuService.class);
     }
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:background="@drawable/open_clock_5dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -14,19 +15,25 @@
        android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
             android:textSize="18sp"
             android:id="@+id/auth_cancle"
             android:text="取消"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="#fff"
+            android:background="@drawable/gray_5dp"
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="40dp" />
         <TextView
+            android:gravity="center"
             android:textSize="18sp"
-            android:textColor="#F0903B"
+            android:textColor="#fff"
             android:id="@+id/auth_sbumit"
+            android:background="@drawable/blue_5dp"
             android:layout_alignParentRight="true"
             android:text="确定"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="60dp"
+            android:layout_height="40dp" />
     </RelativeLayout>
 </LinearLayout>

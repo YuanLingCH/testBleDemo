@@ -7,6 +7,6 @@
         android:topLeftRadius="@dimen/space_10"
         android:topRightRadius="@dimen/space_10" />
 
-    <solid android:color="@color/weishengxiao" />
+    <solid android:color="@color/weishengxiao_" />
 
 </shape>

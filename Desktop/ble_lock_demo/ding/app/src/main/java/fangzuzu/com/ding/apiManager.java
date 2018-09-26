@@ -59,7 +59,7 @@ public interface apiManager {
 
     //权限设置  http://192.168.0.119:443/permissionsUsers/Permissions/getPermissions
     //     https://www.fzzsaas.com/permissionsUsers/Permissions/getPermissions
-
+// https://www.fzzsaas.com/permissionsUsers/Permissions/getPermissions
   @GET("https://www.fzzsaas.com/permissionsUsers/Permissions/getPermissions")
     Call<String>queryPermison(@Query("id") String id,@Query("lockId") String lockId);
 
@@ -77,11 +77,13 @@ public interface apiManager {
     @POST("https://www.fzzsaas.com/lockingSystem/sysLock/initLockModel?")
     Call<String>initLockMolde(@Field("sysLockModel") String sysLockModel);
     //上传开锁记录  http://192.168.0.118:7956/operatin/insert
+    //https://www.fzzsaas.com/lockingSystem/operatin/insert?
     @FormUrlEncoded
     @POST("https://www.fzzsaas.com/lockingSystem/operatin/insert?")
     Call<String>upDataOpenlockRecoder(@Field("operatinModel") String operatinModel);
     //获取开锁记录  http://192.168.0.118:7956
    // @GET("https://www.fzzsaas.com/lockingSystem/operatin/selectPage")
+    //  https://www.fzzsaas.com/lockingSystem/operatin/selectPage
     @GET("https://www.fzzsaas.com/lockingSystem/operatin/selectPage")
     Call<String>getopenLockRecoder(@Query("operatinModel") String operatinModel);
 //授权接口 http://192.168.0.119:443   https://www.fzzsaas.com/permissionsUsers/Permissions/sharePermissions?
@@ -94,6 +96,7 @@ Call<String>authpeople(@Field("authorizationModel") String sysLockModel);
     @GET("https://www.fzzsaas.com/lockingSystem/sysLock/delete")
     Call<String>delectClock(@Query("id") String id);
     //钥匙管理   https://127.0.0.1:9053/lockingSystem/subset/selectPage
+    //  https://www.fzzsaas.com/lockingSystem/subset/selectPage
     @GET("https://www.fzzsaas.com/lockingSystem/subset/selectPage")
     Call<String>keyManager(@Query("userSubsetModel") String userSubsetModel);
 
@@ -134,6 +137,19 @@ Call<String>upDatalockName(@Field("sysLockModel") String sysLockModel);
     Call<String>delctLock(@Query("id") String id);
 
     //检查app 版本
-    @GET("http://192.168.0.119:7956/sysLock/findVersion?")
+    @GET("https://www.fzzsaas.com/lockingSystem/sysLock/findVersion?")
     Call<String>getAppVersion(@Query("elseId") String elseId);
+
+    // 续租接口  请求拿到ic 指纹  身份证 的id
+    @GET("https://www.fzzsaas.com/lockingSystem/unlock/findUp?")
+    Call<String>getxuzhuID(@Query("lockId") String lockId,@Query("userId") String userId);
+
+    // http://192.168.1.9:8799/login/else/logout
+    // 续租接口  请求拿到ic 指纹  身份证 的id
+    @GET("https://www.fzzsaas.com/permissionsUsers/login/else/logout")
+    Call<String>ExitAPP();
+    // http://192.168.1.9:7956/subset/update  修改钥匙信息
+    @FormUrlEncoded
+    @POST("https://www.fzzsaas.com/lockingSystem/subset/update")
+    Call<String>modificationKeyLcokMeaasge(@Field("userSubsetModel") String topicMqttv3);
 }

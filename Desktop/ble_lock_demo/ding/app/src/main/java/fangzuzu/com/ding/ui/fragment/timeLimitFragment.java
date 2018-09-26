@@ -253,7 +253,7 @@ public class timeLimitFragment extends BaseFragment {
                 });
 
                     }else {
-                        Toast.makeText(getActivity(),"失效时间不能小于生效时间，并且2个时间不能相同",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(),"失效时间必须比当前时间和生效时间晚",Toast.LENGTH_LONG).show();
                     }
                 }
             }

@@ -63,17 +63,17 @@ public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.pe
         Log.d("TAG","adapter"+id );
         holder.itemView.setTag(id);
 
-        if (description.equals("发送钥匙")){
+        if (description.equals("发送钥匙")){  // 钥匙管理
             Log.d("TAG","点击了我");
-            holder.tvpermison.setText(description);
+            holder.tvpermison.setText("钥匙授权");
             holder.iv_auth.setImageResource(R.drawable.auth_yaoshi_sel);
 
 
         }else if (description.equals("发送密码")){
-            holder.tvpermison.setText(description);
+            holder.tvpermison.setText("密码授权");
             holder.iv_auth.setImageResource(R.drawable.auth_senmima_sel);
 
-        }else if (description.equals("钥匙管理")){
+        }/*else if (description.equals("钥匙管理")){
             holder.tvpermison.setText(description);
             holder.iv_auth.setImageResource(R.drawable.auth_yaosiguanli_sel);
 
@@ -81,7 +81,7 @@ public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.pe
             holder.tvpermison.setText(description);
             holder.iv_auth.setImageResource(R.drawable.auth_mimaguanli_sel);
 
-        }else if (description.equals("IC卡")){
+        }*/else if (description.equals("IC卡")){
             holder.tvpermison.setText(description);
             holder.iv_auth.setImageResource(R.drawable.auth_kapianguanli_sel);
 
@@ -91,11 +91,11 @@ public class PermissionAdapter extends RecyclerView.Adapter<PermissionAdapter.pe
 
         }else if (description.equals("操作记录")){
             holder.tvpermison.setText(description);
-            holder.iv_auth.setImageResource(R.drawable.auth_caozuojilu_sel);
+            holder.iv_auth.setImageResource(R.mipmap.jilu);
 
         }else if (description.equals("设置")){
             holder.tvpermison.setText(description);
-            holder.iv_auth.setImageResource(R.drawable.auth_sezhi_sel);
+            holder.iv_auth.setImageResource(R.mipmap.set);
 
         }
 

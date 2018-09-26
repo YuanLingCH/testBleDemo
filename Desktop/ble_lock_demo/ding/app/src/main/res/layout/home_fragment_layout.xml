@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundjiemian"
+    android:id="@+id/ll_home"
+android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar
@@ -21,8 +24,13 @@
 <android.support.v7.widget.RecyclerView
     android:id="@+id/re_auth_list"
     android:layout_width="match_parent"
-    android:layout_height="160dp"/>
+    android:overScrollMode="never"
+    android:layout_height="201dp"/>
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
 
+    android:layout_height="match_parent">
     <View
         android:layout_marginTop="10dp"
         android:background="#e8e8e8"
@@ -41,7 +49,6 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content">
-
         <TextView
             android:text="名称:"
             android:layout_width="wrap_content"
@@ -77,42 +84,31 @@
 
 </LinearLayout>
 
-<!--    <TextView
-        android:textSize="18sp"
-        android:textColor="#F19442"
-       android:layout_gravity="center"
-        android:text="叮一下就开了"
-        android:layout_marginTop="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />-->
-<LinearLayout
+<FrameLayout
    android:gravity="center"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_weight="3"
     android:layout_height="0dp">
 <Button
-    android:layout_marginTop="20dp"
-
+    android:layout_marginTop="10dp"
     android:id="@+id/tv_ding"
     android:gravity="center"
     android:layout_gravity="center"
     android:background="@mipmap/ding"
-    android:layout_width="130dp"
-    android:layout_height="130dp" />
-</LinearLayout>
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp">
-        <TextView
-            android:layout_gravity="center"
-            android:textSize="14sp"
-            android:gravity="bottom"
-            android:text="请打开蓝牙靠近设备"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    android:layout_width="185dp"
+    android:layout_height="185dp" />
 
-    </LinearLayout>
+    <fangzuzu.com.ding.view.RoundProgressBarWidthNumber
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:id="@+id/id_progress02"
+        android:layout_gravity="center"
+
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:progress="0" />
+
+</FrameLayout>
+</LinearLayout>
 </LinearLayout>

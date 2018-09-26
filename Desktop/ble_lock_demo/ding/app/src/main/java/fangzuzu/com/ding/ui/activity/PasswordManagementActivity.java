@@ -546,6 +546,7 @@ public class PasswordManagementActivity extends BaseActivity {
         map.put("addPerson",uid );
         final Gson gson=new Gson();
         String s = gson.toJson(map);
+
         Retrofit re=new Retrofit.Builder()
                 .baseUrl(apiManager.baseUrl)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -738,6 +739,10 @@ public class PasswordManagementActivity extends BaseActivity {
 
             @Override
             public void onConnFailed() {
+
+                      hideProgressDialog();
+                mBleController.closeBleConn();
+
 
             }
         });

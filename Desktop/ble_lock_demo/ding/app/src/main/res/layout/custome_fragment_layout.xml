@@ -93,7 +93,7 @@
     </LinearLayout>
     <EditText
         android:inputType="number"
-        android:maxLength="9"
+        android:maxLength="6"
         android:textColor="#000"
         android:layout_marginTop="40dp"
         android:layout_gravity="center"
@@ -108,7 +108,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
         android:textSize="14sp"
-        android:text="手动输入6-9位数字作为密码,并且在锁的旁边"
+        android:text="手动输入6位数字作为密码,并且在锁的旁边"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Button

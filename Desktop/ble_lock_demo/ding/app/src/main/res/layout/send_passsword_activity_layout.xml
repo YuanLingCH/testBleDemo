@@ -19,7 +19,7 @@
                 android:id="@+id/tv_toolbar"
                 android:layout_gravity="center"
                 android:textSize="@dimen/title_bar"
-                android:text="密码钥匙"
+                android:text="发送密码"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView

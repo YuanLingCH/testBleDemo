@@ -99,7 +99,7 @@ public class LoginPresenter {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("TAG", "登录失败");
+                Log.d("TAG", "登录失败"+t);
                 listener.loginFaild();
             }
         });

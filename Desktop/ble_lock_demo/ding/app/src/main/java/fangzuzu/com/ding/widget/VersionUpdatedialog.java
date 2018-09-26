@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -206,7 +208,9 @@ public class VersionUpdatedialog extends BaseDialog{
                     out.flush();
                     Log.d("TAG","下载中完成！");
                     // 下载完成
-                  installAPK(file);//安装
+                    Looper.prepare();
+                    installAPK(file);//安装
+                    Looper.loop();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -294,7 +298,7 @@ public class VersionUpdatedialog extends BaseDialog{
      */
     private void openFile(File file) {
         Log.d("TAG","当前系统版本高于6.0时，用此方法安装apk");
-        Intent intent = new Intent();
+    Intent intent = new Intent();
         intent.addFlags(268435456);         //启动方式
         intent.setAction("android.intent.action.VIEW");
         intent.setDataAndType(Uri.fromFile(file), getMIMEType(file));
@@ -305,6 +309,22 @@ public class VersionUpdatedialog extends BaseDialog{
             //当前没有找到打开apk的运用
             Toast.makeText(getContext(), getContext().getString(R.string.program_to_open_such_files_not_found), Toast.LENGTH_SHORT).show();
         }
+
+        if(Build.VERSION.SDK_INT>=24) {//判读版本是否在7.0以上
+            Uri apkUri = FileProvider.getUriForFile(activity, "fangzuzu.com.ding.fileprovider", file);//在AndroidManifest中的android:authorities值
+            Intent install = new Intent(Intent.ACTION_VIEW);
+            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//添加这一句表示对目标应用临时授权该Uri所代表的文件
+            install.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            activity. startActivity(install);
+        } else {
+            Intent install = new Intent(Intent.ACTION_VIEW);
+            install.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            activity. startActivity(install);
+        }
+
+
     }
 
     /**

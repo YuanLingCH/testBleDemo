@@ -8,10 +8,11 @@ import java.util.List;
 
 public class keyManagerBean  {
 
+
     /**
      * code : 1001
      * msg : null
-     * data : {"recordsTotal":2,"pageSize":10,"totalPage":1,"data":[{"id":"8ddc67f9-7122-40ea-83a6-63a335e01f29","userId":"69715640858","parentId":null,"keyName":"aaaaaaaa","startTime":null,"endTime":null},{"id":"c8b4a43c-9d57-4a75-83cc-fc3737708b55","userId":"69712753416","parentId":"8ddc67f9-7122-40ea-83a6-63a335e01f29","keyName":"科技左","startTime":"2018-08-01 00:00:00.0","endTime":"2019-01-01 00:00:00.0"}]}
+     * data : {"recordsTotal":1,"pageSize":10,"totalPage":1,"data":[{"id":"d61f78fe-eee1-4fa6-b62c-00a0b6448356","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"袁的锁","startTime":"2018-09-19 13:38:00.0","endTime":"2021-01-01 00:00:00.0","statu":0}]}
      */
 
     private int code;
@@ -44,10 +45,10 @@ public class keyManagerBean  {
 
     public static class DataBeanX {
         /**
-         * recordsTotal : 2
+         * recordsTotal : 1
          * pageSize : 10
          * totalPage : 1
-         * data : [{"id":"8ddc67f9-7122-40ea-83a6-63a335e01f29","userId":"69715640858","parentId":null,"keyName":"aaaaaaaa","startTime":null,"endTime":null},{"id":"c8b4a43c-9d57-4a75-83cc-fc3737708b55","userId":"69712753416","parentId":"8ddc67f9-7122-40ea-83a6-63a335e01f29","keyName":"科技左","startTime":"2018-08-01 00:00:00.0","endTime":"2019-01-01 00:00:00.0"}]
+         * data : [{"id":"d61f78fe-eee1-4fa6-b62c-00a0b6448356","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"袁的锁","startTime":"2018-09-19 13:38:00.0","endTime":"2021-01-01 00:00:00.0","statu":0}]
          */
 
         private int recordsTotal;
@@ -89,20 +90,24 @@ public class keyManagerBean  {
 
         public static class DataBean {
             /**
-             * id : 8ddc67f9-7122-40ea-83a6-63a335e01f29
-             * userId : 69715640858
-             * parentId : null
-             * keyName : aaaaaaaa
-             * startTime : null
-             * endTime : null
+             * id : d61f78fe-eee1-4fa6-b62c-00a0b6448356
+             * userId : 69880820011
+             * childUsername : 18665261827
+             * parentId : 18365408378
+             * keyName : 袁的锁
+             * startTime : 2018-09-19 13:38:00.0
+             * endTime : 2021-01-01 00:00:00.0
+             * statu : 0
              */
 
             private String id;
             private String userId;
-            private Object parentId;
+            private String childUsername;
+            private String parentId;
             private String keyName;
-            private Object startTime;
-            private Object endTime;
+            private String startTime;
+            private String endTime;
+            private int statu;
 
             public String getId() {
                 return id;
@@ -120,11 +125,19 @@ public class keyManagerBean  {
                 this.userId = userId;
             }
 
-            public Object getParentId() {
+            public String getChildUsername() {
+                return childUsername;
+            }
+
+            public void setChildUsername(String childUsername) {
+                this.childUsername = childUsername;
+            }
+
+            public String getParentId() {
                 return parentId;
             }
 
-            public void setParentId(Object parentId) {
+            public void setParentId(String parentId) {
                 this.parentId = parentId;
             }
 
@@ -136,20 +149,28 @@ public class keyManagerBean  {
                 this.keyName = keyName;
             }
 
-            public Object getStartTime() {
+            public String getStartTime() {
                 return startTime;
             }
 
-            public void setStartTime(Object startTime) {
+            public void setStartTime(String startTime) {
                 this.startTime = startTime;
             }
 
-            public Object getEndTime() {
+            public String getEndTime() {
                 return endTime;
             }
 
-            public void setEndTime(Object endTime) {
+            public void setEndTime(String endTime) {
                 this.endTime = endTime;
+            }
+
+            public int getStatu() {
+                return statu;
+            }
+
+            public void setStatu(int statu) {
+                this.statu = statu;
             }
         }
     }

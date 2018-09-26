@@ -2,16 +2,17 @@ package fangzuzu.com.ding;
 
 import android.app.Activity;
 import android.app.Application;
-import android.util.Log;
 
+import com.franmontiel.persistentcookiejar.ClearableCookieJar;
+import com.franmontiel.persistentcookiejar.PersistentCookieJar;
+import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
+import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 /**
@@ -27,6 +28,24 @@ public class MainApplication extends Application {
     String elect;
     String mac;
     String appVersion;
+    String startTime;
+    String endTime;
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public String getAppVersion() {
         return appVersion;
@@ -126,10 +145,10 @@ public class MainApplication extends Application {
 
     }
 
-
-
+    OkHttpClient okHttpClient;
+    ClearableCookieJar cookieJar;
     public OkHttpClient getClient() {
-        if (client == null) {
+/*        if (client == null) {
             //保存Cookies
             //添加请求头
             client = new OkHttpClient.Builder()
@@ -152,7 +171,20 @@ public class MainApplication extends Application {
                         }
                     }).build();
         }
-        return client;
+        return client;*/
+
+        if (cookieJar==null){
+            cookieJar =
+                    new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(MainApplication.getInstence()));
+        }
+
+        if (okHttpClient==null){
+            okHttpClient = new OkHttpClient.Builder()
+                    .cookieJar(cookieJar)
+                    .build();
+        }
+
+        return okHttpClient;
     }
 
 

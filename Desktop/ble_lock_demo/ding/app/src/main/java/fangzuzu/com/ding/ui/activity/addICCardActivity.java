@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -55,6 +56,7 @@ public class addICCardActivity extends BaseActivity{
     IcListAdapter adapter;
     boolean isKitKat = false;
 LinearLayout ll_no_data;
+    SwipeRefreshLayout srf;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +74,7 @@ LinearLayout ll_no_data;
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-setStatusBar();
+        setStatusBar();
         getData();
         initViews();
         initlize();
@@ -106,10 +108,17 @@ setStatusBar();
         iv_no_data=(ImageView) findViewById(R.id.iv_no_data);
         tv_no_data=(TextView) findViewById(R.id.tv_no_data);
         rc= (RecyclerView) findViewById(R.id.lv);
+        srf=(SwipeRefreshLayout) findViewById(R.id.srf);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
         rc.setLayoutManager(layoutManager);
-
+        srf.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //  adapter.resetDatas();
+                getData();
+            }
+        });
     }
 
     private void initViews() {
@@ -158,7 +167,7 @@ setStatusBar();
         String uid = SharedUtils.getString("uid");
         String lockid = MainApplication.getInstence().getLockid();
         Map<String,String> map=new HashMap<>();
-        map.put("pageSize","10");
+        map.put("pageSize","100");
         map.put("currentPage","1");
         map.put("lockId",lockid);
         map.put("addType","0");
@@ -179,8 +188,12 @@ setStatusBar();
                 if (!StringUtils.isEmpty(body)){
                 Log.d("TAG",body);
                 Icbean bean= gson.fromJson(body, new TypeToken<Icbean>() {}.getType());
+                    int code = bean.getCode();
                 Icbean.DataBeanX data = bean.getData();
-                List<Icbean.DataBeanX.DataBean> data1 = data.getData();
+                   if (code==1001){
+
+
+                    List<Icbean.DataBeanX.DataBean> data1 = data.getData();
                     if (data1.size()==0){
                         rc.setVisibility(View.GONE);
                         ll_no_data.setVisibility(View.VISIBLE);
@@ -196,9 +209,12 @@ setStatusBar();
                 }
                 adapter=new IcListAdapter(data3,addICCardActivity.this);
                 rc.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
 
             }
+                    srf.setRefreshing(false);
             }
+                }
             }
             @Override
             public void onFailure(Call<String> call, Throwable t) {

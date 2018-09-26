@@ -327,12 +327,12 @@ public class CustomDatePickerCir {
             }
         });
 
-        minute_pv.setOnSelectListener(new DatePickerView.onSelectListener() {
+    /*    minute_pv.setOnSelectListener(new DatePickerView.onSelectListener() {
             @Override
             public void onSelect(String text) {
                 selectedCalender.set(Calendar.MINUTE, Integer.parseInt(text));
             }
-        });
+        });*/
     }
 
     private void monthChange() {
@@ -510,8 +510,8 @@ public class CustomDatePickerCir {
                 day_pv.setVisibility(View.GONE);
                 hour_pv.setVisibility(View.VISIBLE);
                 hour_text.setVisibility(View.VISIBLE);
-                minute_pv.setVisibility(View.VISIBLE);
-                minute_text.setVisibility(View.VISIBLE);
+                minute_pv.setVisibility(View.GONE);
+                minute_text.setVisibility(View.GONE);
             } else {
                 disScrollUnit(SCROLL_TYPE.HOUR, SCROLL_TYPE.MINUTE);
                 hour_pv.setVisibility(View.GONE);

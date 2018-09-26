@@ -96,7 +96,9 @@ public class bleConnectUtils {
 
             @Override
             public void onConnFailed() {
-                Log.d("TAG","连接失败");
+
+
+
             }
         });
 

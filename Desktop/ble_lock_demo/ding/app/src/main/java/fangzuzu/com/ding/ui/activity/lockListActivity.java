@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -337,8 +339,15 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
                 final AlertDialog dialog = new AlertDialog.Builder(lockListActivity.this)
                         .setView(viewDialog)
                         .create();
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
-
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
                 tv_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -520,7 +529,13 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
             @Override
             public void onConnFailed() {
 
+                  hideProgressDialog();
+                    mBleController.closeBleConn();
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
             }
+
         });
     }
 
@@ -781,7 +796,7 @@ public String topic="fzzchat/PTP";
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(lockListActivity.this,addSmartActivity.class);
+                Intent intent=new Intent(lockListActivity.this,addSmartServiceActivityOne.class);
                 startActivity(intent);
               //  finish();
             }
@@ -817,6 +832,8 @@ public String topic="fzzchat/PTP";
     String allow;
     String id1;
     String lockNumber;
+    String startTime;
+    String endTime;
 
     public void getUserLockList() {
         String partid = SharedUtils.getString("partid");
@@ -863,8 +880,13 @@ public String topic="fzzchat/PTP";
                         electricity = next.getElectricity();
                         allow = next.getAllow();
                         id1 = next.getId();
+                        endTime = next.getEndTime();
+                        startTime = next.getStartTime();
+
                         lockNumber = next.getLockNumber();
                         Log.d("TAG","锁命"+lockName);
+                        Log.d("TAG","endTimeTest"+endTime);
+                        Log.d("TAG","startTimeTest"+startTime);
                         data3.add(next);
                     }
 
@@ -882,6 +904,7 @@ public String topic="fzzchat/PTP";
                 if (!data3.isEmpty()){
                         // 解析数据
                     if (data3.size()==1){
+                        Log.d("TAG","test租期");
                         Intent intent=new Intent(MainApplication.getInstence(),MainActviity.class);
                         intent.putExtra("id",id1);
                         intent.putExtra("secretKey",secretKey);
@@ -892,6 +915,8 @@ public String topic="fzzchat/PTP";
                         intent.putExtra("lockName",lockName);
                         intent.putExtra("jihe","1");
                         intent.putExtra("adminUserId",adminUserId);
+                        intent.putExtra("startTime",startTime);
+                        intent.putExtra("endTime",endTime);
                         startActivity(intent);
                         finish();
 
@@ -1044,7 +1069,7 @@ public String topic="fzzchat/PTP";
                 }
                 break;
             case R.id.seting_add_admini:
-                Intent intent1=new Intent(lockListActivity.this,addSmartActivity.class);
+                Intent intent1=new Intent(lockListActivity.this,addSmartServiceActivityOne.class);
                 startActivity(intent1);
                 break;
         }

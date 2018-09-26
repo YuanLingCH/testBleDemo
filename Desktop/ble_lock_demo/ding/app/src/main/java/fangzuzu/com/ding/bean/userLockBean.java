@@ -12,7 +12,7 @@ public class userLockBean {
     /**
      * code : 1001
      * msg : null
-     * data : {"parentLock":[],"userLock":[{"id":"88dc616f-f3e7-44d7-83cd-c140da04f47f","lockNumber":"C7:85:4A:22:8D:7D","lockName":"测试袁","allow":"002793","electricity":"0","adminPsw":"123456789","adminUserId":"69712753416","endTime":"2018-07-23 18:04:00.0","startTime":"2018-07-23 18:04:00.0","secretKey":"464f2c026b4d50716d410b0c53621502","keyId":"0310ae95-ea45-4daa-8aa4-765ec4a12dd9"}]}
+     * data : {"parentLock":[],"userLock":[{"id":"627365ce-4c34-4db3-adb1-c7a6d4e3dad6","lockNumber":"DF:04:8C:40:F4:DF","lockName":"袁的锁","allow":"509417","electricity":"42","adminPsw":"39181568","adminUserId":"70744183741","endTime":"2018-09-06 14:18:00.0","startTime":"2018-09-06 14:17:00.0","secretKey":"1570567f14304f7076233a1e04691d37","keyId":"7eba35c0-850d-465f-adb0-b3f31dd686db","updataFlag":null}]}
      */
 
     private int code;
@@ -65,17 +65,18 @@ public class userLockBean {
 
         public static class UserLockBean {
             /**
-             * id : 88dc616f-f3e7-44d7-83cd-c140da04f47f
-             * lockNumber : C7:85:4A:22:8D:7D
-             * lockName : 测试袁
-             * allow : 002793
-             * electricity : 0
-             * adminPsw : 123456789
-             * adminUserId : 69712753416
-             * endTime : 2018-07-23 18:04:00.0
-             * startTime : 2018-07-23 18:04:00.0
-             * secretKey : 464f2c026b4d50716d410b0c53621502
-             * keyId : 0310ae95-ea45-4daa-8aa4-765ec4a12dd9
+             * id : 627365ce-4c34-4db3-adb1-c7a6d4e3dad6
+             * lockNumber : DF:04:8C:40:F4:DF
+             * lockName : 袁的锁
+             * allow : 509417
+             * electricity : 42
+             * adminPsw : 39181568
+             * adminUserId : 70744183741
+             * endTime : 2018-09-06 14:18:00.0
+             * startTime : 2018-09-06 14:17:00.0
+             * secretKey : 1570567f14304f7076233a1e04691d37
+             * keyId : 7eba35c0-850d-465f-adb0-b3f31dd686db
+             * updataFlag : null
              */
 
             private String id;
@@ -89,6 +90,7 @@ public class userLockBean {
             private String startTime;
             private String secretKey;
             private String keyId;
+            private Object updataFlag;
 
             public String getId() {
                 return id;
@@ -176,6 +178,14 @@ public class userLockBean {
 
             public void setKeyId(String keyId) {
                 this.keyId = keyId;
+            }
+
+            public Object getUpdataFlag() {
+                return updataFlag;
+            }
+
+            public void setUpdataFlag(Object updataFlag) {
+                this.updataFlag = updataFlag;
             }
         }
     }

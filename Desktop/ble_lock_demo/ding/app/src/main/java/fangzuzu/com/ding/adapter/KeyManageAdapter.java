@@ -1,6 +1,7 @@
 package fangzuzu.com.ding.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import fangzuzu.com.ding.R;
 import fangzuzu.com.ding.bean.keyManagerBean;
+import fangzuzu.com.ding.ui.activity.keyManagerDetialActivity;
 import fangzuzu.com.ding.unixTime;
 import fangzuzu.com.ding.utils.StringUtils;
 
@@ -57,11 +59,15 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
     public void onBindViewHolder(final keyViewHolder holder, int position) {
 
         keyManagerBean.DataBeanX.DataBean dataBean = mDatas.get(position);
-      String startTime = dataBean.getStartTime()+"";
-        String endTime = dataBean.getEndTime()+"";
-        String keyName = dataBean.getKeyName();
-        String substringstartTime= startTime.substring(0, startTime.length() - 2);
-        String substringendTime = endTime.substring(0, endTime.length() - 2);
+      final String startTime = dataBean.getStartTime()+"";
+        final String endTime = dataBean.getEndTime()+"";
+        final String keyName = dataBean.getKeyName();
+        final String childUsername = dataBean.getChildUsername();
+        final String parentId = dataBean.getParentId();
+        final String userId1 = dataBean.getUserId();
+
+        final String substringstartTime= startTime.substring(0, startTime.length() - 2);
+        final String substringendTime = endTime.substring(0, endTime.length() - 2);
         holder.name.setText(keyName);
         holder.startTime.setText(substringstartTime+"至"+substringendTime);
         long timeStampSec = System.currentTimeMillis()/1000;
@@ -136,7 +142,20 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
                 }
             });
         }
-
+            holder.re_adapter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(mContext, keyManagerDetialActivity.class);
+                    intent.putExtra("startTime",substringstartTime);
+                    intent.putExtra("endTime",substringendTime);
+                    intent.putExtra("keyName",keyName);
+                    intent.putExtra("childUsername",childUsername);
+                    intent.putExtra("parentId",parentId);
+                    intent.putExtra("userId1",userId1);
+                    intent.putExtra("id",id);
+                    mContext.startActivity(intent);
+                }
+            });
     }
 
     @Override

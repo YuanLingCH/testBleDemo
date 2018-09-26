@@ -28,6 +28,7 @@ import java.util.List;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import fangzuzu.com.ding.MainApplication;
 import fangzuzu.com.ding.R;
+import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.adapter.BaseFragmentPagerAdapter;
 import fangzuzu.com.ding.event.passwordMessage;
 import fangzuzu.com.ding.ui.fragment.circulationFragment;
@@ -48,6 +49,8 @@ public class sendPassWordActivity extends BaseActivity {
     Toolbar toolbar;
     TextView send_password;
     boolean isKitKat = false;
+    String uid;
+    String adminUserId;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +67,17 @@ public class sendPassWordActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-setStatusBar();
-
-       initview();
+        setStatusBar();
+        uid= SharedUtils.getString("uid");
+        adminUserId = SharedUtils.getString("adminUserId");
+        initview();
         initEvents();
         initlize();
         EventBus.getDefault().register(this);
+
+        Log.d("TAG","点击我了"+uid);
+        Log.d("TAG","点击我了"+adminUserId);
+
     }
 
     protected void setStatusBar() {
@@ -179,10 +187,16 @@ setStatusBar();
         send_password= (TextView) findViewById(R.id.send_password);
         tabLayout = (TabLayout)findViewById(R.id.tab);
         // 添加标签
-        tabLayout.addTab(tabLayout.newTab().setText("永久"));
-        tabLayout.addTab(tabLayout.newTab().setText("限时"));
-        tabLayout.addTab(tabLayout.newTab().setText("自定义"));
-        tabLayout.addTab(tabLayout.newTab().setText("循环"));
+        if (uid.equals(adminUserId)){
+            tabLayout.addTab(tabLayout.newTab().setText("永久"));
+            tabLayout.addTab(tabLayout.newTab().setText("限时"));
+            tabLayout.addTab(tabLayout.newTab().setText("自定义"));
+            tabLayout.addTab(tabLayout.newTab().setText("循环"));
+        }else {
+            tabLayout.addTab(tabLayout.newTab().setText("限时"));
+            tabLayout.addTab(tabLayout.newTab().setText("自定义"));
+        }
+
       //  tabLayout.addTab(tabLayout.newTab().setText("清空"));
 
 
@@ -191,10 +205,17 @@ setStatusBar();
         viewPager = (ViewPager)findViewById(R.id.vp);
 
         List<Fragment> list = new ArrayList<>();
-        list.add(new foreverFragment());
-        list.add(new timeLimitFragment());
-        list.add(new customFragment());
-        list.add(new circulationFragment());
+        if (uid.equals(adminUserId)){
+            list.add(new foreverFragment());
+            list.add(new timeLimitFragment());
+            list.add(new customFragment());
+            list.add(new circulationFragment());
+        }else {
+            list.add(new timeLimitFragment());
+            list.add(new customFragment());
+        }
+
+
       //  list.add(new clearFragment());
 
 

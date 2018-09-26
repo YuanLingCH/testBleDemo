@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/backgroundjiemian"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:background="@color/backgroundtoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:id="@+id/tv_toolbar"
+            android:layout_gravity="center"
+            android:text="更改有效期"
+            android:textSize="@dimen/title_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </android.support.v7.widget.Toolbar>
+
+<LinearLayout
+    android:id="@+id/ll_start_time"
+    android:gravity="center"
+    android:background="#fff"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+    <TextView
+        android:layout_marginLeft="@dimen/space_10"
+        android:text="生效时间"
+        android:layout_weight="2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/tv_start_time"
+        android:text="2018"
+        android:layout_weight="4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+    <View
+        android:background="#ede8e8"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+    <LinearLayout
+        android:id="@+id/ll_end_time"
+       android:gravity="center"
+        android:background="#fff"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+        <TextView
+            android:layout_marginLeft="@dimen/space_10"
+            android:text="失效时间"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_end_time"
+            android:text="2018"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/but_time"
+        android:textColor="#ffffff"
+        android:background="@mipmap/login"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:textSize="15sp"
+        android:text="修改有效期"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

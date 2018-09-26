@@ -28,7 +28,7 @@ import fangzuzu.com.ding.SharedUtils;
 import fangzuzu.com.ding.adapter.lockListSmartAdapter;
 import fangzuzu.com.ding.apiManager;
 import fangzuzu.com.ding.bean.userLockBean;
-import fangzuzu.com.ding.ui.activity.addSmartActivity;
+import fangzuzu.com.ding.ui.activity.addSmartServiceActivityOne;
 import fangzuzu.com.ding.utils.screenAdapterUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -82,7 +82,7 @@ public class SmartDevice extends BaseFragment {
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainApplication.getInstence(), addSmartActivity.class );
+                Intent intent=new Intent(MainApplication.getInstence(), addSmartServiceActivityOne.class );
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 MainApplication.getInstence().startActivity(intent);
 

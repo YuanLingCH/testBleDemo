@@ -3,12 +3,14 @@ package fangzuzu.com.ding.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -83,6 +85,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
     boolean isKitKat = false;
     LinearLayout  ll_dfu;
     View v_1,v_2;
+    TextView youxiaoqi;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,6 +143,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
         v_2=(View) findViewById(R.id.v_2);
         set_keymanager= (TextView) findViewById(R.id.set_keymanager);
         tv_time= (TextView) findViewById(R.id.tv_time_clock);
+        youxiaoqi=(TextView) findViewById(R.id.youxiaoqi);
+        String startTime = MainApplication.getInstence().getStartTime();
+        String endTime = MainApplication.getInstence().getEndTime();
+        if (!StringUtils.isEmpty(startTime)&&!StringUtils.isEmpty(endTime)&&!startTime.equals(endTime)){
+            youxiaoqi.setText("限时");
+        }else {
+
+            youxiaoqi.setText("永久");
+        }
         ll_set_managerPasw= (LinearLayout) findViewById(R.id.ll_set_managerPasw);
         //同步时钟
         tv_time.setOnClickListener(new View.OnClickListener() {
@@ -168,8 +180,16 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                         final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                                 .setView(viewDialog)
                                 .create();
+                        Window window=dialog.getWindow();
+                        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialog.show();
                         final String pasw = SharedUtils.getString("pasw");
+                        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                        WindowManager manager=getWindowManager();
+                        Display defaultDisplay = manager.getDefaultDisplay();
+                        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                        p.width= (int) (defaultDisplay.getWidth()*0.85);
+                        dialog.getWindow().setAttributes(p);     //设置生效
                         tv_cancle.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -254,7 +274,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                     final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                             .setView(viewDialog)
                             .create();
+                    Window window=dialog.getWindow();
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
+                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                    WindowManager manager=getWindowManager();
+                    Display defaultDisplay = manager.getDefaultDisplay();
+                    android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                    p.width= (int) (defaultDisplay.getWidth()*0.85);
+                    dialog.getWindow().setAttributes(p);     //设置生效
                     final String pasw = SharedUtils.getString("pasw");
                     tv_cancle.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -349,7 +377,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                 final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                         .setView(view)
                         .create();
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
                 add_cancle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -438,7 +474,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                     final AlertDialog dialog = new AlertDialog.Builder(keySetActivity.this)
                             .setView(viewDialog)
                             .create();
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
                     final String pasw = SharedUtils.getString("pasw");
                     tv_cancle.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -549,7 +593,16 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                 .setView(viewDialog)
                 .create();
         dialog.setCanceledOnTouchOutside(false);
+        Window window=dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        WindowManager manager=this.getWindowManager();
+        Display defaultDisplay = manager.getDefaultDisplay();
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+        p.width= (int) (defaultDisplay.getWidth()*0.85);
+        dialog.getWindow().setAttributes(p);     //设置生效
         final String pasw = SharedUtils.getString("pasw");
         Log.d("TAG","密码"+pasw);
 
@@ -605,6 +658,7 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
+                Log.d("TAG","删除钥匙"+body);
                 Gson gson=new Gson();
                 msg m = gson.fromJson(body, new TypeToken<msg>() {}.getType());
                 int code = m.getCode();
@@ -662,15 +716,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                     jiaoyan();
 
                 }
-
                 @Override
                 public void onConnFailed() {
-                    //如果失败连接  考虑重连蓝牙   递归
-                    mBleController.closeBleConn();
-                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                    hideProgressDialog();
+
+                        Log.d("TAG","蓝牙状态码不对取消对话框");
+                        mBleController.closeBleConn();
+                        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
 
                 }
+
 
             });
         }
