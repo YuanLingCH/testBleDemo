@@ -21,4 +21,6 @@
     <dimen name="text_size_14">14.0sp</dimen>
     <dimen name="text_size_18">18.0sp</dimen>
     <dimen name="text_size_13">13.0sp</dimen>
+    <dimen name="jiange_size">15dp</dimen>
+    <dimen name="height_wrap_content">44dp</dimen>
 </resources>

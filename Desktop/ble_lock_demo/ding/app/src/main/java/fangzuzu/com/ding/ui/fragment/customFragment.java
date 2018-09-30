@@ -2,12 +2,16 @@ package fangzuzu.com.ding.ui.fragment;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -22,7 +26,6 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
-import com.hansion.h_ble.event.bleStateMessage;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -89,12 +92,7 @@ public class customFragment extends BaseFragment {
 
 
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
     StringBuffer buf;
     byte []cunzai=new byte[1];
     private void initReceiveData() {
@@ -122,7 +120,10 @@ public class customFragment extends BaseFragment {
                             tv_pasw.setEnabled(false);
                             tv_pasw.setText(pasw);
                         }
-                    updataPasw(pasw);
+
+                            updataPasw(pasw);
+
+
 
                 }
                 if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
@@ -165,12 +166,36 @@ public class customFragment extends BaseFragment {
                     Log.d("TAG","密码回来值"+buf);
                     sumbitmima(byteData);
 
-                } if (decrypt[0]==04&&decrypt[1]==01&&decrypt[4]==-16){
+                } if (decrypt[0]==04&&decrypt[1]==01&&decrypt[3]==0x05){
                         System.arraycopy(decrypt,4,cunzai,0,cunzai.length);
-                    dialog("该密码已经存在");
-                    mBleController.closeBleConn();
-                    mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
-                }
+                        if (decrypt[4]==-16){
+                            dialog("该密码已经存在");
+                            mBleController.closeBleConn();
+                            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                        }
+                        if (decrypt[4]==0x00){
+                            sendBlezuqi();
+                        }
+                }if (decrypt[0]==03&&decrypt[1]==03&&decrypt[2]==01&&decrypt[3]==00){
+                        if (!StringUtils.isEmpty(blepasw)){
+                            Log.d("TAG","App端");
+                            Timer timer=new Timer();
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    Log.d("TAG","连续走了 ");
+                                    sendDataToBle(blepasw);
+                                }
+                            },300);
+
+                        }else {
+                            Log.d("TAG","锁端");
+                            senddataTOLock();
+                        }
+                    }
+
+
+
                 }
             }
         });
@@ -195,13 +220,14 @@ public class customFragment extends BaseFragment {
             @Override
             public void onSuccess() {
                 Log.d("TAG", "发送成功");
-                sendBlezuqi();
+             //   sendBlezuqi();
 
             }
 
             @Override
             public void onFailed(int state) {
-
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
+            hideProgressDialog();
             }
         });
     }
@@ -300,6 +326,8 @@ public class customFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mBleController.closeBleConn();
+        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY );
         EventBus.getDefault().unregister(this);
     }
     String endtime;
@@ -431,9 +459,11 @@ String blepasw;
             @Override
             public void onConnFailed() {
 
-                  hideProgressDialog();
+
                     mBleController.closeBleConn();
                     Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+
 
 
             }
@@ -463,6 +493,13 @@ String blepasw;
                     }
                     @Override
                     public void onFailed(int state) {
+                        hideProgressDialog();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         Log.d("TAG","身份校验失败"+state);
                     }
                 });
@@ -515,7 +552,13 @@ String blepasw;
                     }
                     @Override
                     public void onFailed(int state) {
-
+                hideProgressDialog();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 });
             }
@@ -556,18 +599,19 @@ String blepasw;
             @Override
             public void onSuccess() {
 
-                if (!StringUtils.isEmpty(blepasw)){
+            /*    if (!StringUtils.isEmpty(blepasw)){
                     Log.d("TAG","App端");
                     sendDataToBle(blepasw);
                 }else {
                     Log.d("TAG","锁端");
                     senddataTOLock();
-                }
+                }*/
 
             }
             @Override
             public void onFailed(int state) {
-
+hideProgressDialog();
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -591,14 +635,16 @@ String blepasw;
         mBleController.writeBuffer(encrypt11, new OnWriteCallback() {
             @Override
             public void onSuccess() {
-                Log.d("TAG", "发送成功");
+                Log.d("TAG", "租期发送成功");
 
 
             }
 
             @Override
             public void onFailed(int state) {
-
+                Log.d("TAG", "发送租期失败"+state);
+                hideProgressDialog();
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -610,8 +656,6 @@ String blepasw;
     byte[] bytesstartendTime;
 
     private void sendDataToBle(String senddata) {
-            if (cunzai[0]!=-16){
-
 
 
           String pas1=new String();
@@ -659,11 +703,12 @@ String blepasw;
 
             @Override
             public void onFailed(int state) {
-
+                hideProgressDialog();
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
             }
         });
 
-            }
+
 
     }
 
@@ -728,6 +773,8 @@ String blepasw;
 
                     @Override
                     public void onFailed(int state) {
+                        hideProgressDialog();
+
 
                     }
                 });
@@ -783,11 +830,20 @@ String blepasw;
         tv.setTextColor(Color.BLACK);
         tv.setTextSize(18);
         tv.setGravity(Gravity.CENTER);
+
         TextView tv_de_me= (TextView)viewDialog.findViewById(R.id.tv_de_me);
         final AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setView(viewDialog)
                 .create();
+        Window window=dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        WindowManager manager=getActivity().getWindowManager();
+        Display defaultDisplay = manager.getDefaultDisplay();
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+        p.width= (int) (defaultDisplay.getWidth()*0.85);
+        dialog.getWindow().setAttributes(p);     //设置生效
         tv_de_me.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

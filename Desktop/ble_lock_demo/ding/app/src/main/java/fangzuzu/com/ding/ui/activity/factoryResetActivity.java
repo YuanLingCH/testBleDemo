@@ -205,9 +205,12 @@ public class factoryResetActivity extends BaseActivity {
                 @Override
                 public void onConnFailed() {
 
-
                         mBleController.closeBleConn();
                         Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
+
+
 
 
                 }

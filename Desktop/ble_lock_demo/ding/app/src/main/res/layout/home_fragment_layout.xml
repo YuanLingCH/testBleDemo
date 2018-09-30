@@ -16,6 +16,7 @@ android:gravity="center"
             android:id="@+id/tv_toolbar"
             android:layout_gravity="center"
             android:text="首页"
+            android:textColor="@color/black"
             android:textSize="@dimen/title_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -25,17 +26,16 @@ android:gravity="center"
     android:id="@+id/re_auth_list"
     android:layout_width="match_parent"
     android:overScrollMode="never"
-    android:layout_height="201dp"/>
+    android:layout_height="190dp"/>
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
 
     android:layout_height="match_parent">
     <View
-        android:layout_marginTop="10dp"
         android:background="#e8e8e8"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="10dp"/>
 <LinearLayout
     android:layout_marginRight="10dp"
     android:layout_marginLeft="10dp"
@@ -83,7 +83,11 @@ android:gravity="center"
 
 
 </LinearLayout>
-
+    <View
+        android:background="#e8e8e8"
+        android:layout_margin="@dimen/space_10"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
 <FrameLayout
    android:gravity="center"
     android:orientation="vertical"
@@ -102,9 +106,9 @@ android:gravity="center"
     <fangzuzu.com.ding.view.RoundProgressBarWidthNumber
         android:layout_marginTop="10dp"
         android:visibility="gone"
+        android:rotation="-85"
         android:id="@+id/id_progress02"
         android:layout_gravity="center"
-
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:progress="0" />

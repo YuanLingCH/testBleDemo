@@ -23,11 +23,6 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
-import com.hansion.h_ble.event.bleStateMessage;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,14 +86,9 @@ public class upDataManagerPaswActivity extends BaseActivity {
         mBleController = BleController.getInstance().init(this);
         initlize();
         setStatusBar();
-        EventBus.getDefault().register(this);
+
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
     protected void setStatusBar() {
         if (isKitKat){
 
@@ -242,9 +232,10 @@ public class upDataManagerPaswActivity extends BaseActivity {
                 @Override
                 public void onConnFailed() {
 
-                    hideProgressDialog();
+
                         mBleController.closeBleConn();
                         Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
 
                 }
 
@@ -505,7 +496,7 @@ public class upDataManagerPaswActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+
     }
 
 }

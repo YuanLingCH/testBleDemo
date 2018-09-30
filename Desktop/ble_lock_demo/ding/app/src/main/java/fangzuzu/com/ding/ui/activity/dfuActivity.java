@@ -3,11 +3,13 @@ package fangzuzu.com.ding.ui.activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,11 +26,6 @@ import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 import com.hansion.h_ble.callback.ScanCallback;
-import com.hansion.h_ble.event.bleStateMessage;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,7 +86,7 @@ public class dfuActivity extends BaseActivity {
         //初始化蓝牙
         mBleController = BleController.getInstance();
 
-        EventBus.getDefault().register(this);
+
     }
 
   private void initlize() {
@@ -100,12 +97,7 @@ public class dfuActivity extends BaseActivity {
 
   }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
     protected void setStatusBar() {
         if (isKitKat){
 
@@ -296,12 +288,13 @@ List addressDfu=new ArrayList();
             @Override
             public void onConnFailed() {
 
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
                     mBleController.closeBleConn();
                     hideProgressDialog();
-                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
-                    // hideProgressDialog();
-                    //  mStringBuilder.append("蓝牙连接失败,请重试");
                     tv.setText("蓝牙连接失败,请重试");
+
+
+
 
             }
 
@@ -438,9 +431,11 @@ List addressDfu=new ArrayList();
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBleController.unregistReciveListener("REQUESTKEY_SENDANDRECIVEACTIVITY");
-        //   mBleController.closeBleConn();
-        EventBus.getDefault().unregister(this);
+        if (mBleController!=null){
+            mBleController.closeBleConn();
+            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+        }
+
     }
     /**
      * 点击连接蓝牙检查版本号  固件版本小于服务器版本就升级  ，否则提示用户已是最新版本
@@ -472,7 +467,16 @@ List addressDfu=new ArrayList();
         dialog = new AlertDialog.Builder(dfuActivity.this)
                 .setView(viewname)
                 .create();
+        Window window=dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        WindowManager manager=getWindowManager();
+        Display defaultDisplay = manager.getDefaultDisplay();
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+        p.width= (int) (defaultDisplay.getWidth()*0.85);
+        dialog.getWindow().setAttributes(p);     //设置生效
+
         tv_cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

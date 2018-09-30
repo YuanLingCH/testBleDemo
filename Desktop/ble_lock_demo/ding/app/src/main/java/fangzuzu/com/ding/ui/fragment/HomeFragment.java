@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,11 +41,6 @@ import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 import com.hansion.h_ble.callback.ScanCallback;
-import com.hansion.h_ble.event.bleStateMessage;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -113,17 +109,28 @@ public class HomeFragment extends BaseFragment {
     RoundProgressBarWidthNumber  mRoundProgressBar;
    // private HorizontalProgressBarWithNumber mProgressBar;
     private static final int MSG_PROGRESS_UPDATE = 0x110;
-
+    private static final int MSG_PROGRESS_STOP = 0x111;
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
-          //  int progress = mProgressBar.getProgress();
-            int roundProgress = mRoundProgressBar.getProgress();
-         //   mProgressBar.setProgress(++progress);
-            mRoundProgressBar.setProgress(++roundProgress);
-         /*   if (progress >= 100) {
-                mHandler.removeMessages(MSG_PROGRESS_UPDATE);
-            }*/
-            mHandler.sendEmptyMessageDelayed(MSG_PROGRESS_UPDATE, 100);
+            switch (msg.what){
+                case MSG_PROGRESS_UPDATE:
+                    int roundProgress = mRoundProgressBar.getProgress();
+                    Log.d("TAG","roundProgress"+roundProgress);
+                mRoundProgressBar.setProgress(++roundProgress);
+
+                    if (roundProgress >= 100) {
+                        mRoundProgressBar.setProgress(0);
+            }
+                    mHandler.sendEmptyMessageDelayed(MSG_PROGRESS_UPDATE, 5);
+                    break;
+                case MSG_PROGRESS_STOP:
+                    Log.d("TAG","handler停止");
+                    flag=false;
+                    mRoundProgressBar.setVisibility(View.GONE);
+                    mHandler.removeMessages(MSG_PROGRESS_UPDATE);
+                    break;
+            }
+
         };
     };
 
@@ -138,9 +145,10 @@ public class HomeFragment extends BaseFragment {
         mBleController = BleController.getInstance().init(getActivity());
 
         initgetData();
-        EventBus.getDefault().register(this);
+
 
         //  initThinkTime();
+
 
     }
 
@@ -436,14 +444,8 @@ public class HomeFragment extends BaseFragment {
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-       // hideProgressDialog();
-        mRoundProgressBar.setVisibility(View.GONE);
-        flag=false;
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
+
 
     /**
      * 拿到权限列表
@@ -590,7 +592,7 @@ public class HomeFragment extends BaseFragment {
 
     //  mProgressBar = (HorizontalProgressBarWithNumber)root. findViewById(R.id.id_progressbar01);
      mRoundProgressBar = (RoundProgressBarWidthNumber)root. findViewById(R.id.id_progress02);
-        mHandler.sendEmptyMessage(MSG_PROGRESS_UPDATE);
+
     }
 
     protected void setStatusBar() {
@@ -673,10 +675,10 @@ public class HomeFragment extends BaseFragment {
                         hideProgressDialog();
                         Log.d("TAG","开锁成功");
 
-                        flag=false;
-                            mRoundProgressBar.setVisibility(View.GONE);
+
                         mediaPlayer01 = MediaPlayer.create(getActivity(), R.raw.sound_for_connect);
                         mediaPlayer01.start();
+                        mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
                         upDataOpenRecoder();
                         //弹出对话框  yyyy年MM月dd日
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");// HH:mm:ss
@@ -1005,13 +1007,15 @@ public class HomeFragment extends BaseFragment {
                     public void onSuccess() {
                       //  hideProgressDialog();
                         Log.d("TAG","蓝牙扫描结束ces");
+                        if (mBleController!=null){
+
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
-                              mRoundProgressBar.setVisibility(View.GONE);
-                                   flag=false;
-
+                                        mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+                                        mBleController.closeBleConn();
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (strbiaozhi.equals("02")){
@@ -1025,9 +1029,11 @@ public class HomeFragment extends BaseFragment {
                                 }
 
                             }
+
                         });
                      //
                        // hideProgressDialog();
+                        }
                     }
 
                     @Override
@@ -1048,8 +1054,8 @@ public class HomeFragment extends BaseFragment {
                                   strbiaozhi= split[1].substring(14, 16);
                                     if (!strbiaozhi.equals("02")){
                                       //  hideProgressDialog();
-                                        mRoundProgressBar.setVisibility(View.GONE);
-                                        flag=false;
+                                      mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+                                        mBleController.closeBleConn();
                                         Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
@@ -1062,8 +1068,8 @@ public class HomeFragment extends BaseFragment {
                         if (!StringUtils.isEmpty(name)){
                             if (name.equals("H_DFU")){
                                 blename.add(name);
-                                mRoundProgressBar.setVisibility(View.GONE);
-                                flag=false;
+                              mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+                                mBleController.closeBleConn();
                                 Toast.makeText(MainApplication.getInstence(), "你的锁已处于升级模式，请升级完成才能正常使用", Toast.LENGTH_SHORT).show();
                             return;
                             }
@@ -1075,8 +1081,8 @@ public class HomeFragment extends BaseFragment {
                 Log.d("TAG","没扫描");
                 if (strbiaozhi.equals("00")||strbiaozhi.equals("01")){
                     Log.d("TAG","标准"+strbiaozhi);
-                    mRoundProgressBar.setVisibility(View.GONE);
-                    flag=false;
+                 mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+                    mBleController.closeBleConn();
                     Toast.makeText(MainApplication.getInstence(), "你的锁已被初始化,请联系管理员", Toast.LENGTH_SHORT).show();
                          //   hideProgressDialog();
                     return;
@@ -1101,20 +1107,21 @@ public class HomeFragment extends BaseFragment {
         mBleController.connect(0, lockNumber, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
+                Log.d("TAG","连接蓝牙成功回调方法");
                 jiaoyan();
             }
 
 
             @Override
             public void onConnFailed() {
+                Log.d("TAG", "连接蓝牙失败回调方法");
 
-                   hideProgressDialog();
-                    mRoundProgressBar.setVisibility(View.GONE);
-                    flag=false;
-                    Toast.makeText(MainApplication.getInstence(), "连接蓝牙失败", Toast.LENGTH_SHORT).show();
+
+                mBleController.closeBleConn();
+                mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+                Toast.makeText(MainApplication.getInstence(), "连接蓝牙失败", Toast.LENGTH_SHORT).show();
 
             }
-
 
         });
     }
@@ -1142,7 +1149,16 @@ public class HomeFragment extends BaseFragment {
                     }
                     @Override
                     public void onFailed(int state) {
-                        hideProgressDialog();
+                        mRoundProgressBar.setVisibility(View.GONE);
+                        flag=false;
+                        mBleController.closeBleConn();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MainApplication.getInstence(), "连接蓝牙失败", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                         Log.d("TAG","身份校验失败"+state);
                     }
                 });
@@ -1193,6 +1209,9 @@ public class HomeFragment extends BaseFragment {
                     }
                     @Override
                     public void onFailed(int state) {
+                        mRoundProgressBar.setVisibility(View.GONE);
+                        flag=false;
+                        mBleController.closeBleConn();
 
                     }
                 });
@@ -1238,7 +1257,15 @@ public class HomeFragment extends BaseFragment {
             }
             @Override
             public void onFailed(int state) {
-
+                mRoundProgressBar.setVisibility(View.GONE);
+                flag=false;
+                mBleController.closeBleConn();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainApplication.getInstence(), "连接蓝牙失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -1313,7 +1340,7 @@ public class HomeFragment extends BaseFragment {
     /**
      * 蓝牙开锁
      */
-    boolean flag=false;
+ public    boolean flag=false;
     @Override
     protected void initEvents() {
 
@@ -1324,13 +1351,14 @@ public class HomeFragment extends BaseFragment {
                         int tv_width = tv_ding.getMeasuredWidth();
                         int tv_height = tv_ding.getMeasuredHeight();
                         Log.d("TAG","控件的宽度"+tv_width+"控件的高度"+tv_height);
-
+                        LinearInterpolator lir = new LinearInterpolator();
                         ViewGroup.LayoutParams layoutParams = mRoundProgressBar.getLayoutParams();
                         layoutParams.width=tv_width-70;
                         layoutParams.height=tv_height-70;
                         mRoundProgressBar.setLayoutParams(layoutParams);
                         mRoundProgressBar.setVisibility(View.VISIBLE);
                         mRoundProgressBar.setProgress(0);
+                        mRoundProgressBar.setInterpolator(lir);
                         initReceiveData(); //接收数据
                         initConnectBle();  //连接蓝牙
                         flag=true;
@@ -1339,7 +1367,7 @@ public class HomeFragment extends BaseFragment {
 
 
 
-
+                mHandler.sendEmptyMessage(MSG_PROGRESS_UPDATE);
 
 
             }
@@ -1406,8 +1434,12 @@ public class HomeFragment extends BaseFragment {
             mediaPlayer01.release();
         }
         mBleController.closeBleConn();
-
-       EventBus.getDefault().unregister(this);
+        flag=false;
+        mRoundProgressBar.setVisibility(View.GONE);
+        if (mRoundProgressBar!=null){
+            mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
+        }
+        Log.d("TAG","界面销毁");
     }
 
     @Override

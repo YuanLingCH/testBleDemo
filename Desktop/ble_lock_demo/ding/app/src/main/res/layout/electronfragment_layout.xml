@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:id="@+id/ll_bg"
-    android:background="@color/backgroundjiemian"
+    android:background="#ede8e8"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
         <android.support.v7.widget.Toolbar
@@ -14,6 +14,7 @@
                     android:id="@+id/tv_toolbar"
                     android:layout_gravity="center"
                     android:text="钥匙授权"
+                    android:textColor="@color/black"
                     android:textSize="@dimen/title_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -21,18 +22,18 @@
     <View
         android:id="@+id/view_1"
         android:background="#ede8e8"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/jiange_size"/>
        <LinearLayout
+           android:background="@color/backgroundjiemian"
            android:id="@+id/ll_yao_type"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
+          android:gravity="center"
+
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_height="wrap_content">
+            android:layout_height="44dp">
                 <TextView
+                    android:layout_marginLeft="20dp"
                     android:textSize="@dimen/butTextSize"
                     android:id="@+id/key_type"
                     android:text="钥匙类型"
@@ -62,25 +63,27 @@
         </LinearLayout>
 
     <View
+        android:layout_marginBottom="@dimen/space_5"
         android:id="@+id/view_2"
         android:background="#ede8e8"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
         <LinearLayout
+            android:gravity="center"
+            android:background="@color/backgroundjiemian"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="44dp">
                 <TextView
+                    android:layout_marginLeft="@dimen/space_20"
                     android:text="账号"
                     android:textSize="@dimen/butTextSize"
                     android:layout_weight="2.5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
                 <fangzuzu.com.ding.widget.EditTextDrawableClick
+                    android:layout_marginRight="@dimen/space_20"
                     android:id="@+id/electfrg_inputaccount"
                     android:background="@mipmap/input_box"
                     android:hint="请输入接受者的注册账号"
@@ -95,18 +98,20 @@
 
         </LinearLayout>
     <View
+        android:visibility="gone"
         android:background="#ede8e8"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
         <LinearLayout
             android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:background="@color/backgroundjiemian"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="44dp">
                 <TextView
+                    android:layout_marginLeft="@dimen/space_20"
                     android:text="锁名称"
                     android:textSize="@dimen/butTextSize"
                     android:layout_weight="2.5"
@@ -120,28 +125,31 @@
                     android:singleLine="true"
                     android:textSize="@dimen/butTextSize"
                     android:layout_width="0dp"
+                    android:layout_marginRight="@dimen/space_20"
                     android:layout_height="wrap_content" />
         </LinearLayout>
     <View
+        android:layout_marginBottom="@dimen/space_5"
         android:background="#ede8e8"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
         <LinearLayout
             android:id="@+id/create_time"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:background="@color/backgroundjiemian"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="44dp">
                 <TextView
+                    android:layout_marginLeft="@dimen/space_20"
                     android:text="生效时间"
                     android:textSize="@dimen/butTextSize"
                     android:layout_weight="2.5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
                 <TextView
+                    android:layout_marginRight="@dimen/space_20"
                     android:id="@+id/electfrg_effect_time"
                     android:background="@mipmap/input_box"
                     android:hint="请输入时间"
@@ -151,6 +159,7 @@
                     android:layout_height="wrap_content" />
         </LinearLayout>
     <View
+        android:visibility="gone"
         android:background="#ede8e8"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
@@ -158,12 +167,13 @@
         <LinearLayout
             android:id="@+id/lose_time"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:background="@color/backgroundjiemian"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="44dp">
                 <TextView
+                    android:layout_marginLeft="@dimen/space_20"
                     android:text="失效时间"
                     android:textSize="@dimen/butTextSize"
                     android:layout_weight="2.5"
@@ -176,28 +186,37 @@
                    android:gravity="center"
                     android:layout_weight="7"
                     android:layout_width="0dp"
+                    android:layout_marginRight="@dimen/space_20"
                     android:layout_height="wrap_content" />
         </LinearLayout>
     <View
         android:background="#ede8e8"
-        android:layout_margin="5dp"
+
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/jiange_size"/>
+<LinearLayout
+    android:layout_marginTop="@dimen/space_10"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/backgroundjiemian"
+    android:layout_height="@dimen/height_wrap_content">
         <TextView
+           android:layout_gravity="center_vertical"
             android:textSize="@dimen/butTextSize"
             android:id="@+id/select_author"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="20dp"
+           android:layout_marginRight="@dimen/space_20"
+            android:layout_marginLeft="@dimen/space_20"
+            android:background="@color/backgroundjiemian"
             android:text="请选择授权模块"
+                 android:gravity="center_vertical"
             android:drawableRight="@mipmap/more"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="44dp" />
+</LinearLayout>
     <View
         android:background="#ede8e8"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/jiange_size"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rc"
             android:layout_width="wrap_content"

@@ -12,7 +12,7 @@ public class keyManagerBean  {
     /**
      * code : 1001
      * msg : null
-     * data : {"recordsTotal":1,"pageSize":10,"totalPage":1,"data":[{"id":"d61f78fe-eee1-4fa6-b62c-00a0b6448356","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"袁的锁","startTime":"2018-09-19 13:38:00.0","endTime":"2021-01-01 00:00:00.0","statu":0}]}
+     * data : {"recordsTotal":1,"pageSize":10,"totalPage":1,"data":[{"id":"3d16e9bd-522a-44bb-a7c7-e700bd00dcfd","lockId":"3352dc20-46d3-40a6-84ba-5f245d48e860","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"测试袁","startTime":"2018-09-27 10:38:00.0","endTime":"2023-01-01 00:00:00.0","statu":0,"createtime":1538015915000}]}
      */
 
     private int code;
@@ -48,7 +48,7 @@ public class keyManagerBean  {
          * recordsTotal : 1
          * pageSize : 10
          * totalPage : 1
-         * data : [{"id":"d61f78fe-eee1-4fa6-b62c-00a0b6448356","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"袁的锁","startTime":"2018-09-19 13:38:00.0","endTime":"2021-01-01 00:00:00.0","statu":0}]
+         * data : [{"id":"3d16e9bd-522a-44bb-a7c7-e700bd00dcfd","lockId":"3352dc20-46d3-40a6-84ba-5f245d48e860","userId":"69880820011","childUsername":"18665261827","parentId":"18365408378","keyName":"测试袁","startTime":"2018-09-27 10:38:00.0","endTime":"2023-01-01 00:00:00.0","statu":0,"createtime":1538015915000}]
          */
 
         private int recordsTotal;
@@ -90,17 +90,20 @@ public class keyManagerBean  {
 
         public static class DataBean {
             /**
-             * id : d61f78fe-eee1-4fa6-b62c-00a0b6448356
+             * id : 3d16e9bd-522a-44bb-a7c7-e700bd00dcfd
+             * lockId : 3352dc20-46d3-40a6-84ba-5f245d48e860
              * userId : 69880820011
              * childUsername : 18665261827
              * parentId : 18365408378
-             * keyName : 袁的锁
-             * startTime : 2018-09-19 13:38:00.0
-             * endTime : 2021-01-01 00:00:00.0
+             * keyName : 测试袁
+             * startTime : 2018-09-27 10:38:00.0
+             * endTime : 2023-01-01 00:00:00.0
              * statu : 0
+             * createtime : 1538015915000
              */
 
             private String id;
+            private String lockId;
             private String userId;
             private String childUsername;
             private String parentId;
@@ -108,6 +111,7 @@ public class keyManagerBean  {
             private String startTime;
             private String endTime;
             private int statu;
+            private long createtime;
 
             public String getId() {
                 return id;
@@ -115,6 +119,14 @@ public class keyManagerBean  {
 
             public void setId(String id) {
                 this.id = id;
+            }
+
+            public String getLockId() {
+                return lockId;
+            }
+
+            public void setLockId(String lockId) {
+                this.lockId = lockId;
             }
 
             public String getUserId() {
@@ -171,6 +183,14 @@ public class keyManagerBean  {
 
             public void setStatu(int statu) {
                 this.statu = statu;
+            }
+
+            public long getCreatetime() {
+                return createtime;
+            }
+
+            public void setCreatetime(long createtime) {
+                this.createtime = createtime;
             }
         }
     }

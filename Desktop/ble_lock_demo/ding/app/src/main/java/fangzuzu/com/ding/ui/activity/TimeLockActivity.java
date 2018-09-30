@@ -21,11 +21,6 @@ import com.hansion.h_ble.BleController;
 import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
-import com.hansion.h_ble.event.bleStateMessage;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -81,15 +76,10 @@ public class TimeLockActivity extends AppCompatActivity {
        //初始化蓝牙
         mBleController = BleController.getInstance().init(TimeLockActivity.this);
         initReceiveData();
-        EventBus.getDefault().register(this);
+
 
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
     protected void setStatusBar() {
         if (isKitKat){
 
@@ -164,9 +154,12 @@ public class TimeLockActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnFailed() {
-                  hideProgressDialog();
+
                         mBleController.closeBleConn();
                         Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
+
+
 
 
                 }
@@ -333,7 +326,7 @@ public class TimeLockActivity extends AppCompatActivity {
         super.onDestroy();
         mBleController.unregistReciveListener("REQUESTKEY_SENDANDRECIVEACTIVITY");
      //   mBleController.closeBleConn();
-        EventBus.getDefault().unregister(this);
+
     }
 
     public  void showProgressDialog(String title, String message) {

@@ -3,12 +3,14 @@ package fangzuzu.com.ding.ui.activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -277,19 +279,17 @@ public class addfingerOneStepActivity extends BaseActivity {
                     mBleController.closeBleConn();  //断掉蓝牙
                     mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
 
-                     if (idCard[0]==-16){
-                         dialog("用户已存在");
-                     }else {
+
                          dialog("添加指纹成功");
                          upData();
-                     }
+
 
                 }else if (decrypt[0]==04&&decrypt[3]==01){
                     Toast.makeText(MainApplication.getInstence(),"设置失败",Toast.LENGTH_LONG).show();
                 }else if (decrypt[0]==04&&decrypt[3]==0xFF){
                     Toast.makeText(MainApplication.getInstence(),"无权限操作",Toast.LENGTH_LONG).show();
                 }else if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==02){
-                    setzuqiTime();
+
                     byte []idLength=new byte[1];
                     for (int i = 0; i < decrypt.length; i++) {
                         idLength[0]=decrypt[2];
@@ -302,7 +302,14 @@ public class addfingerOneStepActivity extends BaseActivity {
                         Log.d("TAG","转换结果idicard"+idCard[i]);
 
                     }
+                     if (idCard[0]==-16){
 
+                         dialog("用户已存在");
+                         mBleController.closeBleConn();  //断掉蓝牙
+                         mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                     }else {
+                         setzuqiTime();
+                     }
 
                 }
             }
@@ -506,7 +513,15 @@ public class addfingerOneStepActivity extends BaseActivity {
                 .setView(viewDialog)
                 .create();
         //  dialog.setCanceledOnTouchOutside(false);
+        Window window=dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        WindowManager manager=getWindowManager();
+        Display defaultDisplay = manager.getDefaultDisplay();
+        android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+        p.width= (int) (defaultDisplay.getWidth()*0.85);
+        dialog.getWindow().setAttributes(p);     //设置生效
         ll_duihuakuang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -532,7 +547,8 @@ public class addfingerOneStepActivity extends BaseActivity {
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
-
+                                    hideProgressDialog();
+                                    mBleController.closeBleConn();
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (strbiaozhi.equals("02")){
@@ -608,8 +624,14 @@ public class addfingerOneStepActivity extends BaseActivity {
 
             @Override
             public void onConnFailed() {
+
+                    Log.d("TAG","蓝牙状态码不对");
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败", Toast.LENGTH_SHORT).show();
                     mBleController.closeBleConn();
-                   hideProgressDialog();
+                    hideProgressDialog();
+
+
+
 
             }
         });
@@ -783,6 +805,11 @@ public class addfingerOneStepActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        if (mBleController!=null){
+            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+            mBleController.closeBleConn();
+
+        }
     }
     String endtime;
 

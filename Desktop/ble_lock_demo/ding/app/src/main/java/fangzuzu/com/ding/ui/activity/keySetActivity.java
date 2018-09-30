@@ -623,13 +623,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                         dialog.dismiss();
                         //1 根据当前uid 来判断  和锁里面的uid 是不是蓝牙管理员和普通用户
                         //连接蓝牙 和删除服务器数据
+                        Log.d("TAG","uid"+uid+"adminUserId"+adminUserId);
                         if (uid.equals(adminUserId)){
-                            initReceiveData();
-                            initConnectBle(mac,lockid);
+                         initReceiveData();
+                          initConnectBle(mac,lockid);
+                            Log.d("TAG","管理员钥匙删除"+pasw+"lockid"+lockid);
                         }else {
                             //普通直接删除钥匙
-                            upDataDelet(keyId);
-                            Log.d("TAG","普通钥匙"+pasw);
+                         upDataDelet(keyId);
+                            Log.d("TAG","普通钥匙删除"+pasw+"keyId"+keyId);
                         }
 
                     }else {
@@ -718,10 +720,11 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
                 }
                 @Override
                 public void onConnFailed() {
-
-                        Log.d("TAG","蓝牙状态码不对取消对话框");
+                   hideProgressDialog();
                         mBleController.closeBleConn();
                         Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
 
                 }
 
@@ -1088,6 +1091,15 @@ public class keySetActivity extends BaseActivity implements OnMqttListener{
 
 
 
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mBleController!=null){
+            mBleController.closeBleConn();
+            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
         }
     }
 }

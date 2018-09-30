@@ -21,10 +21,7 @@ import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 import com.hansion.h_ble.callback.ScanCallback;
-import com.hansion.h_ble.event.bleStateMessage;
 import com.hansion.h_ble.request.ReceiverRequestQueue;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -230,12 +227,15 @@ public void stopScan(){
      * @param devicesAddress    想要连接的设备地址
      */
     public void connect(final int connectionTimeOut, final String devicesAddress, ConnectCallback connectCallback) {
+        if (null != mBluetoothGatt){
+            mBluetoothGatt.close();     //连接的时候清掉被连接的设备
+        }
         BluetoothDevice remoteDevice = mAdapter.getRemoteDevice(devicesAddress);
         if (null == remoteDevice) {
             Log.e(LOGTAG, "No device found at this address：" + devicesAddress);
             return;
         }
-
+        mBluetoothGatt = remoteDevice.connectGatt(mContext, false, mGattCallback);
         this.connectCallback = connectCallback;
 
      /*   if (null != mBluetoothGatt) {
@@ -243,7 +243,7 @@ public void stopScan(){
             mBluetoothGatt.disconnect();
         }
         reset();*/
-        mBluetoothGatt = remoteDevice.connectGatt(mContext, false, mGattCallback);
+
         Log.e(LOGTAG, "connecting mac-address:" + devicesAddress);
         delayConnectResponse(connectionTimeOut);
       /*  if (null != mBluetoothGatt) {
@@ -380,9 +380,7 @@ public void stopScan(){
                 if (!isConnectResponse && !isBreakByMyself) {
                     Log.e(LOGTAG, "connect timeout");
                     disConnection();
-                 //  reConnect();
-                    bleStateMessage message=new bleStateMessage();
-                    EventBus.getDefault().post(message);
+                 reConnect();
                 } else {
                     isBreakByMyself = false;
                 }
@@ -411,7 +409,7 @@ public void stopScan(){
     /**
      * 蓝牙GATT连接及操作事件回调
      */
-    int state;
+
     private class BleGattCallback extends BluetoothGattCallback {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -424,15 +422,15 @@ public void stopScan(){
                 mBluetoothGatt.disconnect();
                 mBluetoothGatt.close();
                 reset();
+                if (status!=0){
+                    reConnect();
+                }
 
+                Log.e(LOGTAG, "蓝牙失败"+status);
             }
-            state=status;
-            if (status==133||status==62||status==34||status==22){
-                Log.d("TAG","蓝牙状态码不对");
-                bleStateMessage message=new bleStateMessage();
-                EventBus.getDefault().postSticky(message);
 
-            }
+
+
 
         }
 
@@ -453,7 +451,7 @@ public void stopScan(){
                         if (characteristics.get(j).getUuid().toString().equals(BLUETOOTH_NOTIFY_C)) {
                             if (enableNotification(true, characteristics.get(j))) {
                                 isConnectResponse = true;
-                                connSuccess();
+                              connSuccess();
                             } else {
                                 reConnect();
                             }

@@ -37,8 +37,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <LinearLayout
-android:layout_alignParentBottom="true"
-        android:background="@drawable/open_lock_bottom_5dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/open_lock_bottom_left_5dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="40dp">
@@ -51,4 +51,5 @@ android:layout_alignParentBottom="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
 </RelativeLayout>

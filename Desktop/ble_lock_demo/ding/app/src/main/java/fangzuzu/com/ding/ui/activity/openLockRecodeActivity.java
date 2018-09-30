@@ -177,6 +177,9 @@ public class openLockRecodeActivity extends BaseActivity {
                     Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
 
 
+
+
+
             }
 
 
@@ -310,32 +313,44 @@ public class openLockRecodeActivity extends BaseActivity {
     int numbler=0;
     byte []byteType=new byte[1];
     public void  sendData(){
-
+        Timer timer=new Timer();
         if (ziwenData.size()>0) {
             Log.d("TAG", "指纹大小" + ziwenData.size());
             byteType[0] = 0x02;
+            Log.d("TAG", "指纹走了");
             for (int i = 0; i < ziwenData.size(); i++) {
                 sendopenLockrecode((String) ziwenData.get(i), byteType);
                 Log.d("TAG", "ic卡Id" + ziwenData.get(i));
             }
         }
-       if (ICData.size()>0) {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (ICData.size()>0) {
+                    Log.d("TAG", "ic卡走了");
+                    byteType[0]=0x03;
+                    for (int i = 0; i < ICData.size(); i++) {
+                        sendopenLockrecode((String) ICData.get(i),byteType);
 
-                byteType[0]=0x03;
-                for (int i = 0; i < ICData.size(); i++) {
-                    sendopenLockrecode((String) ICData.get(i),byteType);
-
+                    }
                 }
-        }
-
-        if (shenfenzData.size()>0) {
-
-            byteType[0]=0x04;
-            for (int i = 0; i < shenfenzData.size(); i++) {
-                sendopenLockrecode((String) shenfenzData.get(i),byteType);
-
             }
-        }
+        },500);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (shenfenzData.size()>0) {
+                    Log.d("TAG", "身份证走了");
+                    byteType[0]=0x04;
+                    for (int i = 0; i < shenfenzData.size(); i++) {
+                        sendopenLockrecode((String) shenfenzData.get(i),byteType);
+
+                    }
+                }
+            }
+        },500);
+
     }
 
 
@@ -498,13 +513,11 @@ public class openLockRecodeActivity extends BaseActivity {
                 }if (decrypt[0]==03&&decrypt[1]==04&&decrypt[2]==01&&decrypt[3]==01){
                     tongbuTime();  //同步时间
                 }
-                if (decrypt[0]==05&&decrypt[1]==03&&decrypt[2]==05){
-                    sendopenLockrecodetow();  //第二次确认
-                }
                 if (decrypt[0]==05&&decrypt[1]==01&&decrypt[3]==00){
                     sendopenLockrecodeone();  //第一次确认
                 }
                 if (decrypt[0]==05&&decrypt[1]==03&&decrypt[2]==05) {
+                    sendopenLockrecodetow();  //第二次确认 //每回来一条确认一次
                     // 蓝牙返回开锁时间
                     System.arraycopy(decrypt, 3, bleToAppDataOne, 0, bleToAppDataOne.length);
                     System.arraycopy(decrypt, 4, bleToAppDataTow, 0, bleToAppDataTow.length);
@@ -523,25 +536,41 @@ public class openLockRecodeActivity extends BaseActivity {
                     //  0 ic   1身份证   2指纹     2：获取指纹开锁记录；3：获取用户IC卡开锁记录；4：获取用户身份证开锁记录；
 
                     if (byteType[0]==0x02){
-                        upDataOpenRecoder(s,"2");
+                      upDataOpenRecoder(s,"2");
                     }else if (byteType[0]==0x03){
-                        upDataOpenRecoder(s,"3");
-                    }else if (byteType[0]==0x04){
+                      upDataOpenRecoder(s,"3");
+                    }/*else if (byteType[0]==0x04){
                         upDataOpenRecoder(s,"4");
-                    }
+                    }*/
                     //   upDataOpenRecoder(s,"");
+
                 }
                 }
                 }
         });
     }
 
+    /**
+     * 删除开锁记录
+     */
+    public  void deleteOpenRecord(){
+         // id长度大于14 就要分包 7个字节
+                byte []head=new byte[4];
+                head[0]=0x05;
+                head[1]=0x04;
+                head[2]=0x05;  //长度
+                head[3]=0x05;   //类型
+
+            }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBleController.closeBleConn();
+        if (mBleController!=null){
+            mBleController.closeBleConn();
+            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+        }
     }
 
     private void initlize() {

@@ -20,12 +20,18 @@ public abstract class BaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (root==null){
+            root = inflater.inflate(getLayoutId(), null);
+            initViews();
 
-        root = inflater.inflate(getLayoutId(), null);
+            initEvents();
+        }
 
-        initViews();
+        ViewGroup parent = (ViewGroup) root.getParent();
+        if (parent != null) {
+            parent.removeView(root);
+        }
 
-        initEvents();
 
         return root;
     }

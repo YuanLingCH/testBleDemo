@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
   <android.support.v7.widget.Toolbar
       android:id="@+id/toolbar"
+      android:textColor="@color/black"
       android:background="@color/backgroundjiemian"
       android:layout_width="match_parent"
       android:layout_height="?attr/actionBarSize">
@@ -70,7 +71,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:background="@mipmap/login"
+        android:background="@drawable/blue_5dp"
         android:onClick="onclick"
         android:text="登录"
         android:textColor="#ffffff"

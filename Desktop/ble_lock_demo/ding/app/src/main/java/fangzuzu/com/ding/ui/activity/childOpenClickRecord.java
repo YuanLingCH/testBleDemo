@@ -83,8 +83,8 @@ public class childOpenClickRecord extends BaseActivity {
 
     private void initViews() {
          uid = getIntent().getStringExtra("uid");
-     keyName = getIntent().getStringExtra("keyName");
-     lockId = getIntent().getStringExtra("lockId");
+         keyName = getIntent().getStringExtra("keyName");
+        lockId = getIntent().getStringExtra("lockId");
         rc=(RecyclerView) findViewById(R.id.lv);
         srf=(SwipeRefreshLayout) findViewById(R.id.srf);
         ll_no_data=(LinearLayout) findViewById(R.id.ll_nodata);
@@ -132,6 +132,9 @@ public class childOpenClickRecord extends BaseActivity {
     }
 
     public void getData() {
+       Log.d("TAG","锁id"+lockId);
+        Log.d("TAG","锁名"+keyName);
+        Log.d("TAG","userid"+uid);
         data3=new ArrayList();
         Retrofit re=new Retrofit.Builder()
                 .baseUrl(apiManager.baseUrl)
@@ -142,11 +145,12 @@ public class childOpenClickRecord extends BaseActivity {
         Map<String,String> map=new HashMap<>();
         map.put("pageSize","100");
         map.put("currentPage","1");
-        map.put("key",keyName);
+        map.put("key","");
         map.put("lockId",lockId);
         map.put("userId",uid );
         final Gson gson=new Gson();
         String s = gson.toJson(map);
+        Log.d("TAG", "上传json"+s);
         data3.clear();
         Call<String> call = manager.getopenLockRecoder(s);
         call.enqueue(new Callback<String>() {
@@ -154,8 +158,6 @@ public class childOpenClickRecord extends BaseActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 String body = response.body();
                 if (!StringUtils.isEmpty(body)) {
-
-
                     Log.d("TAG", body);
                     openLockRecoderBean bean = gson.fromJson(body, new TypeToken<openLockRecoderBean>() {
                     }.getType());

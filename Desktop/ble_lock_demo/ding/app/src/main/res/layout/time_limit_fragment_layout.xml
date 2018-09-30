@@ -9,7 +9,7 @@
         android:layout_marginTop="10dp"
         android:background="#e8e8e8"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
     <LinearLayout
         android:id="@+id/create_time"
         android:layout_marginTop="20dp"
@@ -60,7 +60,7 @@
         android:layout_marginTop="10dp"
         android:background="#e8e8e8"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
     <TextView
         android:textColor="#000"
         android:layout_marginTop="40dp"

@@ -370,6 +370,7 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
                         if (uid.equals(lockusid)){
                             initReceiveData();
                             initConnectBle(lockNumber,id,position);
+                            showProgressDialog("","正在连接蓝牙...");
                         }else {
                             //普通直接删除钥匙
                             upDataDelet(keyId,position);
@@ -450,7 +451,7 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
-
+                                    hideProgressDialog();
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (strbiaozhi.equals("02")){
@@ -463,12 +464,12 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
                             }
                         });
                         //
-                        hideProgressDialog();
+
                     }
 
                     @Override
                     public void onScanning(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                        showProgressDialog("","正在连接蓝牙...");
+
                         String address = device.getAddress();
                         if (address.equals(mac)){
                             if (!bledata.contains(mac)){
@@ -519,7 +520,7 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
 
 
     public void connect(){
-        showProgressDialog("","正在连接蓝牙...");
+
         mBleController.connect(0, mac, new ConnectCallback() {
             @Override
             public void onConnSuccess() {
@@ -528,35 +529,18 @@ public class lockListActivity extends BaseActivity implements OnMqttListener {
 
             @Override
             public void onConnFailed() {
-
-                  hideProgressDialog();
+               hideProgressDialog();
                     mBleController.closeBleConn();
                     Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
+
 
 
             }
 
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private void jiaoyan(){

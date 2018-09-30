@@ -14,7 +14,7 @@
         android:layout_below="@+id/tv"
         android:background="@drawable/login_shape"
         android:layout_marginTop="10dp"
-        android:hint="请给锁命名"
+        android:hint="请给锁名称"
         android:textSize="15sp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"

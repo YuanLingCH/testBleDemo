@@ -145,18 +145,18 @@ LinearLayout ll_no_data;
            //添加ic卡
 
                 intent.putExtra("addType","0");
-                intent.putExtra("toolbar","添加IC卡");
+                intent.putExtra("toolbar","添加卡片");
                 intent.putExtra("byte","3");
                 startActivity(intent);
                 break;
-            case R.id.seting_identity_card:
+  /*          case R.id.seting_identity_card:
                 //添加身份证
 
                 intent.putExtra("addType","1");
                 intent.putExtra("toolbar","添加身份证");
                 intent.putExtra("byte","4");
                 startActivity(intent);
-                break;
+                break;*/
         }
         return true;
       //  return super.onOptionsItemSelected(item);

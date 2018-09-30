@@ -66,7 +66,7 @@ public class IcListAdapter extends RecyclerView.Adapter<IcListAdapter.IcViewHold
         Log.d("TAG","开锁类型"+unlockType);
         final String id = bean.getId();
         if (addType==0){
-            holder.lock_elcet.setText("IC卡");
+            holder.lock_elcet.setText(unlockName);
         }else if (addType==1){
             holder.lock_elcet.setText("身份证");
         }else if (addType==2){

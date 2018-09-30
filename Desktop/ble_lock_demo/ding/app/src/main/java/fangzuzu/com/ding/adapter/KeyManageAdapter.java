@@ -65,6 +65,7 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
         final String childUsername = dataBean.getChildUsername();
         final String parentId = dataBean.getParentId();
         final String userId1 = dataBean.getUserId();
+        final String lockId = dataBean.getLockId();
 
         final String substringstartTime= startTime.substring(0, startTime.length() - 2);
         final String substringendTime = endTime.substring(0, endTime.length() - 2);
@@ -153,6 +154,7 @@ public class KeyManageAdapter extends RecyclerView.Adapter<KeyManageAdapter.keyV
                     intent.putExtra("parentId",parentId);
                     intent.putExtra("userId1",userId1);
                     intent.putExtra("id",id);
+                    intent.putExtra("lockid",lockId);
                     mContext.startActivity(intent);
                 }
             });

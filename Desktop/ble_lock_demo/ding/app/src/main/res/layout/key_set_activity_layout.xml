@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:background="@color/backgroundjiemian"
+    android:background="#ede8e8"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar
@@ -14,27 +14,28 @@
             android:layout_gravity="center"
             android:text="锁的设置"
             android:textSize="@dimen/title_bar"
+            android:textColor="@color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </android.support.v7.widget.Toolbar>
 
     <View
         android:background="#ede8e8"
-        android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/jiange_size"/>
     <RelativeLayout
+            android:background="@color/backgroundjiemian"
         android:id="@+id/rl"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+         android:gravity="center"
+
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
 
         <TextView
             android:text="名称"
             android:textSize="@dimen/top"
-
+                android:layout_marginLeft="@dimen/space_10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
@@ -46,27 +47,30 @@
             android:drawablePadding="5dp"
             android:drawableRight="@mipmap/more"
             android:layout_width="wrap_content"
+            android:layout_marginRight="@dimen/space_10"
             android:layout_height="wrap_content" />
     </RelativeLayout>
     <View
         android:background="#ede8e8"
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
     <LinearLayout
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:background="@color/backgroundjiemian"
+      android:gravity="center"
+
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
 
         <TextView
-
+android:layout_marginLeft="@dimen/space_10"
             android:text="MAC"
             android:textSize="@dimen/top"
             android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <TextView
+            android:layout_marginRight="@dimen/space_10"
             android:id="@+id/mac"
             android:text="C9;F0:29:97:7D"
             android:gravity="center_vertical|right"
@@ -83,13 +87,15 @@
         android:layout_height="1dp"/>
 
     <LinearLayout
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:background="@color/backgroundjiemian"
+       android:gravity="center"
+
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
 
         <TextView
+            android:layout_marginLeft="@dimen/space_10"
 
             android:text="有效期"
             android:textSize="@dimen/top"
@@ -97,6 +103,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <TextView
+            android:layout_marginRight="@dimen/space_10"
             android:id="@+id/youxiaoqi"
             android:text="永久"
             android:gravity="center_vertical|right"
@@ -111,20 +118,21 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
     <LinearLayout
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+        android:gravity="center"
+       android:background="@color/backgroundjiemian"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
 
         <TextView
-
+android:layout_marginLeft="@dimen/space_10"
             android:text="电量"
             android:textSize="@dimen/top"
             android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <TextView
+            android:layout_marginRight="@dimen/space_10"
             android:id="@+id/lock_elect"
             android:text="100%"
             android:gravity="center_vertical|right"
@@ -137,24 +145,25 @@
         android:background="#ede8e8"
 
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="@dimen/jiange_size"/>
 
     <LinearLayout
         android:id="@+id/ll_set_managerPasw"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
+       android:gravity="center"
+       android:background="@color/backgroundjiemian"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
 
         <TextView
-
+android:layout_marginLeft="@dimen/space_10"
             android:text="管理员开门密码"
             android:textSize="@dimen/top"
             android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
         <TextView
+            android:layout_marginRight="@dimen/space_10"
             android:id="@+id/set_keymanager"
             android:text="12345678"
             android:gravity="center_vertical|right"
@@ -170,13 +179,21 @@
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
+    <LinearLayout
+        android:gravity="center"
+        android:background="@color/backgroundjiemian"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_wrap_content">
     <TextView
         android:id="@+id/tv_time_clock"
-        android:layout_margin="10dp"
+      android:layout_marginRight="@dimen/space_10"
+android:layout_marginLeft="@dimen/space_10"
         android:drawableRight="@mipmap/more"
         android:text="时钟"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    </LinearLayout>
     <View
         android:background="#ede8e8"
         android:layout_margin="5dp"
@@ -198,31 +215,36 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
     <LinearLayout
+        android:background="@color/backgroundjiemian"
         android:visibility="gone"
         android:id="@+id/ll_dfu"
+        android:gravity="center"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/height_wrap_content">
     <TextView
-        android:layout_margin="10dp"
+       android:layout_marginLeft="@dimen/space_10"
+        android:layout_marginRight="@dimen/space_10"
         android:drawableRight="@mipmap/more"
         android:text="锁升级"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     </LinearLayout>
+
     <View
         android:visibility="gone"
         android:id="@+id/v_2"
         android:background="#ede8e8"
-        android:layout_margin="5dp"
+
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="@dimen/jiange_size"/>
 <Button
+
     android:onClick="butClick"
     android:textSize="16sp"
     android:textColor="#fff"
     android:background="#EE882D"
-    android:layout_marginTop="5dp"
+    android:layout_marginTop="10dp"
     android:layout_marginRight="10dp"
     android:layout_marginLeft="10dp"
     android:text="删除"

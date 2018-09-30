@@ -13,6 +13,7 @@
             android:id="@+id/tv_toolbar"
             android:layout_gravity="center"
             android:text="操作记录"
+            android:textColor="@color/black"
             android:textSize="@dimen/title_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -110,12 +111,13 @@
                     android:gravity="center"
                     android:layout_marginLeft="5dp"
                     android:id="@+id/open_lock_ic"
-                    android:text="IC卡开锁"
+                    android:text="卡片开锁"
                     android:layout_weight="1"
                     android:background="@drawable/search_shape"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
                 <TextView
+                    android:visibility="gone"
                     android:gravity="center"
                     android:layout_marginLeft="10dp"
                     android:id="@+id/open_lock_shengfenz"

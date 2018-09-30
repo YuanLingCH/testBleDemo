@@ -49,6 +49,8 @@ public class keyManagerDetialActivity extends BaseActivity {
     RelativeLayout rl_name,rl_time,rl_jilu;
     TextView key_lock,key_time,accept_name,send_name,send_time,key_time_end;
     Button but_key_delect;
+    private String lockId;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,7 +122,7 @@ public class keyManagerDetialActivity extends BaseActivity {
         parentId = getIntent().getStringExtra("parentId");
       userId1 = getIntent().getStringExtra("userId1");
        id = getIntent().getStringExtra("id");
-
+        lockId = getIntent().getStringExtra("lockid");
 
 
     }
@@ -235,7 +237,7 @@ public class keyManagerDetialActivity extends BaseActivity {
                 Intent intent=new Intent(MainApplication.getInstence(),childOpenClickRecord.class);
                 intent.putExtra("uid",userId1); //child 的
                 intent.putExtra("keyName",keyName);
-                intent.putExtra("lockId",id);
+                intent.putExtra("lockId",lockId);
                 startActivity(intent);
             }
         });

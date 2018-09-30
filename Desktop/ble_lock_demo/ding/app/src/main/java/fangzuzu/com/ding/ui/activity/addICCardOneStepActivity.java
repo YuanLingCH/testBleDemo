@@ -3,12 +3,14 @@ package fangzuzu.com.ding.ui.activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -102,7 +104,7 @@ String adminUserId;
             isKitKat = true;
         }
         setContentView(R.layout.add_ic_one_activity_layout);
-
+        EventBus.getDefault().register(this);
         getValue();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -116,7 +118,7 @@ initHide();
         setStatusBar();
         initlize();
 
-        EventBus.getDefault().register(this);
+
         mBleController = BleController.getInstance();
 
         //获取密钥
@@ -357,7 +359,8 @@ initHide();
                             @Override
                             public void run() {
                                 if (bledata.size()==0){
-
+                                    hideProgressDialog();
+                                    mBleController.closeBleConn();
                                     Toast.makeText(MainApplication.getInstence(), "没有扫描到锁，请重新扫描", Toast.LENGTH_SHORT).show();
                                 }else{
                                     if (strbiaozhi.equals("02")){
@@ -433,8 +436,12 @@ initHide();
 
             @Override
             public void onConnFailed() {
+
+                    Log.d("TAG","蓝牙状态码不对");
+                Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败", Toast.LENGTH_SHORT).show();
+                    mBleController.closeBleConn();
                     hideProgressDialog();
-                mBleController.closeBleConn();
+
 
             }
         });
@@ -617,7 +624,7 @@ initHide();
                 Log.d("TAG","解密addICCardOneStepActivity"+mBleController.bytesToHexString(decrypt) + "\r\n");
                 if (decrypt[0]==04&&decrypt[1]==02&&decrypt[2]==01&&decrypt[3]==00){
                     hideProgressDialog();
-                    Toast.makeText(addICCardOneStepActivity.this,"请刷卡",Toast.LENGTH_LONG).show();
+                    Toast.makeText(addICCardOneStepActivity.this,"请刷卡片",Toast.LENGTH_LONG).show();
                      //   dialog("请刷卡片");
                 } if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
                     System.arraycopy(decrypt,3,token2,0,token2.length);
@@ -639,35 +646,34 @@ initHide();
                     mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
                     String s = mBleController.bytesToHexString(idCard);
                     Log.d("TAG","截取结果s"+s);
-                    if (cunzai[0]==-16){
-                        dialog("用户已存在");
-                    }else {
+
                         dialog("添加卡片成功");
                         upData();
-                    }
-
                 }
+                    //合并身份证和ic卡
+                if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]!=02&&decrypt[3]!=03&&decrypt[3]!=05&&decrypt[15]==00){  //第2条数据回来
 
-                if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==04&&decrypt[15]==00){
-                    if (decrypt[4]==-16){
-                        dialog("用户已存在");
-                    }else {
-                        Log.d("TAG", "身份证租期走了" );
-                        System.arraycopy(decrypt, 2, pingjieLength, 0, pingjieLength.length); //设置租期
-                        changdu=new byte[pingjieLength[0]];
-                        System.arraycopy(decrypt, 3, changdu, 0, changdu.length); //设置
-                        setzuqiTime();//设置租期范围
-                    }
+                            Log.d("TAG", "身份证租期走了" );
+                            if (decrypt[4]==-16){
+                                dialog("用户已存在");
+                                mBleController.closeBleConn();  //断掉蓝牙
+                                mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                            }else {
+                                System.arraycopy(decrypt, 2, pingjieLength, 0, pingjieLength.length); //设置租期
+                                changdu=new byte[pingjieLength[0]];
+                                System.arraycopy(decrypt, 3, changdu, 0, changdu.length); //设置
+                                setzuqiTime();//设置租期范围
+                            }
+
+
 
                 }
                 if (decrypt[0]==04&&decrypt[3]==01){
                     Toast.makeText(addICCardOneStepActivity.this,"设置失败",Toast.LENGTH_LONG).show();
-
-
                 } if (decrypt[0]==04&&decrypt[3]==0xFF){
                     mBleController.closeBleConn();
                     Toast.makeText(addICCardOneStepActivity.this,"无权限操作",Toast.LENGTH_LONG).show();
-                }   if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==03){
+                }   if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==03){  //Ic卡  身份证  第一条数据
                     System.arraycopy(decrypt,0,bytezuqi,0,bytezuqi.length); //设置租期
                     System.arraycopy(decrypt, 4, cunzai, 0, cunzai.length);
                     setzuqiTime();//设置租期范围
@@ -685,6 +691,132 @@ initHide();
 
                     }
                     String s = mBleController.bytesToHexString(idCard);
+                    if (idCard[0]==-16){
+                        dialog("用户已存在");
+                        mBleController.closeBleConn();  //断掉蓝牙
+                        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                    }else if (decrypt[15]==0x00){
+                        setzuqiTime();    // ic卡
+                    }
+                } /*if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==04&&decrypt[15]==01) {
+                    Log.d("TAG", "身份证走了" );
+                    System.arraycopy(decrypt, 0, bytezuqi, 0, bytezuqi.length); //设置租期
+                    System.arraycopy(decrypt, 4, cunzai, 0, cunzai.length);
+                    for (int i = 0; i < cunzai.length; i++) {
+                        Log.d("TAG", "截取身份证" + cunzai[i]);
+                    }
+
+                    byte[] idLength = new byte[1];
+                    for (int i = 0; i < decrypt.length; i++) {
+                        idLength[0] = decrypt[2];
+
+                    }
+                    Log.d("TAG", "转换结果idLength[0]" + idLength[0]);
+                    idCard = new byte[idLength[0] - 1];   //定义长度
+                    System.arraycopy(decrypt, 4, idCard, 0, idCard.length);
+                    for (int i = 0; i < idCard.length; i++) {
+                        Log.d("TAG", "转换结果idicard" + idCard[i]);
+
+                    }
+
+
+                }*/  if (decrypt[0]==04&&decrypt[3]==0xFE){
+                    Toast.makeText(addICCardOneStepActivity.this,"操作超时，请重试",Toast.LENGTH_LONG).show();
+                    mBleController.closeBleConn();
+                }
+
+
+
+
+
+
+
+
+
+
+              //--------------------------------------------------------------------------------------
+
+                /*if (decrypt[0]==04&&decrypt[1]==02&&decrypt[2]==01&&decrypt[3]==00){
+                    hideProgressDialog();
+                    Toast.makeText(addICCardOneStepActivity.this,"请刷卡片",Toast.LENGTH_LONG).show();
+                    //   dialog("请刷卡片");
+                } if (decrypt[0]==02&&decrypt[1]==01&&decrypt[2]==04){
+                    System.arraycopy(decrypt,3,token2,0,token2.length);
+                    token3=new byte[4];
+                    byte[]token1=new byte[4];
+                    token1[0]=02;
+                    token1[1]=03;
+                    token1[2]=04;
+                    token1[3]=05;
+                    token3[0]= (byte) (token2[0]^token1[0]);
+                    token3[1]= (byte) (token2[1]^token1[1]);
+                    token3[2]= (byte) (token2[2]^token1[2]);
+                    token3[3]= (byte) (token2[3]^token1[3]);
+                }
+                if (decrypt[0]==04&&decrypt[1]==04&&decrypt[2]==01&&decrypt[3]==00){
+                    //设置成功  提交数据到服务器
+
+                    mBleController.closeBleConn();  //断掉蓝牙
+                    mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                    String s = mBleController.bytesToHexString(idCard);
+                    Log.d("TAG","截取结果s"+s);
+
+                    dialog("添加卡片成功");
+                    upData();
+                }
+
+                if (decrypt[0]==04&&decrypt[1]==03&&decrypt[15]==00){  //第2条数据回来
+                    if (bytestype[0]==04){
+                        Log.d("TAG", "身份证租期走了" );
+                        if (decrypt[4]==-16){
+                            dialog("用户已存在");
+                            mBleController.closeBleConn();  //断掉蓝牙
+                            mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                        }else {
+                            System.arraycopy(decrypt, 2, pingjieLength, 0, pingjieLength.length); //设置租期
+                            changdu=new byte[pingjieLength[0]];
+                            System.arraycopy(decrypt, 3, changdu, 0, changdu.length); //设置
+                            setzuqiTime();//设置租期范围
+                        }
+
+                    }
+
+
+
+
+                }
+                if (decrypt[0]==04&&decrypt[3]==01){
+                    Toast.makeText(addICCardOneStepActivity.this,"设置失败",Toast.LENGTH_LONG).show();
+
+
+                } if (decrypt[0]==04&&decrypt[3]==0xFF){
+                    mBleController.closeBleConn();
+                    Toast.makeText(addICCardOneStepActivity.this,"无权限操作",Toast.LENGTH_LONG).show();
+                }   if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==03){  //Ic卡
+                    System.arraycopy(decrypt,0,bytezuqi,0,bytezuqi.length); //设置租期
+                    System.arraycopy(decrypt, 4, cunzai, 0, cunzai.length);
+                    setzuqiTime();//设置租期范围
+                    //   Toast.makeText(addICCardOneStepActivity.this,"添加卡片成功",Toast.LENGTH_LONG).show();
+                    byte []idLength=new byte[1];
+                    for (int i = 0; i < decrypt.length; i++) {
+                        idLength[0]=decrypt[2];
+
+                    }
+                    Log.d("TAG","转换结果idLength[0]"+idLength[0]);
+                    idCard=new byte[idLength[0]-1];   //定义长度
+                    System.arraycopy(decrypt,4,idCard,0,idCard.length);
+                    for (int i = 0; i < idCard.length; i++) {
+                        Log.d("TAG","转换结果idicard"+idCard[i]);
+
+                    }
+                    String s = mBleController.bytesToHexString(idCard);
+                    if (idCard[0]==-16){
+                        dialog("用户已存在");
+                        mBleController.closeBleConn();  //断掉蓝牙
+                        mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
+                    }else {
+                        setzuqiTime();
+                    }
                 } if (decrypt[0]==04&&decrypt[1]==03&&decrypt[3]==04&&decrypt[15]==01) {
                     Log.d("TAG", "身份证走了" );
                     System.arraycopy(decrypt, 0, bytezuqi, 0, bytezuqi.length); //设置租期
@@ -692,9 +824,9 @@ initHide();
                     for (int i = 0; i < cunzai.length; i++) {
                         Log.d("TAG", "截取身份证" + cunzai[i]);
                     }
-                    if (cunzai[0]==-16){
+                  *//*  if (cunzai[0]==-16){
                         setzuqiTime();
-                    }
+                    }*//*
                     // setzuqiTime();//设置租期范围
                     //   Toast.makeText(addICCardOneStepActivity.this,"添加卡片成功",Toast.LENGTH_LONG).show();
                     byte[] idLength = new byte[1];
@@ -715,6 +847,20 @@ initHide();
                     Toast.makeText(addICCardOneStepActivity.this,"操作超时，请重试",Toast.LENGTH_LONG).show();
                     mBleController.closeBleConn();
                 }
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
             }
@@ -738,8 +884,15 @@ initHide();
                 .setView(viewDialog)
                 .create();
       // dialogD.setCanceledOnTouchOutside(false);
+        Window window=dialogD.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogD.show();
-
+        WindowManager.LayoutParams params = dialogD.getWindow().getAttributes();
+        WindowManager manager=getWindowManager();
+        Display defaultDisplay = manager.getDefaultDisplay();
+        android.view.WindowManager.LayoutParams p = dialogD.getWindow().getAttributes();  //获取对话框当前的参数值
+        p.width= (int) (defaultDisplay.getWidth()*0.85);
+        dialogD.getWindow().setAttributes(p);     //设置生效
         ll_duihuakuang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -914,8 +1067,6 @@ initHide();
         super.onDestroy();
         EventBus.getDefault().unregister(this);
         if (mBleController!=null){
-
-
         mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
         mBleController.closeBleConn();
 

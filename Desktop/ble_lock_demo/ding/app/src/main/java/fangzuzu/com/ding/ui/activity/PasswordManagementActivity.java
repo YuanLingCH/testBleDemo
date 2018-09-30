@@ -33,11 +33,6 @@ import com.hansion.h_ble.callback.ConnectCallback;
 import com.hansion.h_ble.callback.OnReceiverCallback;
 import com.hansion.h_ble.callback.OnWriteCallback;
 import com.hansion.h_ble.callback.ScanCallback;
-import com.hansion.h_ble.event.bleStateMessage;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,7 +120,7 @@ public class PasswordManagementActivity extends BaseActivity {
         getdata(1);  //默认加载第一页
         initlize();
 
-        EventBus.getDefault().register(this);
+
     }
 
     protected void setStatusBar() {
@@ -740,8 +735,14 @@ public class PasswordManagementActivity extends BaseActivity {
             @Override
             public void onConnFailed() {
 
-                      hideProgressDialog();
-                mBleController.closeBleConn();
+
+                    mBleController.closeBleConn();
+                    hideProgressDialog();
+                    Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败，确认手机在锁旁边", Toast.LENGTH_SHORT).show();
+
+
+
+
 
 
             }
@@ -983,13 +984,8 @@ public void  delectAllPasw(){
             mBleController.closeBleConn();
             mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
         }
-        EventBus.getDefault().unregister(this);
+
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void messageEventBus(bleStateMessage event){
-        hideProgressDialog();
-        Toast.makeText(MainApplication.getInstence(), "蓝牙连接失败,请重试", Toast.LENGTH_SHORT).show();
-        Log.d("TAG","状态刷新");
-    }
+
 }
