@@ -644,7 +644,7 @@ List addressDfu=new ArrayList();
                 .setForceDfu(true);
              // .setPacketsReceiptNotificationsEnabled(PacketsReceipt);
               //  .setPacketsReceiptNotificationsValue(numberOfPackets);
-        stater.setZip(R.raw.app_dfu);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
+        stater.setZip(R.raw.app_dfu_android);//这个方法可以传入raw文件夹中的文件、也可以是文件的string或者url路径。
         stater.start(this, DfuService.class);
     }
 

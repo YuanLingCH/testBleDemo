@@ -40,7 +40,7 @@
     </style>
     <!-- 防止欢迎页白屏或者黑屏，设置图片 -->
     <style name="SplashTheme" parent="@style/AppTheme">
-        <item name="android:windowBackground">@mipmap/log_bijia</item>
+        <item name="android:windowBackground">@mipmap/slash</item>
         <item name="android:windowFullscreen">true</item>
         <item name="windowNoTitle">true</item>
 

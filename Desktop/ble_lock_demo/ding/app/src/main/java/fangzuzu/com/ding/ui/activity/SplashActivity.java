@@ -2,6 +2,7 @@ package fangzuzu.com.ding.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Window;
@@ -51,9 +52,7 @@ public class SplashActivity extends BaseActivity {
 
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);// 设置全屏
         setContentView(R.layout.splash_activity_layout);
-/*   Intent intent=new Intent(MainApplication.getInstence(),LoginActivity.class);
-        startActivity(intent);
-        finish();*/
+
    initlize();
 
     }
@@ -63,17 +62,18 @@ public class SplashActivity extends BaseActivity {
 
 
         if (user!=null){
+            getUserLockList();
             String name = user.name;
             if (!StringUtils.isEmpty(name)){
                 Log.d("TAG","直接走了啊");
                 Intent intent=new Intent(SplashActivity.this, mqttService.class);
                 startService(intent);
 
-              getUserLockList();
+
 
             }
         }else {
-            Timer timer=new Timer();
+       /*     Timer timer=new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -81,7 +81,23 @@ public class SplashActivity extends BaseActivity {
                     startActivity(intent);
                     finish();
                 }
-            },1000);
+            },1000);*/
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    /**
+                     *要执行的操作
+                     */
+                    Intent intent=new Intent(MainApplication.getInstence(),LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }, 1000);//3秒后执行Runnable中的run方法
+
+
+
 
         }
     }

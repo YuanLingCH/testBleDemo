@@ -216,8 +216,8 @@ public class PasswordManagementActivity extends BaseActivity {
             Log.d("TAG","substring1"+substringdata);
             byte[] bytesData1 = StringUtils.toByteArray(substring); //转为字节数组
             byte[] bytesData2 = StringUtils.toByteArray(substringdata); //转为字节数组
+            Log.d("TAG","长度"+bytesData2.length);
             Timer timer=new Timer();
-            if (lockFlag.length()==18){
 
                 byte[]data81=new byte[16];
                 data81[0]=0x04;
@@ -253,18 +253,21 @@ public class PasswordManagementActivity extends BaseActivity {
                         });
 
 
-                byte[]data80=new byte[16];
-                data80[0]=0x04;
-                data80[1]=0x05;
-                data80[2]=0x02;
-                data80[3]=bytesData2[0];
-                data80[4]=bytesData2[1];
-                data80[5]=token3[0];
-                data80[6]=token3[1];
-                data80[7]=token3[2];
-                data80[8]=token3[3];
-                data80[9]=0x00;
-                final byte[] encrypt40 = jiamiandjiemi.Encrypt(data80,aesks);
+             byte[] flag=new byte[1];
+                flag[0]=0x00;
+                byte[]head=new byte[3];
+                head[0]=0x04;
+                head[1]=0x05;
+                head[2]= (byte) bytesData2.length;  //长度
+                byte[] byte_data = byteCunchu.unitByteArray(head, bytesData2);
+                byte[] byte_dataone = byteCunchu.unitByteArray(byte_data, token3);
+                byte[] byte_datatwo = byteCunchu.unitByteArray(byte_dataone, flag);
+                byte[]data16=new byte[16];
+                for (int i = 0; i < byte_datatwo.length; i++) {
+                    data16[i]= byte_datatwo[i];
+                }
+
+                final byte[] encrypt40 = jiamiandjiemi.Encrypt(data16,aesks);
                 Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt40) + "\r\n");
                 timer.schedule(new TimerTask() {
                     @Override
@@ -284,75 +287,6 @@ public class PasswordManagementActivity extends BaseActivity {
                 },1000);
 
 
-            }else if (lockFlag.length()==20){
-
-                byte[]data81=new byte[16];
-                data81[0]=0x04;
-                data81[1]=0x05;
-                data81[2]=0x08;
-                data81[3]=0x06;
-                data81[4]=bytesData1[0];
-                data81[5]=bytesData1[1];
-                data81[6]=bytesData1[2];
-                data81[7]=bytesData1[3];
-                data81[8]=bytesData1[4];
-                data81[9]=bytesData1[5];
-                data81[10]=bytesData1[6];
-                data81[11]=token3[0];
-                data81[12]=token3[1];
-                data81[13]=token3[2];
-                data81[14]=token3[3];
-                data81[15]=0x01;
-                final byte[] encrypt41 = jiamiandjiemi.Encrypt(data81,aesks);
-                Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt41) + "\r\n");
-
-
-                        mBleController.writeBuffer(encrypt41, new OnWriteCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d("TAG","发送成功");
-
-                            }
-                            @Override
-                            public void onFailed(int state) {
-
-                            }
-                        });
-
-
-                byte[]data80=new byte[16];
-                data80[0]=0x04;
-                data80[1]=0x05;
-                data80[2]=0x03;
-                data80[3]=bytesData2[0];
-                data80[4]=bytesData2[1];
-                data80[5]=bytesData2[2];
-                data80[6]=token3[0];
-                data80[7]=token3[1];
-                data80[8]=token3[2];
-                data80[9]=token3[3];
-                data80[10]=0x00;
-                final byte[] encrypt40 = jiamiandjiemi.Encrypt(data80,aesks);
-                Log.d("TAG","加密"+mBleController.bytesToHexString(encrypt40) + "\r\n");
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        mBleController.writeBuffer(encrypt40, new OnWriteCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d("TAG","发送成功");
-
-                            }
-                            @Override
-                            public void onFailed(int state) {
-
-                            }
-                        });
-                    }
-                },1000);
-
-
-            }
         }else { //小于等于16 不用分
             byte[]header=new byte[4];
             String length1 = bytes.length+1+"";

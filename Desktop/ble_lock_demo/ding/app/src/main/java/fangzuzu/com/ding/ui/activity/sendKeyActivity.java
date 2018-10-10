@@ -892,8 +892,9 @@ new Thread(){
                     null);
             while (phone.moveToNext()) {
                 usernumber = phone.getString(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                String s = usernumber.replaceAll("-", "");
                 // electfrg_inputaccount.setText(usernumber+" ("+username+")");
-                electfrg_inputaccount.setText(usernumber);
+                electfrg_inputaccount.setText(s);
                 Log.d("TAG", ",,," + usernumber);
             }
 

@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -110,6 +113,7 @@ public class HomeFragment extends BaseFragment {
    // private HorizontalProgressBarWithNumber mProgressBar;
     private static final int MSG_PROGRESS_UPDATE = 0x110;
     private static final int MSG_PROGRESS_STOP = 0x111;
+    private static final int MSG_PROGRESS_UI = 0x112;
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what){
@@ -119,6 +123,7 @@ public class HomeFragment extends BaseFragment {
                 mRoundProgressBar.setProgress(++roundProgress);
 
                     if (roundProgress >= 100) {
+
                         mRoundProgressBar.setProgress(0);
             }
                     mHandler.sendEmptyMessageDelayed(MSG_PROGRESS_UPDATE, 5);
@@ -128,6 +133,10 @@ public class HomeFragment extends BaseFragment {
                     flag=false;
                     mRoundProgressBar.setVisibility(View.GONE);
                     mHandler.removeMessages(MSG_PROGRESS_UPDATE);
+                    break;
+                case MSG_PROGRESS_UI:
+                    Drawable drawable = getActivity().getDrawable(R.mipmap.ding);
+                    tv_ding.setBackground(drawable);
                     break;
             }
 
@@ -214,6 +223,8 @@ public class HomeFragment extends BaseFragment {
                     .setView(view)
                     .create();
             dialog.setCanceledOnTouchOutside(false);
+            Window window=dialog.getWindow();
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.show();
 
      /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
@@ -223,6 +234,12 @@ public class HomeFragment extends BaseFragment {
 
                 }
             });*/
+            WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+            WindowManager manager=getActivity().getWindowManager();
+            Display defaultDisplay = manager.getDefaultDisplay();
+            android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+            p.width= (int) (defaultDisplay.getWidth()*0.85);
+            dialog.getWindow().setAttributes(p);     //设置生效
            tv_submit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -255,6 +272,8 @@ public class HomeFragment extends BaseFragment {
                             .setView(view)
                             .create();
                     dialog.setCanceledOnTouchOutside(false);
+                    Window window=dialog.getWindow();
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
 
      /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
@@ -264,6 +283,12 @@ public class HomeFragment extends BaseFragment {
 
                 }
             });*/
+                    WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                    WindowManager manager=getActivity().getWindowManager();
+                    Display defaultDisplay = manager.getDefaultDisplay();
+                    android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                    p.width= (int) (defaultDisplay.getWidth()*0.85);
+                    dialog.getWindow().setAttributes(p);     //设置生效
                     tv_submit.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -297,6 +322,9 @@ public class HomeFragment extends BaseFragment {
                     .setView(view)
                     .create();
             dialog.setCanceledOnTouchOutside(false);
+                Window window=dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
             dialog.show();
 
      /*       tv_cancle.setOnClickListener(new View.OnClickListener() {
@@ -306,6 +334,12 @@ public class HomeFragment extends BaseFragment {
 
                 }
             });*/
+                WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+                WindowManager manager=getActivity().getWindowManager();
+                Display defaultDisplay = manager.getDefaultDisplay();
+                android.view.WindowManager.LayoutParams p = dialog.getWindow().getAttributes();  //获取对话框当前的参数值
+                p.width= (int) (defaultDisplay.getWidth()*0.85);
+                dialog.getWindow().setAttributes(p);     //设置生效
           tv_submit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -591,7 +625,7 @@ public class HomeFragment extends BaseFragment {
         initPanDuanTime();
 
     //  mProgressBar = (HorizontalProgressBarWithNumber)root. findViewById(R.id.id_progressbar01);
-     mRoundProgressBar = (RoundProgressBarWidthNumber)root. findViewById(R.id.id_progress02);
+        mRoundProgressBar = (RoundProgressBarWidthNumber)root. findViewById(R.id.id_progress02);
 
     }
 
@@ -673,9 +707,10 @@ public class HomeFragment extends BaseFragment {
 
                     if (decrypt[0]==6&&decrypt[1]==1&&decrypt[2]==1&&decrypt[3]==0){
                         hideProgressDialog();
+
                         Log.d("TAG","开锁成功");
-
-
+                      Drawable drawable = getActivity().getDrawable(R.mipmap.ding_open);
+                        tv_ding.setBackground(drawable);
                         mediaPlayer01 = MediaPlayer.create(getActivity(), R.raw.sound_for_connect);
                         mediaPlayer01.start();
                         mHandler.sendEmptyMessage(MSG_PROGRESS_STOP);
@@ -707,6 +742,8 @@ public class HomeFragment extends BaseFragment {
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
+
+                                mHandler.sendEmptyMessage(MSG_PROGRESS_UI);
                                 alertDialog.dismiss();
                                 mediaPlayer01.release();
                               mBleController.unregistReciveListener(REQUESTKEY_SENDANDRECIVEACTIVITY);
@@ -1348,6 +1385,7 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                     if (!flag){
+                        flag=true;
                         int tv_width = tv_ding.getMeasuredWidth();
                         int tv_height = tv_ding.getMeasuredHeight();
                         Log.d("TAG","控件的宽度"+tv_width+"控件的高度"+tv_height);
@@ -1361,14 +1399,14 @@ public class HomeFragment extends BaseFragment {
                         mRoundProgressBar.setInterpolator(lir);
                         initReceiveData(); //接收数据
                         initConnectBle();  //连接蓝牙
-                        flag=true;
+                        mHandler.sendEmptyMessage(MSG_PROGRESS_UPDATE);
                     }
 
 
 
 
-                mHandler.sendEmptyMessage(MSG_PROGRESS_UPDATE);
 
+             //   flag=true;
 
             }
         });
